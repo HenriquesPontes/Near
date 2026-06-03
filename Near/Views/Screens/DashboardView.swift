@@ -18,9 +18,7 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ZCenterContainer {
-                VStack(spacing: 20) {
-                    
-                    // Alert History List
+                Group {
                     if historicalDevices.isEmpty {
                         VStack(spacing: 12) {
                             Spacer()
@@ -57,57 +55,59 @@ struct DashboardView: View {
                             }
                         }
                         .listStyle(.insetGrouped)
-                        .scrollDisabled(true)
                     }
-                    
-                    // Radar Status Bar
-                    if btManager.continueScanInBackground {
-                        HStack(spacing: 8) {
-                            Circle()
-                                .fill(Color.green)
-                                .frame(width: 8, height: 8)
-                                .shadow(color: Color.green.opacity(0.5), radius: 3)
-                            
-                            Text("Privacy Awareness Active")
-                                .font(.system(size: 15, weight: .bold, design: .rounded))
-                                .foregroundColor(.primary)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 4)
-                        .transition(.opacity)
-                    }
-                    
-                    // Buttons
-                    VStack(spacing: 12) {
-                        // SCAN Button (Blue)
-                        NavigationLink(destination: ScanRadarView()) {
-                            Text("Start Scanning")
-                                .font(.system(size: 16, weight: .bold, design: .rounded))
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 52)
-                                .background(DesignSystem.primaryBlue)
-                                .cornerRadius(26)
+                }
+                .safeAreaInset(edge: .bottom) {
+                    VStack(spacing: 16) {
+                        // Radar Status Bar
+                        if btManager.continueScanInBackground {
+                            HStack(spacing: 8) {
+                                Circle()
+                                    .fill(Color.green)
+                                    .frame(width: 8, height: 8)
+                                    .shadow(color: Color.green.opacity(0.5), radius: 3)
+                                
+                                Text("Privacy Awareness Active")
+                                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                                    .foregroundColor(.primary)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.vertical, 4)
                         }
                         
-                        // Setting Button (Light Gray / Dynamic Secondary Grouped Background)
-                        NavigationLink(destination: SettingsView()) {
-                            Text("Settings")
-                                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                .foregroundColor(.primary)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 52)
-                                .background(DesignSystem.itemBackground)
-                                .cornerRadius(26)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 26)
-                                        .stroke(DesignSystem.borderStroke, lineWidth: 1)
-                                )
+                        // Buttons
+                        VStack(spacing: 12) {
+                            // SCAN Button (Blue)
+                            NavigationLink(destination: ScanRadarView()) {
+                                Text("Start Scanning")
+                                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 52)
+                                    .background(DesignSystem.primaryBlue)
+                                    .cornerRadius(26)
+                            }
+                            
+                            // Setting Button (Light Gray / Dynamic Secondary Grouped Background)
+                            NavigationLink(destination: SettingsView()) {
+                                Text("Settings")
+                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                    .foregroundColor(.primary)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 52)
+                                    .background(DesignSystem.itemBackground)
+                                    .cornerRadius(26)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 26)
+                                            .stroke(DesignSystem.borderStroke, lineWidth: 1)
+                                    )
+                            }
                         }
                     }
                     .padding(.horizontal, 20)
+                    .padding(.top, 12)
                     .padding(.bottom, 16)
+                    .background(DesignSystem.backgroundColor)
                 }
             }
             .navigationTitle("Nearby")
