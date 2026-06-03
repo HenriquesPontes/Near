@@ -30,7 +30,7 @@ struct DashboardView: View {
                             Text("No smart glasses detected yet")
                                 .font(.system(size: 16, weight: .bold, design: .rounded))
                                 .foregroundColor(.primary.opacity(0.8))
-                            Text("Tap SCAN below to scan for nearby devices.")
+                            Text("Tap Start Scanning below to scan for nearby devices.")
                                 .font(.system(size: 13))
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)

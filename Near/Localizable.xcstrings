@@ -4606,6 +4606,12 @@
             "state": "translated",
             "value": "Iniciar Escaneamento"
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始扫描"
+          }
         }
       }
     },
@@ -5709,6 +5715,47 @@
           "stringUnit": {
             "state": "translated",
             "value": "在距离约 %@ 米处检测到。"
+          }
+        }
+      }
+    },
+    "Tap Start Scanning below to scan for nearby devices.": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tippe unten auf „Scan starten“, um nach Geräten in der Nähe zu suchen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Presiona „Iniciar escaneo“ abajo para buscar dispositivos cercanos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appuyez sur „Lancer le scan“ ci-dessous pour rechercher des appareils proches."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca „Avvia scansione“ in basso per cercare i dispositivi vicini."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toque em „Iniciar Escaneamento“ abaixo para buscar dispositivos próximos."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点击下方的“开始扫描”以查找附近的设备。"
           }
         }
       }
