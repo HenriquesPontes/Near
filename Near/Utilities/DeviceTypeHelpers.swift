@@ -14,9 +14,9 @@ import SwiftUI
 /// Returns the appropriate SF Symbol name for a device type string.
 func iconForType(_ type: String) -> String {
     switch type {
-    case "rayban_meta": return "eye.fill"
-    case "vision_pro": return "arkit"
-    case "snap_spectacles": return "camera.filters"
+    case "rayban_meta": return "eyeglasses"
+    case "vision_pro": return "apple.logo"
+    case "snap_spectacles": return "snapchat_icon"
     default: return "questionmark.circle.fill"
     }
 }
@@ -38,5 +38,26 @@ func displayNameForType(_ type: String) -> String {
     case "vision_pro": return "Apple Vision Pro"
     case "snap_spectacles": return "Snapchat Spectacles"
     default: return "Unknown Device"
+    }
+}
+
+/// A view that renders either an SF Symbol or a custom asset image based on the icon name.
+struct DeviceIconView: View {
+    let icon: String
+    let color: Color
+    
+    var body: some View {
+        if icon == "snapchat_icon" {
+            Image("snapchat_icon")
+                .resizable()
+                .renderingMode(.template)
+                .aspectRatio(contentMode: .fit)
+                .foregroundColor(color)
+        } else {
+            Image(systemName: icon)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .foregroundColor(color)
+        }
     }
 }

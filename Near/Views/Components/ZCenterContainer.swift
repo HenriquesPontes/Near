@@ -16,7 +16,7 @@ struct ZCenterContainer<Content: View>: View {
     
     var body: some View {
         ZStack {
-            DesignSystem.backgroundGradient
+            DesignSystem.backgroundColor
                 .ignoresSafeArea()
             
             content

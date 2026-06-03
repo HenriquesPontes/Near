@@ -11,6 +11,18 @@ import SwiftData
 @main
 struct NearApp: App {
     @AppStorage("selectedLanguage") var selectedLanguage: String = Bundle.main.preferredLocalizations.first ?? "en"
+    @AppStorage("appAppearance") var appAppearance: String = "system"
+
+    private var preferredColorScheme: ColorScheme? {
+        switch appAppearance {
+        case "light":
+            return .light
+        case "dark":
+            return .dark
+        default:
+            return nil
+        }
+    }
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -29,6 +41,7 @@ struct NearApp: App {
         WindowGroup {
             ContentView()
                 .environment(\.locale, Locale(identifier: selectedLanguage))
+                .preferredColorScheme(preferredColorScheme)
         }
         .modelContainer(sharedModelContainer)
     }

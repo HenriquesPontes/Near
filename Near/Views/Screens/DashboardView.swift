@@ -13,10 +13,7 @@ struct DashboardView: View {
     @Query(sort: \DetectedDevice.timestamp, order: .reverse) private var historicalDevices: [DetectedDevice]
     @ObservedObject var btManager = BluetoothManager.shared
     
-    @State private var showingScan = false
-    @State private var showingSettings = false
-    @State private var showingInfo = false
-    @State private var selectedDevice: DetectedDevice? = nil
+
     
     var body: some View {
         NavigationStack {
@@ -29,110 +26,68 @@ struct DashboardView: View {
                             Spacer()
                             Image(systemName: "shield.slash")
                                 .font(.system(size: 48))
-                                .foregroundColor(.gray.opacity(0.6))
+                                .foregroundColor(.secondary.opacity(0.6))
                             Text("No smart glasses detected yet")
                                 .font(.system(size: 16, weight: .bold, design: .rounded))
-                                .foregroundColor(.white.opacity(0.8))
+                                .foregroundColor(.primary.opacity(0.8))
                             Text("Tap SCAN below to scan for nearby devices.")
                                 .font(.system(size: 13))
-                                .foregroundColor(.gray)
+                                .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal, 40)
                             Spacer()
                         }
                     } else {
                         List {
-                            ForEach(historicalDevices.prefix(15)) { device in
-                                Button {
-                                    selectedDevice = device
-                                } label: {
-                                    HStack(spacing: 16) {
-                                        // Device Type Icon
-                                        Image(systemName: iconForType(device.type))
-                                            .font(.system(size: 18))
-                                            .foregroundColor(.white)
-                                            .frame(width: 38, height: 38)
-                                            .background(colorForType(device.type).opacity(0.8))
-                                            .cornerRadius(10)
-                                        
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            HStack(spacing: 6) {
-                                                Text(device.name)
-                                                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                                                    .foregroundColor(.white)
-
-                                            }
-                                            
-                                            Text("Detected \(device.timestamp, format: .dateTime.hour().minute().second())")
-                                                .font(.system(size: 12))
-                                                .foregroundColor(.gray)
-                                        }
-                                        
-                                        Spacer()
-                                        
-                                        Text(device.threatLevel)
-                                            .font(.system(size: 11, weight: .bold, design: .rounded))
-                                            .foregroundColor(device.threatLevel == "High" ? .red : .yellow)
-                                            .padding(.horizontal, 8)
-                                            .padding(.vertical, 4)
-                                            .background(
-                                                Capsule()
-                                                    .fill((device.threatLevel == "High" ? Color.red : Color.yellow).opacity(0.15))
-                                            )
-                                        
-                                        // Star Toggle (Favorite)
-                                        Button {
-                                            device.isStarred.toggle()
-                                            try? modelContext.save()
-                                        } label: {
-                                            Image(systemName: device.isStarred ? "star.fill" : "star")
-                                                .font(.system(size: 16))
-                                                .foregroundColor(device.isStarred ? .yellow : .gray)
-                                        }
-                                        .buttonStyle(.plain)
-                                        
-                                        Image(systemName: "chevron.right")
-                                            .font(.system(size: 13, weight: .semibold))
-                                            .foregroundColor(.gray.opacity(0.7))
-                                    }
-                                    .padding(.vertical, 8)
+                            ForEach(historicalDevices.prefix(10)) { device in
+                                NavigationLink(destination: DeviceDetailView(device: device)) {
+                                    Text(device.name)
+                                        .font(.system(size: 16, weight: .regular, design: .rounded))
+                                        .foregroundColor(.primary)
                                 }
-                                .listRowBackground(DesignSystem.cardBackground)
-                                .listRowSeparatorTint(DesignSystem.borderStroke)
                             }
                             .onDelete(perform: deleteDevices)
+                            
+                            if historicalDevices.count > 10 {
+                                NavigationLink(destination: AllResultsView()) {
+                                    Text("View All Results")
+                                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                        .foregroundColor(.blue)
+                                }
+                            }
                         }
-                        .scrollContentBackground(.hidden)
-                        .listStyle(.plain)
+                        .listStyle(.insetGrouped)
                     }
                     
-                    // Mockup Summary Text Box
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Privacy Awareness Active")
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                            .foregroundColor(.white)
-                        
-                        Text("Your device is monitoring BLE radio emissions from wearable camera systems nearby.")
-                            .font(.system(size: 13))
-                            .foregroundColor(.gray)
-                            .lineLimit(2)
+                    // Radar Status Bar
+                    if btManager.continueScanInBackground {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack(spacing: 8) {
+                                Circle()
+                                    .fill(btManager.detectedDevices.isEmpty ? Color.green : Color.red)
+                                    .frame(width: 8, height: 8)
+                                    .shadow(color: (btManager.detectedDevices.isEmpty ? Color.green : Color.red).opacity(0.5), radius: 3)
+                                
+                                Text(btManager.detectedDevices.isEmpty ? "Privacy Awareness Active" : "Smart Wearable Detected! ⚠️")
+                                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                                    .foregroundColor(btManager.detectedDevices.isEmpty ? .primary : .red)
+                            }
+                            
+                            Text(btManager.detectedDevices.isEmpty ? "Your device is monitoring BLE radio emissions from wearable camera systems nearby." : "An active emission has been detected. Check the radar view or list below.")
+                                .font(.system(size: 13, design: .rounded))
+                                .foregroundColor(.secondary)
+                                .lineLimit(2)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 4)
+                        .transition(.opacity)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(18)
-                    .background(DesignSystem.cardBackground)
-                    .cornerRadius(16)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(DesignSystem.borderStroke, lineWidth: 1)
-                    )
-                    .padding(.horizontal, 20)
                     
                     // Buttons
                     VStack(spacing: 12) {
                         // SCAN Button (Blue)
-                        Button {
-                            showingScan = true
-                        } label: {
+                        NavigationLink(destination: ScanRadarView()) {
                             Text("Start Scanning")
                                 .font(.system(size: 16, weight: .bold, design: .rounded))
                                 .foregroundColor(.white)
@@ -142,13 +97,11 @@ struct DashboardView: View {
                                 .cornerRadius(26)
                         }
                         
-                        // Setting Button (Light Gray)
-                        Button {
-                            showingSettings = true
-                        } label: {
+                        // Setting Button (Light Gray / Dynamic Secondary Grouped Background)
+                        NavigationLink(destination: SettingsView()) {
                             Text("Settings")
                                 .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                .foregroundColor(.white)
+                                .foregroundColor(.primary)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 52)
                                 .background(DesignSystem.itemBackground)
@@ -163,44 +116,28 @@ struct DashboardView: View {
                     .padding(.bottom, 16)
                 }
             }
-            .navigationTitle("Near")
+            .navigationTitle("Nearby")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                // Top Left Info Button
+                // Top Left Edit Button
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        showingInfo = true
-                    } label: {
-                        Image(systemName: "info.circle")
-                            .foregroundColor(.white)
-                            .font(.system(size: 17))
-                    }
+                    EditButton()
                 }
                 
-                // Top Right Background Scanning Toggle Button
+                // Top Right Radar Toggle Button
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        btManager.continueScanInBackground.toggle()
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.6, blendDuration: 0)) {
+                            btManager.continueScanInBackground.toggle()
+                        }
                     } label: {
-                        Image(systemName: btManager.continueScanInBackground ? "bolt.shield.fill" : "bolt.shield")
-                            .foregroundColor(btManager.continueScanInBackground ? .green : .white)
+                        Image(systemName: btManager.continueScanInBackground ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash")
+                            .foregroundColor(btManager.continueScanInBackground ? (btManager.detectedDevices.isEmpty ? .green : .red) : .gray)
                             .font(.system(size: 17))
                     }
                 }
             }
-            // Navigation Links / Sheets
-            .fullScreenCover(isPresented: $showingScan) {
-                ScanRadarView()
-            }
-            .sheet(isPresented: $showingSettings) {
-                SettingsView()
-            }
-            .sheet(isPresented: $showingInfo) {
-                PrivacyInfoView()
-            }
-            .sheet(item: $selectedDevice) { device in
-                DeviceDetailView(device: device)
-            }
+
             // Listen to BLE Manager alerts
             .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("NewDeviceDetectedHistory"))) { notification in
                 if let btDevice = notification.object as? BluetoothDevice {
@@ -251,79 +188,65 @@ struct DashboardView: View {
             try? modelContext.save()
         }
     }
-    }
+}
 
-// Info / About Screen
-struct PrivacyInfoView: View {
-    @Environment(\.dismiss) private var dismiss
+struct AllResultsView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \DetectedDevice.timestamp, order: .reverse) private var historicalDevices: [DetectedDevice]
+    @State private var showingClearConfirmation = false
     
     var body: some View {
-        NavigationStack {
-            ZCenterContainer {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
-                        Text("Near App Privacy Awareness")
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
-                            .foregroundColor(.white)
-                            .padding(.top, 10)
-                        
-                        Text("Near is a utility designed to detect and log radio emissions from nearby smart glasses and optical wearables.")
-                            .font(.system(size: 14))
-                            .foregroundColor(.gray)
-                            .lineSpacing(4)
-                        
-                        Text("Why is this needed?")
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                            .foregroundColor(.white)
-                            .padding(.top, 10)
-                        
-                        Text("Camera-integrated smart glasses make it incredibly easy to record audio and video discreetly in public spaces, gyms, and private environments. Near continuously monitors BLE advertisements to identify these devices before they capture your image.")
-                            .font(.system(size: 14))
-                            .foregroundColor(.gray)
-                            .lineSpacing(4)
-                        
-                        Text("How to respond if alerted:")
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                            .foregroundColor(.white)
-                            .padding(.top, 10)
-                        
-                        VStack(alignment: .leading, spacing: 12) {
-                            bulletPoint(number: "1", text: "Visually scan for the device. Look for someone wearing glasses with thicker frames or a tiny lens on the corner hinges.")
-                            bulletPoint(number: "2", text: "Look for recording indicators. Devices like Ray-Ban Meta glasses have a capture LED light on the frame. If it's solid white, it is actively recording or streaming.")
-                            bulletPoint(number: "3", text: "Politely ask the wearer to cover the camera or remove their glasses if in a private space where recording is prohibited.")
-                        }
-                        
-                        Spacer()
-                    }
-                    .padding(24)
+        List {
+            ForEach(historicalDevices) { device in
+                NavigationLink(destination: DeviceDetailView(device: device)) {
+                    Text(device.name)
+                        .font(.system(size: 16, weight: .regular, design: .rounded))
+                        .foregroundColor(.primary)
                 }
             }
-            .navigationTitle("About Near")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Close") {
-                        dismiss()
+            .onDelete(perform: deleteDevices)
+        }
+        .listStyle(.insetGrouped)
+        .navigationTitle("All Detections")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                HStack(spacing: 16) {
+                    if !historicalDevices.isEmpty {
+                        Button {
+                            showingClearConfirmation = true
+                        } label: {
+                            Text("Clear All")
+                                .foregroundColor(.red)
+                        }
                     }
-                    .foregroundColor(.blue)
+                    EditButton()
                 }
             }
         }
+        .confirmationDialog("Are you sure you want to delete all detections?", isPresented: $showingClearConfirmation, titleVisibility: .visible) {
+            Button("Delete All", role: .destructive) {
+                clearAll()
+            }
+            Button("Cancel", role: .cancel) {}
+        }
     }
     
-    private func bulletPoint(number: String, text: LocalizedStringKey) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Text(number)
-                .font(.system(size: 12, weight: .black))
-                .foregroundColor(.white)
-                .frame(width: 24, height: 24)
-                .background(Color.blue)
-                .clipShape(Circle())
-            
-            Text(text)
-                .font(.system(size: 13))
-                .foregroundColor(.gray)
-                .lineSpacing(2)
+    private func clearAll() {
+        withAnimation {
+            for device in historicalDevices {
+                modelContext.delete(device)
+            }
+            try? modelContext.save()
+        }
+    }
+    
+    private func deleteDevices(offsets: IndexSet) {
+        withAnimation {
+            for index in offsets {
+                modelContext.delete(historicalDevices[index])
+            }
+            try? modelContext.save()
         }
     }
 }

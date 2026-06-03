@@ -58,8 +58,28 @@ class BluetoothManager: NSObject, ObservableObject {
     @AppStorage("alertOnNewDevices") var alertOnNewDevices: Bool = true
     @AppStorage("rssiThreshold") var rssiThreshold: Int = -75
     @AppStorage("autoStartScanning") var autoStartScanning: Bool = false
-    @AppStorage("continueScanInBackground") var continueScanInBackground: Bool = true
-    private var wasScanningBeforeBackground: Bool = false
+    @AppStorage("continueScanInBackground") var continueScanInBackground: Bool = true {
+        willSet {
+            objectWillChange.send()
+        }
+        didSet {
+            if continueScanInBackground {
+                if !isScanning {
+                    startScanning()
+                }
+            } else {
+                if isScanning {
+                    stopScanning()
+                }
+            }
+        }
+    }
+    @AppStorage("appAppearance") var appAppearance: String = "system"
+    @AppStorage("notificationCooldown") var notificationCooldown: Double = 10000.0 {
+        willSet {
+            objectWillChange.send()
+        }
+    }
     
     // enabledAlertTypes persisted as JSON string since @AppStorage doesn't support Set<String>
     var enabledAlertTypes: Set<String> {
@@ -116,6 +136,7 @@ class BluetoothManager: NSObject, ObservableObject {
     
     private var centralManager: CBCentralManager?
     private var lastNotifiedTimes: [String: Date] = [:]
+    private var cleanupTimer: Timer?
     
     override init() {
         super.init()
@@ -127,39 +148,76 @@ class BluetoothManager: NSObject, ObservableObject {
         NotificationCenter.default.addObserver(self, selector: #selector(handleDidEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         #endif
+        
+        // Auto-start scanning on launch if scan toggle is enabled
+        if continueScanInBackground {
+            isScanning = true
+            startCleanupTimer()
+        }
+    }
+    
+    deinit {
+        cleanupTimer?.invalidate()
     }
     
     #if os(iOS)
     @objc private func handleDidEnterBackground() {
-        if !continueScanInBackground {
-            if isScanning {
-                wasScanningBeforeBackground = true
-                stopScanning()
-            } else {
-                wasScanningBeforeBackground = false
-            }
+        if continueScanInBackground && isScanning {
+            // Transition scanning to background-compatible mode using specific service UUIDs
+            centralManager?.stopScan()
+            let backgroundServices = [
+                CBUUID(string: "180F"), // Battery Service
+                CBUUID(string: "180A"), // Device Information
+                CBUUID(string: "FEAA")  // Eddystone
+            ]
+            centralManager?.scanForPeripherals(withServices: backgroundServices, options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
         }
     }
     
     @objc private func handleWillEnterForeground() {
-        if !continueScanInBackground && wasScanningBeforeBackground {
-            startScanning()
+        if continueScanInBackground && isScanning {
+            // Restore full generic scanning in foreground
+            centralManager?.stopScan()
+            centralManager?.scanForPeripherals(withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
         }
     }
     #endif
     
     func startScanning() {
+        if !continueScanInBackground {
+            continueScanInBackground = true
+        }
         guard !isScanning else { return }
         isScanning = true
+        startCleanupTimer()
         
         if centralManager?.state == .poweredOn {
+            #if os(iOS)
+            if UIApplication.shared.applicationState == .background {
+                let backgroundServices = [
+                    CBUUID(string: "180F"), // Battery Service
+                    CBUUID(string: "180A"), // Device Information
+                    CBUUID(string: "FEAA")  // Eddystone
+                ]
+                centralManager?.scanForPeripherals(withServices: backgroundServices, options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
+                return
+            }
+            #endif
             centralManager?.scanForPeripherals(withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
         }
     }
     
     func stopScanning() {
+        if continueScanInBackground {
+            continueScanInBackground = false
+        }
+        guard isScanning else { return }
         isScanning = false
+        stopCleanupTimer()
         centralManager?.stopScan()
+        DispatchQueue.main.async {
+            self.detectedDevices = []
+        }
     }
     
     func requestNotificationPermission() {
@@ -173,12 +231,13 @@ class BluetoothManager: NSObject, ObservableObject {
     }
     
     private func checkAndTriggerAlert(for device: BluetoothDevice) {
-        // Limit alerts: only alert if RSSI exceeds threshold and not notified recently (2 mins)
+        // Limit alerts: only alert if RSSI exceeds threshold and not notified recently (cooldown)
         guard alertOnNewDevices else { return }
         guard device.rssi >= rssiThreshold else { return }
         
         let now = Date()
-        if let lastNotified = lastNotifiedTimes[device.deviceId], now.timeIntervalSince(lastNotified) < 120 {
+        let cooldownSeconds = notificationCooldown / 1000.0
+        if let lastNotified = lastNotifiedTimes[device.deviceId], now.timeIntervalSince(lastNotified) < cooldownSeconds {
             return // Alert rate limit
         }
         
@@ -228,6 +287,33 @@ class BluetoothManager: NSObject, ObservableObject {
     private func saveToSwiftDataHistory(device: BluetoothDevice) {
         NotificationCenter.default.post(name: NSNotification.Name("NewDeviceDetectedHistory"), object: device)
     }
+    
+    // MARK: - Active Device Cleanup (Radar Calming)
+    
+    func startCleanupTimer() {
+        DispatchQueue.main.async { [weak self] in
+            self?.cleanupTimer?.invalidate()
+            self?.cleanupTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+                self?.cleanupExpiredDevices()
+            }
+        }
+    }
+    
+    func stopCleanupTimer() {
+        DispatchQueue.main.async { [weak self] in
+            self?.cleanupTimer?.invalidate()
+            self?.cleanupTimer = nil
+        }
+    }
+    
+    private func cleanupExpiredDevices() {
+        let now = Date()
+        let cooldownSeconds = notificationCooldown / 1000.0
+        let filtered = detectedDevices.filter { now.timeIntervalSince($0.lastSeen) <= cooldownSeconds }
+        if filtered.count != detectedDevices.count {
+            self.detectedDevices = filtered
+        }
+    }
 }
 
 // MARK: - CBCentralManagerDelegate
@@ -235,6 +321,17 @@ extension BluetoothManager: CBCentralManagerDelegate {
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         if central.state == .poweredOn {
             if isScanning {
+                #if os(iOS)
+                if UIApplication.shared.applicationState == .background {
+                    let backgroundServices = [
+                        CBUUID(string: "180F"), // Battery Service
+                        CBUUID(string: "180A"), // Device Information
+                        CBUUID(string: "FEAA")  // Eddystone
+                    ]
+                    centralManager?.scanForPeripherals(withServices: backgroundServices, options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
+                    return
+                }
+                #endif
                 centralManager?.scanForPeripherals(withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
             }
         } else {

@@ -22,34 +22,6 @@ struct ScanRadarView: View {
         ZCenterContainer {
             VStack(spacing: 16) {
                 
-                // HEADER BAR
-                HStack {
-                    Button {
-                        btManager.stopScanning()
-                        dismiss()
-                    } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: "chevron.left")
-                            Text("Near")
-                        }
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                        .foregroundColor(.white)
-                    }
-                    Spacer()
-                    Text("Scan")
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
-                    Spacer()
-                    // Empty space for balance
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left").opacity(0)
-                        Text("Near").opacity(0)
-                    }
-                    .font(.system(size: 16))
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 16)
-                
                 // RADAR SCREEN
                 GeometryReader { geo in
                     let radarSize = max(geo.size.width - 40, 0)
@@ -148,7 +120,7 @@ struct ScanRadarView: View {
                         }
                         Text("\(btManager.detectedDevices.count) smart wearable emissions in range")
                             .font(.system(size: 14, weight: .medium, design: .rounded))
-                            .foregroundColor(.gray)
+                            .foregroundColor(.secondary)
                     } else {
                         HStack(spacing: 8) {
                             Circle()
@@ -160,7 +132,7 @@ struct ScanRadarView: View {
                         }
                         Text("Tap Play to resume privacy detection scan")
                             .font(.system(size: 14, weight: .medium, design: .rounded))
-                            .foregroundColor(.gray)
+                            .foregroundColor(.secondary)
                     }
                 }
                 .padding(.top, 8)
@@ -174,9 +146,8 @@ struct ScanRadarView: View {
                             } label: {
                                 VStack(alignment: .leading, spacing: 6) {
                                     HStack {
-                                        Image(systemName: iconForType(device.type))
-                                            .foregroundColor(.white)
-                                            .font(.system(size: 14))
+                                        DeviceIconView(icon: iconForType(device.type), color: .white)
+                                            .frame(width: 14, height: 14)
                                             .padding(6)
                                             .background(colorForType(device.type).opacity(0.8))
                                             .cornerRadius(6)
@@ -190,12 +161,12 @@ struct ScanRadarView: View {
                                     
                                     Text(device.name)
                                         .font(.system(size: 14, weight: .bold, design: .rounded))
-                                        .foregroundColor(.white)
+                                        .foregroundColor(.primary)
                                         .lineLimit(1)
                                     
                                     Text("RSSI: \(device.rssi) dBm")
                                         .font(.system(size: 11))
-                                        .foregroundColor(.gray)
+                                        .foregroundColor(.secondary)
                                 }
                                 .padding(12)
                                 .frame(width: 140)
@@ -239,10 +210,15 @@ struct ScanRadarView: View {
                 .padding(.bottom, 24)
             }
         }
+        .navigationTitle("Scan")
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             btManager.startScanning()
         }
-        .sheet(item: $selectedDevice) { device in
+        .onDisappear {
+            btManager.stopScanning()
+        }
+        .navigationDestination(item: $selectedDevice) { device in
             // Map the transient BluetoothDevice to a temporary DetectedDevice for the details view
             let tempDevice = DetectedDevice(
                 deviceId: device.deviceId,

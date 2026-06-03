@@ -14,7 +14,184 @@ struct SettingsView: View {
     @Query(sort: \DetectedDevice.timestamp, order: .reverse) private var historicalDevices: [DetectedDevice]
     @AppStorage("selectedLanguage") var selectedLanguage: String = Bundle.main.preferredLocalizations.first ?? "en"
     
-    // Sensitivity UI representation
+    var body: some View {
+        List {
+            // SECTION 1: GENERAL
+            Section(header: Text("General")) {
+                // Notifications Row
+                HStack(spacing: 16) {
+                    Image(systemName: "bell.fill")
+                        .foregroundColor(.blue)
+                        .font(.system(size: 18))
+                        .frame(width: 24, height: 24)
+                    Text("Notifications")
+                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                    Spacer()
+                    Toggle("", isOn: $btManager.alertOnNewDevices)
+                        .toggleStyle(SwitchToggleStyle(tint: .green))
+                        .labelsHidden()
+                }
+                
+                // Appearance Row
+                HStack(spacing: 16) {
+                    Image(systemName: "paintpalette.fill")
+                        .foregroundColor(.blue)
+                        .font(.system(size: 18))
+                        .frame(width: 24, height: 24)
+                    Text("Appearance")
+                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                    Spacer()
+                    Picker("", selection: $btManager.appAppearance) {
+                        Text("System").tag("system")
+                        Text("Light").tag("light")
+                        Text("Dark").tag("dark")
+                    }
+                    .pickerStyle(.menu)
+                    .labelsHidden()
+                }
+                
+                // Language Row
+                HStack(spacing: 16) {
+                    Image(systemName: "globe")
+                        .foregroundColor(.blue)
+                        .font(.system(size: 18))
+                        .frame(width: 24, height: 24)
+                    Text("Language")
+                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                    Spacer()
+                    Picker("", selection: $selectedLanguage) {
+                        Text("English").tag("en")
+                        Text("Deutsch").tag("de")
+                        Text("Français").tag("fr")
+                        Text("Español").tag("es")
+                        Text("Italiano").tag("it")
+                        Text("Português").tag("pt")
+                    }
+                    .pickerStyle(.menu)
+                    .labelsHidden()
+                }
+                
+                // Privacy Row
+                NavigationLink {
+                    PrivacySettingsView(historicalDevices: historicalDevices)
+                } label: {
+                    HStack(spacing: 16) {
+                        Image(systemName: "hand.raised.fill")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                            .frame(width: 24, height: 24)
+                        Text("Privacy")
+                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                    }
+                }
+            }
+            
+            // SECTION 2: SCANNING
+            Section(header: Text("Scanning")) {
+                // Scan Range Row
+                NavigationLink {
+                    ScanRangeSettingsView()
+                } label: {
+                    HStack(spacing: 16) {
+                        Image(systemName: "scope")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                            .frame(width: 24, height: 24)
+                        Text("Scan Preference")
+                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                    }
+                }
+                
+                // Device Filters Row
+                NavigationLink {
+                    DeviceFiltersSettingsView()
+                } label: {
+                    HStack(spacing: 16) {
+                        Image(systemName: "slider.horizontal.3")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                            .frame(width: 24, height: 24)
+                        Text("Device Filters")
+                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                    }
+                }
+            }
+            
+            // SECTION 3: ABOUT
+            Section(header: Text("About")) {
+                // About Near Row
+                NavigationLink {
+                    PrivacyInfoView()
+                } label: {
+                    HStack(spacing: 16) {
+                        Image(systemName: "info.circle.fill")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                            .frame(width: 24, height: 24)
+                        Text("About Near")
+                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                    }
+                }
+                
+                // Version Row
+                HStack(spacing: 16) {
+                    Image(systemName: "number")
+                        .foregroundColor(.blue)
+                        .font(.system(size: 18))
+                        .frame(width: 24, height: 24)
+                    Text("Version")
+                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                    Spacer()
+                    Text("1.0.0")
+                        .font(.system(size: 15, design: .rounded))
+                        .foregroundColor(.secondary)
+                }
+                
+                // Build Row
+                HStack(spacing: 16) {
+                    Image(systemName: "hammer.fill")
+                        .foregroundColor(.blue)
+                        .font(.system(size: 18))
+                        .frame(width: 24, height: 24)
+                    Text("Build")
+                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                    Spacer()
+                    Text("1")
+                        .font(.system(size: 15, design: .rounded))
+                        .foregroundColor(.secondary)
+                }
+                
+                // Licences Row
+                NavigationLink {
+                    LicensesSettingsView()
+                } label: {
+                    HStack(spacing: 16) {
+                        Image(systemName: "doc.text.fill")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                            .frame(width: 24, height: 24)
+                        Text("Licences")
+                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                    }
+                }
+            }
+        }
+        .listStyle(.insetGrouped)
+        .navigationTitle("Settings")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// MARK: - Reusable Row Styling Components
+
+
+
+// MARK: - Sub-Screens
+
+struct ScanRangeSettingsView: View {
+    @ObservedObject var btManager = BluetoothManager.shared
+    @Environment(\.dismiss) private var dismiss
+    
     private var sensitivityLabel: LocalizedStringKey {
         switch btManager.rssiThreshold {
         case -60...(-40):
@@ -27,324 +204,154 @@ struct SettingsView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            ZCenterContainer {
-                ScrollView {
-                    VStack(spacing: 24) {
-                        
-                        // SECTION 1: Privacy Shields Alert settings
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("SHIELD CONTROLS")
-                                .font(.system(size: 13, weight: .bold, design: .rounded))
-                                .foregroundColor(.gray)
-                                .padding(.horizontal, 4)
-                            
-                            VStack(spacing: 0) {
-                                ToggleRow(
-                                    title: "Alert on New Devices",
-                                    subtitle: "Notify when smart glasses enter your zone",
-                                    icon: "bell.badge.fill",
-                                    color: .blue,
-                                    isOn: $btManager.alertOnNewDevices
-                                )
-                                
-                                Divider().background(Color.white.opacity(0.1))
-                                
-                                VStack(alignment: .leading, spacing: 8) {
-                                    HStack {
-                                        Label {
-                                            Text("Detection Sensitivity")
-                                                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                                .foregroundColor(.white)
-                                        } icon: {
-                                            Image(systemName: "waveform.path.ecg")
-                                                .foregroundColor(.blue)
-                                        }
-                                        Spacer()
-                                        Text(sensitivityLabel)
-                                            .font(.system(size: 12, weight: .medium, design: .rounded))
-                                            .foregroundColor(.blue)
-                                    }
-                                    
-                                    Slider(value: Binding(
-                                        get: { Double(btManager.rssiThreshold) },
-                                        set: { btManager.rssiThreshold = Int($0) }
-                                    ), in: -95...(-55), step: 5)
-                                    .accentColor(.blue)
-                                    
-                                    Text("Higher sensitivity alerts you even for weak/distant signals, but increases potential false triggers.")
-                                        .font(.system(size: 11, weight: .regular, design: .rounded))
-                                        .foregroundColor(.gray)
-                                }
-                                .padding(16)
-                            }
-                            .background(DesignSystem.cardBackground)
-                            .cornerRadius(16)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(DesignSystem.borderStroke, lineWidth: 1)
-                            )
-                        }
-                        
-                        // APPLICATION SETTINGS
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("APPLICATION SETTINGS")
-                                .font(.system(size: 13, weight: .bold, design: .rounded))
-                                .foregroundColor(.gray)
-                                .padding(.horizontal, 4)
-                            
-                            VStack(spacing: 0) {
-                                HStack(spacing: 16) {
-                                    Image(systemName: "globe")
-                                        .font(.system(size: 18))
-                                        .foregroundColor(.white)
-                                        .frame(width: 36, height: 36)
-                                        .background(Color.blue.opacity(0.8))
-                                        .cornerRadius(8)
-                                    
-                                    Text("Language")
-                                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                        .foregroundColor(.white)
-                                    
-                                    Spacer()
-                                    
-                                    Picker("", selection: $selectedLanguage) {
-                                        Text("English").tag("en")
-                                        Text("Deutsch").tag("de")
-                                        Text("Français").tag("fr")
-                                        Text("Español").tag("es")
-                                        Text("Italiano").tag("it")
-                                        Text("Português").tag("pt")
-                                    }
-                                    .pickerStyle(.menu)
-                                    .accentColor(.blue)
-                                }
-                                .padding(16)
-                            }
-                            .background(DesignSystem.cardBackground)
-                            .cornerRadius(16)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(DesignSystem.borderStroke, lineWidth: 1)
-                            )
-                        }
-                        
-                        // SECTION 2: DEVICE FILTERS
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("DETECTED GLASSES CHANNELS")
-                                .font(.system(size: 13, weight: .bold, design: .rounded))
-                                .foregroundColor(.gray)
-                                .padding(.horizontal, 4)
-                            
-                            VStack(spacing: 0) {
-                                FilterToggleRow(
-                                    title: "Ray-Ban Meta Series",
-                                    description: "Discreet photo/video capturing",
-                                    icon: "eye.fill",
-                                    color: .red,
-                                    isOn: bindingForType("rayban_meta")
-                                )
-                                
-                                Divider().background(Color.white.opacity(0.1))
-                                
-                                FilterToggleRow(
-                                    title: "Apple Vision Pro",
-                                    description: "Spatial video & high power AR logging",
-                                    icon: "arkit",
-                                    color: .purple,
-                                    isOn: bindingForType("vision_pro")
-                                )
-                                
-                                Divider().background(Color.white.opacity(0.1))
-                                
-                                FilterToggleRow(
-                                    title: "Snapchat Spectacles",
-                                    description: "AR recording and sharing HUD",
-                                    icon: "camera.filters",
-                                    color: .yellow,
-                                    isOn: bindingForType("snap_spectacles")
-                                )
-                                
-                                Divider().background(Color.white.opacity(0.1))
-                                
-                                FilterToggleRow(
-                                    title: "Unknown Smart Devices",
-                                    description: "Generic smart wear emissions",
-                                    icon: "questionmark.circle.fill",
-                                    color: .gray,
-                                    isOn: bindingForType("unknown")
-                                )
-                            }
-                            .background(DesignSystem.cardBackground)
-                            .cornerRadius(16)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(DesignSystem.borderStroke, lineWidth: 1)
-                            )
-                        }
-
-                        // SECTION 3: IGNORED DEVICES (WHITELIST)
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("IGNORED DEVICES (WHITELIST)")
-                                .font(.system(size: 13, weight: .bold, design: .rounded))
-                                .foregroundColor(.gray)
-                                .padding(.horizontal, 4)
-                            
-                            if btManager.ignoredDevices.isEmpty {
-                                VStack(spacing: 8) {
-                                    Text("No ignored devices")
-                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                        .foregroundColor(.gray)
-                                    Text("Devices you choose to ignore from details view will appear here.")
-                                        .font(.system(size: 11))
-                                        .foregroundColor(.gray.opacity(0.7))
-                                        .multilineTextAlignment(.center)
-                                }
-                                .padding(24)
-                                .frame(maxWidth: .infinity)
-                                .background(DesignSystem.cardBackground)
-                                .cornerRadius(16)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .stroke(DesignSystem.borderStroke, lineWidth: 1)
-                                )
-                            } else {
-                                VStack(spacing: 0) {
-                                    let keys = Array(btManager.ignoredDevices.keys).sorted()
-                                    ForEach(keys, id: \.self) { id in
-                                        HStack {
-                                            VStack(alignment: .leading, spacing: 4) {
-                                                Text(btManager.ignoredDevices[id] ?? "Unknown Device")
-                                                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                                                    .foregroundColor(.white)
-                                                Text("ID: \(id)")
-                                                    .font(.system(size: 11, design: .monospaced))
-                                                    .foregroundColor(.gray)
-                                            }
-                                            Spacer()
-                                            Button {
-                                                withAnimation {
-                                                    btManager.unignoreDevice(id: id)
-                                                }
-                                            } label: {
-                                                Text("Restore")
-                                                    .font(.system(size: 13, weight: .bold, design: .rounded))
-                                                    .foregroundColor(.blue)
-                                                    .padding(.horizontal, 12)
-                                                    .padding(.vertical, 6)
-                                                    .background(DesignSystem.itemBackground)
-                                                    .cornerRadius(12)
-                                            }
-                                        }
-                                        .padding(16)
-                                        
-                                        if id != keys.last {
-                                            Divider().background(Color.white.opacity(0.1))
-                                        }
-                                    }
-                                }
-                                .background(DesignSystem.cardBackground)
-                                .cornerRadius(16)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .stroke(DesignSystem.borderStroke, lineWidth: 1)
-                                )
-                            }
-                        }
-
-                        // SECTION 4: LOG UTILITIES
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("LOG UTILITIES")
-                                .font(.system(size: 13, weight: .bold, design: .rounded))
-                                .foregroundColor(.gray)
-                                .padding(.horizontal, 4)
-                            
-                            VStack(spacing: 0) {
-                                Button {
-                                    exportCSVLog()
-                                } label: {
-                                    HStack {
-                                        Label("Export CSV Detection Log", systemImage: "square.and.arrow.up")
-                                            .foregroundColor(.white)
-                                            .font(.system(size: 15, weight: .semibold, design: .rounded))
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .foregroundColor(.gray)
-                                            .font(.system(size: 13, weight: .semibold))
-                                    }
-                                    .padding(16)
-                                }
-                            }
-                            .background(DesignSystem.cardBackground)
-                            .cornerRadius(16)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(DesignSystem.borderStroke, lineWidth: 1)
-                            )
-                        }
-
-                        // SECTION 5: EDUCATIONAL CARD
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("PRIVACY DISCLOSURES")
-                                .font(.system(size: 13, weight: .bold, design: .rounded))
-                                .foregroundColor(.gray)
-                                .padding(.horizontal, 4)
-                            
-                            VStack(alignment: .leading, spacing: 14) {
-                                HStack {
-                                    Image(systemName: "exclamationmark.shield.fill")
-                                        .foregroundColor(.red)
-                                        .font(.title2)
-                                    Text("Understanding Smart Wear Risks")
-                                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                                        .foregroundColor(.white)
-                                }
-                                
-                                Text("Most smart glasses utilize a front-facing white LED indicator that turns solid or flashes when recording is active. However, these LEDs can be obstructed or modified.")
-                                    .font(.system(size: 13, weight: .regular, design: .rounded))
-                                    .foregroundColor(.gray)
-                                    .lineSpacing(4)
-                                
-                                Text("The Near app continuously parses Bluetooth Low Energy advertisements. Ray-Ban Meta glasses emit periodic BLE pulses to negotiate data transfers, letting us detect them even if recording is not actively running.")
-                                    .font(.system(size: 13, weight: .regular, design: .rounded))
-                                    .foregroundColor(.gray)
-                                    .lineSpacing(4)
-                            }
-                            .padding(18)
-                            .background(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [Color.red.opacity(0.1), Color.black.opacity(0.3)]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .cornerRadius(16)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(Color.red.opacity(0.2), lineWidth: 1)
-                            )
-                        }
-                    }
-                    .padding(20)
+        List {
+            // Radar Mode Toggle
+            Section(header: Text("Radar Mode")) {
+                HStack(spacing: 16) {
+                    Image(systemName: "antenna.radiowaves.left.and.right")
+                        .foregroundColor(.blue)
+                        .font(.system(size: 18))
+                        .frame(width: 24, height: 24)
+                    Text("Radar Mode")
+                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                    Spacer()
+                    Toggle("", isOn: $btManager.continueScanInBackground)
+                        .toggleStyle(SwitchToggleStyle(tint: .green))
+                        .labelsHidden()
                 }
             }
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .foregroundColor(.white)
-                            .font(.system(size: 16, weight: .semibold))
+            
+            // Detection Sensitivity
+            Section(header: Text("Detection Sensitivity")) {
+                HStack {
+                    Text("Current sensitivity:")
+                        .font(.system(size: 15, design: .rounded))
+                    Spacer()
+                    Text(sensitivityLabel)
+                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .foregroundColor(.blue)
+                }
+                
+                Slider(value: Binding(
+                    get: { Double(btManager.rssiThreshold) },
+                    set: { btManager.rssiThreshold = Int($0) }
+                ), in: -95...(-55), step: 5)
+                .accentColor(.blue)
+            }
+            
+            Section(footer: Text("Higher sensitivity alerts you even for weak/distant signals, but increases potential false triggers.")) {
+                EmptyView()
+            }
+            
+            // Notification Cooldown
+            Section(header: Text("Notification Cooldown")) {
+                NavigationLink {
+                    CooldownSettingsView()
+                } label: {
+                    HStack(spacing: 16) {
+                        Image(systemName: "timer")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                            .frame(width: 24, height: 24)
+                        Text("Notification Cooldown")
+                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                        Spacer()
+                        Text("\(Int(btManager.notificationCooldown / 1000))s")
+                            .font(.system(size: 15, design: .rounded))
+                            .foregroundColor(.secondary)
                     }
                 }
             }
         }
+        .listStyle(.insetGrouped)
+        .navigationTitle("Scan Preference")
+        .navigationBarTitleDisplayMode(.inline)
+
+    }
+}
+
+struct DeviceFiltersSettingsView: View {
+    @ObservedObject var btManager = BluetoothManager.shared
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+    
+    var body: some View {
+        List {
+            Section(header: Text("Detected Glasses Channels")) {
+                SettingsFilterToggleRow(
+                    title: "Ray-Ban Meta Series",
+                    description: "Discreet photo/video capturing",
+                    icon: iconForType("rayban_meta"),
+                    color: .red,
+                    isOn: bindingForType("rayban_meta")
+                )
+                
+                SettingsFilterToggleRow(
+                    title: "Apple Vision Pro",
+                    description: "Spatial video & high power AR logging",
+                    icon: iconForType("vision_pro"),
+                    color: .purple,
+                    isOn: bindingForType("vision_pro")
+                )
+                
+                SettingsFilterToggleRow(
+                    title: "Snapchat Spectacles",
+                    description: "AR recording and sharing HUD",
+                    icon: iconForType("snap_spectacles"),
+                    color: .yellow,
+                    isOn: bindingForType("snap_spectacles")
+                )
+                
+                SettingsFilterToggleRow(
+                    title: "Unknown Smart Devices",
+                    description: "Generic smart wear emissions",
+                    icon: iconForType("unknown"),
+                    color: .gray,
+                    isOn: bindingForType("unknown")
+                )
+            }
+            
+            Section(header: Text("Ignored Devices")) {
+                if btManager.ignoredDevices.isEmpty {
+                    Text("No ignored devices")
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundColor(.secondary)
+                } else {
+                    let keys = Array(btManager.ignoredDevices.keys).sorted()
+                    ForEach(keys, id: \.self) { id in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(btManager.ignoredDevices[id] ?? "Unknown Device")
+                                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                Text("ID: \(id)")
+                                    .font(.system(size: 11, design: .monospaced))
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Button {
+                                withAnimation {
+                                    btManager.unignoreDevice(id: id)
+                                }
+                            } label: {
+                                Text("Restore")
+                                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                                    .foregroundColor(.blue)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(colorScheme == .dark ? Color(.systemGray5) : Color(.systemGray6))
+                                    .cornerRadius(12)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .listStyle(.insetGrouped)
+        .navigationTitle("Device Filters")
+        .navigationBarTitleDisplayMode(.inline)
+
     }
     
-    // Binding helper for Set<String> toggle
     private func bindingForType(_ type: String) -> Binding<Bool> {
         Binding(
             get: { btManager.enabledAlertTypes.contains(type) },
@@ -357,8 +364,94 @@ struct SettingsView: View {
             }
         )
     }
+}
+
+struct SettingsFilterToggleRow: View {
+    let title: LocalizedStringKey
+    let description: LocalizedStringKey
+    let icon: String
+    let color: Color
+    @Binding var isOn: Bool
     
-    // CSV Export
+    var body: some View {
+        HStack(spacing: 16) {
+            DeviceIconView(icon: icon, color: color)
+                .frame(width: 24, height: 24)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                Text(description)
+                    .font(.system(size: 12, design: .rounded))
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            Toggle("", isOn: $isOn)
+                .toggleStyle(SwitchToggleStyle(tint: .green))
+                .labelsHidden()
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+struct PrivacySettingsView: View {
+    @ObservedObject var btManager = BluetoothManager.shared
+    @Environment(\.dismiss) private var dismiss
+    let historicalDevices: [DetectedDevice]
+    @Environment(\.colorScheme) var colorScheme
+    
+    var body: some View {
+        List {
+            
+            // Log Utilities
+            Section(header: Text("Log Utilities")) {
+                Button {
+                    exportCSVLog()
+                } label: {
+                    HStack {
+                        Text("Export CSV Detection Log")
+                            .font(.system(size: 15, weight: .semibold, design: .rounded))
+                            .foregroundColor(.primary)
+                        Spacer()
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.system(size: 15))
+                            .foregroundColor(.blue)
+                    }
+                }
+            }
+            
+            // Privacy disclosures
+            Section(header: Text("Privacy Disclosures")) {
+                VStack(alignment: .leading, spacing: 14) {
+                    HStack {
+                        Image(systemName: "exclamationmark.shield.fill")
+                            .foregroundColor(.red)
+                            .font(.title2)
+                        Text("Understanding Smart Wear Risks")
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                    }
+                    
+                    Text("Most smart glasses utilize a front-facing white LED indicator that turns solid or flashes when recording is active. However, these LEDs can be obstructed or modified.")
+                        .font(.system(size: 13, weight: .regular, design: .rounded))
+                        .foregroundColor(.secondary)
+                        .lineSpacing(4)
+                    
+                    Text("The Near app continuously parses Bluetooth Low Energy advertisements. Ray-Ban Meta glasses emit periodic BLE pulses to negotiate data transfers, letting us detect them even if recording is not actively running.")
+                        .font(.system(size: 13, weight: .regular, design: .rounded))
+                        .foregroundColor(.secondary)
+                        .lineSpacing(4)
+                }
+                .padding(.vertical, 6)
+            }
+        }
+        .listStyle(.insetGrouped)
+        .navigationTitle("Privacy")
+        .navigationBarTitleDisplayMode(.inline)
+
+    }
+    
     private func exportCSVLog() {
         let csv = LogExporter.generateCSV(from: historicalDevices)
         let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("near_log_\(Date().timeIntervalSince1970).csv")
@@ -375,7 +468,149 @@ struct SettingsView: View {
     }
 }
 
+struct LicensesSettingsView: View {
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        List {
+            Section(header: Text("Near Software License Agreement")) {
+                Text("""
+Copyright (c) 2026 Henriques Pontes. All rights reserved.
+
+IMPORTANT: PLEASE READ THIS SOFTWARE LICENSE AGREEMENT ("AGREEMENT") CAREFULLY BEFORE USING THE NEAR APP ("SOFTWARE"). BY USING THE SOFTWARE, YOU ARE AGREEING TO BE BOUND BY THE TERMS OF THIS LICENSE.
+
+1. General
+The Software, documentation, and any fonts accompanying this License, whether on disk, in read only memory, on any other media or in any other form, are licensed, not sold, to you by Henriques Pontes ("Licensor") for use only under the terms of this License. Licensor retains ownership of the Software itself and reserves all rights not expressly granted to you.
+
+2. Proprietary Nature
+The Software is closed-source, proprietary, and confidential. The source code, structure, organization, and algorithms of the Software are the valuable trade secrets and confidential information of the Licensor. 
+
+3. Permitted License Uses and Restrictions
+A. Subject to the terms and conditions of this License, you are granted a limited, non-exclusive, non-transferable license to install and use one copy of the Software on a single Apple-branded device that you own or control.
+B. You may not, and you agree not to or enable others to, copy, decompile, reverse engineer, disassemble, attempt to derive the source code of, decrypt, modify, or create derivative works of the Software or any services provided by the Software, or any part thereof.
+C. You may not rent, lease, lend, sell, redistribute, or sublicense the Software.
+D. Any attempt to do so is a violation of the rights of the Licensor. If you breach this restriction, you may be subject to prosecution and damages.
+
+4. Consent to Use of Data
+You agree that Licensor may collect and use technical data and related information, including but not limited to technical information about your device, system and application software, and peripherals, that is gathered periodically to facilitate the provision of software updates, product support, and other services to you (if any) related to the Software. Licensor may use this information, as long as it is in a form that does not personally identify you, to improve its products or to provide services or technologies to you.
+
+5. Termination
+This License is effective until terminated. Your rights under this License will terminate automatically without notice from the Licensor if you fail to comply with any term(s) of this License. Upon the termination of this License, you must cease all use of the Software and destroy all copies, full or partial, of the Software.
+
+6. Disclaimer of Warranty
+YOU EXPRESSLY ACKNOWLEDGE AND AGREE THAT USE OF THE SOFTWARE IS AT YOUR SOLE RISK AND THAT THE ENTIRE RISK AS TO SATISFACTORY QUALITY, PERFORMANCE, ACCURACY, AND EFFORT IS WITH YOU. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE", WITH ALL FAULTS AND WITHOUT WARRANTY OF ANY KIND. LICENSOR HEREBY DISCLAIMS ALL WARRANTIES AND CONDITIONS WITH RESPECT TO THE SOFTWARE, EITHER EXPRESS, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES AND/OR CONDITIONS OF MERCHANTABILITY, OF SATISFACTORY QUALITY, OF FITNESS FOR A PARTICULAR PURPOSE, OF ACCURACY, OF QUIET ENJOYMENT, AND OF NON-INFRINGEMENT OF THIRD-PARTY RIGHTS.
+
+7. Limitation of Liability
+TO THE EXTENT NOT PROHIBITED BY LAW, IN NO EVENT SHALL LICENSOR BE LIABLE FOR PERSONAL INJURY OR ANY INCIDENTAL, SPECIAL, INDIRECT, OR CONSEQUENTIAL DAMAGES WHATSOEVER, INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF PROFITS, LOSS OF DATA, BUSINESS INTERRUPTION, OR ANY OTHER COMMERCIAL DAMAGES OR LOSSES, ARISING OUT OF OR RELATED TO YOUR USE OR INABILITY TO USE THE SOFTWARE, HOWEVER CAUSED, REGARDLESS OF THE THEORY OF LIABILITY (CONTRACT, TORT, OR OTHERWISE) AND EVEN IF LICENSOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+8. Governing Law
+This License will be governed by and construed in accordance with the laws of the jurisdiction in which the Licensor resides, excluding its conflict of law principles. Any dispute arising out of or in connection with this License shall be subject to the exclusive jurisdiction of the courts located in that jurisdiction.
+""")
+                .font(.system(size: 13, design: .rounded))
+                .foregroundColor(.secondary)
+                .lineSpacing(5)
+            }
+        }
+        .listStyle(.insetGrouped)
+        .navigationTitle("Licences")
+        .navigationBarTitleDisplayMode(.inline)
+
+    }
+}
+
+// Info / About Screen
+struct PrivacyInfoView: View {
+    var body: some View {
+        ZCenterContainer {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Near App Privacy Awareness")
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                        .foregroundColor(.primary)
+                        .padding(.top, 10)
+                    
+                    Text("Near is a utility designed to detect and log radio emissions from nearby smart glasses and optical wearables.")
+                        .font(.system(size: 14))
+                        .foregroundColor(.secondary)
+                        .lineSpacing(4)
+                    
+                    Text("Why is this needed?")
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .foregroundColor(.primary)
+                        .padding(.top, 10)
+                    
+                    Text("Camera-integrated smart glasses make it incredibly easy to record audio and video discreetly in public spaces, gyms, and private environments. Near continuously monitors BLE advertisements to identify these devices before they capture your image.")
+                        .font(.system(size: 14))
+                        .foregroundColor(.secondary)
+                        .lineSpacing(4)
+                    
+                    Text("How to respond if alerted:")
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .foregroundColor(.primary)
+                        .padding(.top, 10)
+                    
+                    VStack(alignment: .leading, spacing: 12) {
+                        bulletPoint(number: "1", text: "Visually scan for the device. Look for someone wearing glasses with thicker frames or a tiny lens on the corner hinges.")
+                        bulletPoint(number: "2", text: "Look for recording indicators. Devices like Ray-Ban Meta glasses have a capture LED light on the frame. If it's solid white, it is actively recording or streaming.")
+                        bulletPoint(number: "3", text: "Politely ask the wearer to cover the camera or remove their glasses if in a private space where recording is prohibited.")
+                    }
+                    
+                    Spacer()
+                }
+                .padding(24)
+            }
+        }
+        .navigationTitle("About Near")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    private func bulletPoint(number: String, text: LocalizedStringKey) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Text(number)
+                .font(.system(size: 12, weight: .black))
+                .foregroundColor(.white)
+                .frame(width: 24, height: 24)
+                .background(Color.blue)
+                .clipShape(Circle())
+            
+            Text(text)
+                .font(.system(size: 13))
+                .foregroundColor(.secondary)
+                .lineSpacing(2)
+        }
+    }
+}
+
+struct CooldownSettingsView: View {
+    @ObservedObject var btManager = BluetoothManager.shared
+    
+    var body: some View {
+        List {
+            Section(header: Text("Notification Cooldown")) {
+                HStack {
+                    Text("Cooldown interval:")
+                        .font(.system(size: 15, design: .rounded))
+                    Spacer()
+                    Text("\(Int(btManager.notificationCooldown)) ms (\(Int(btManager.notificationCooldown / 1000)) s)")
+                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .foregroundColor(.blue)
+                }
+                
+                Slider(value: $btManager.notificationCooldown, in: 2000...60000, step: 1000)
+                    .accentColor(.blue)
+            }
+            
+            Section(footer: Text("Minimum delay between alert notifications and active device tracking resets. A shorter cooldown makes detection highly responsive, while a longer one prevents repeating alerts.")) {
+                EmptyView()
+            }
+        }
+        .listStyle(.insetGrouped)
+        .navigationTitle("Notification Cooldown")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
 #Preview {
     SettingsView()
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(.light)
 }
