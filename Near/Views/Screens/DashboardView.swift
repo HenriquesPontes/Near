@@ -57,6 +57,7 @@ struct DashboardView: View {
                             }
                         }
                         .listStyle(.insetGrouped)
+                        .scrollDisabled(true)
                     }
                     
                     // Radar Status Bar
