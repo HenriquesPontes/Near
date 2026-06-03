@@ -223,7 +223,9 @@ struct ScanRadarView: View {
                 rssi: device.rssi,
                 isStarred: device.isStarred,
                 threatLevel: device.threatLevel,
-                isSimulated: device.isSimulated
+                isSimulated: device.isSimulated,
+                companyID: device.companyID,
+                manufacturer: device.manufacturer
             )
             DeviceDetailView(device: tempDevice)
         }

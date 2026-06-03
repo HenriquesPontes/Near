@@ -155,6 +155,12 @@ struct DashboardView: View {
             if let first = existing.first {
                 first.rssi = device.rssi
                 first.timestamp = Date()
+                if first.manufacturer == nil {
+                    first.manufacturer = device.manufacturer
+                }
+                if first.companyID == nil {
+                    first.companyID = device.companyID
+                }
                 try? modelContext.save()
             }
             return
@@ -167,7 +173,9 @@ struct DashboardView: View {
             rssi: device.rssi,
             isStarred: false,
             threatLevel: device.threatLevel,
-            isSimulated: device.isSimulated
+            isSimulated: device.isSimulated,
+            companyID: device.companyID,
+            manufacturer: device.manufacturer
         )
         
         modelContext.insert(newLog)

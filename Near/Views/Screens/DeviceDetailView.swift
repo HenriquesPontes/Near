@@ -78,6 +78,32 @@ struct DeviceDetailView: View {
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets())
                 
+                // DEVICE INFO
+                if device.manufacturer != nil || device.companyID != nil {
+                    Section(header: Text("Device Info")) {
+                        if let manufacturer = device.manufacturer {
+                            HStack {
+                                Text("Manufacturer")
+                                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                                Spacer()
+                                Text(manufacturer)
+                                    .font(.system(size: 15, design: .rounded))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        if let companyID = device.companyID {
+                            HStack {
+                                Text("Company Identifier")
+                                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                                Spacer()
+                                Text(String(format: "0x%04X", companyID))
+                                    .font(.system(size: 15, design: .monospaced))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
+                }
+                
                 // 2. SIGNAL TREND (LINE CHART)
                 Section(header: Text("Signal Strength")) {
                     HStack {

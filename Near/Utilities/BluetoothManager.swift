@@ -21,6 +21,8 @@ struct BluetoothDevice: Identifiable, Hashable {
     var lastSeen: Date = Date()
     var isStarred: Bool = false
     var isSimulated: Bool = false
+    var companyID: Int? = nil
+    var manufacturer: String? = nil
 
     var threatLevel: String {
         switch type {
@@ -147,9 +149,30 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     #endif
     private var lastNotifiedTimes: [String: Date] = [:]
     private var cleanupTimer: Timer?
+    private var companyIdentifiers: [String: String] = [:]
+
+    private func loadCompanyIdentifiers() {
+        guard let url = Bundle.main.url(forResource: "company_identifiers", withExtension: "json") else {
+            print("company_identifiers.json not found in Bundle")
+            return
+        }
+        do {
+            let data = try Data(contentsOf: url)
+            companyIdentifiers = try JSONDecoder().decode([String: String].self, from: data)
+            print("Successfully loaded \(companyIdentifiers.count) company identifiers")
+        } catch {
+            print("Failed to decode company_identifiers.json: \(error)")
+        }
+    }
+
+    func companyName(for companyID: UInt16) -> String? {
+        let hexStr = String(format: "0x%04X", companyID)
+        return companyIdentifiers[hexStr]
+    }
 
     override init() {
         super.init()
+        loadCompanyIdentifiers()
         self.locationManager = CLLocationManager()
         self.locationManager?.delegate = self
         self.centralManager = CBCentralManager(delegate: self, queue: nil)
@@ -465,6 +488,12 @@ extension BluetoothManager: CBCentralManagerDelegate {
             discoveredCompanyID = UInt16(manufacturerData[0]) | (UInt16(manufacturerData[1]) << 8)
         }
 
+        // Resolve manufacturer name from company ID
+        var manufacturerName: String? = nil
+        if let companyID = discoveredCompanyID {
+            manufacturerName = companyName(for: companyID)
+        }
+
         // Categorize by Name or Company ID
         if lowerName.contains("ray-ban") || lowerName.contains("meta")
             || lowerName.contains("rb-meta") || discoveredCompanyID == 0x058E
@@ -495,13 +524,23 @@ extension BluetoothManager: CBCentralManagerDelegate {
         // Check if type is enabled in Settings
         guard enabledAlertTypes.contains(detectedType) else { return }
 
+        // Improve name if it is Unknown Device but we have a manufacturer
+        var deviceName = name
+        if deviceName == "Unknown Device" || deviceName.isEmpty {
+            if let manufacturer = manufacturerName {
+                deviceName = "\(manufacturer) Device"
+            }
+        }
+
         let bluetoothDevice = BluetoothDevice(
             deviceId: deviceId,
-            name: name,
+            name: deviceName,
             type: detectedType,
             rssi: RSSI.intValue,
             lastSeen: Date(),
-            isSimulated: false
+            isSimulated: false,
+            companyID: discoveredCompanyID != nil ? Int(discoveredCompanyID!) : nil,
+            manufacturer: manufacturerName
         )
 
         var updatedDevices = detectedDevices
@@ -509,6 +548,15 @@ extension BluetoothManager: CBCentralManagerDelegate {
             var dev = updatedDevices[index]
             dev.rssi = RSSI.intValue
             dev.lastSeen = Date()
+            if dev.manufacturer == nil {
+                dev.manufacturer = manufacturerName
+            }
+            if dev.companyID == nil && discoveredCompanyID != nil {
+                dev.companyID = Int(discoveredCompanyID!)
+            }
+            if dev.name == "Unknown Device" || dev.name.isEmpty {
+                dev.name = deviceName
+            }
             updatedDevices[index] = dev
 
             checkAndTriggerAlert(for: dev)
