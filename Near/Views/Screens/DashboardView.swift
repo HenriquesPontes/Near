@@ -64,16 +64,16 @@ struct DashboardView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack(spacing: 8) {
                                 Circle()
-                                    .fill(btManager.detectedDevices.isEmpty ? Color.green : Color.red)
+                                    .fill(Color.green)
                                     .frame(width: 8, height: 8)
-                                    .shadow(color: (btManager.detectedDevices.isEmpty ? Color.green : Color.red).opacity(0.5), radius: 3)
+                                    .shadow(color: Color.green.opacity(0.5), radius: 3)
                                 
-                                Text(btManager.detectedDevices.isEmpty ? "Privacy Awareness Active" : "Smart Wearable Detected! ⚠️")
+                                Text("Privacy Awareness Active")
                                     .font(.system(size: 15, weight: .bold, design: .rounded))
-                                    .foregroundColor(btManager.detectedDevices.isEmpty ? .primary : .red)
+                                    .foregroundColor(.primary)
                             }
                             
-                            Text(btManager.detectedDevices.isEmpty ? "Your device is monitoring BLE radio emissions from wearable camera systems nearby." : "An active emission has been detected. Check the radar view or list below.")
+                            Text("Your device is monitoring BLE radio emissions from wearable camera systems nearby.")
                                 .font(.system(size: 13, design: .rounded))
                                 .foregroundColor(.secondary)
                                 .lineLimit(2)
@@ -127,7 +127,7 @@ struct DashboardView: View {
                         }
                     } label: {
                         Image(systemName: btManager.continueScanInBackground ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash")
-                            .foregroundColor(btManager.continueScanInBackground ? (btManager.detectedDevices.isEmpty ? .green : .red) : .gray)
+                            .foregroundColor(btManager.continueScanInBackground ? .green : .gray)
                             .font(.system(size: 17))
                     }
                 }
