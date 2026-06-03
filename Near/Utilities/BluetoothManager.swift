@@ -54,6 +54,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     @Published var detectedDevices: [BluetoothDevice] = []
     @Published var isScanning: Bool = false
+    @Published var activeNotification: BluetoothDevice? = nil
     
     // Persisted settings via UserDefaults
     @AppStorage("alertOnNewDevices") var alertOnNewDevices: Bool = true
@@ -281,6 +282,10 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         lastNotifiedTimes[device.deviceId] = now
         sendPrivacyAlert(for: device)
         saveToSwiftDataHistory(device: device)
+        
+        DispatchQueue.main.async {
+            self.activeNotification = device
+        }
     }
     
     private func sendPrivacyAlert(for device: BluetoothDevice) {
@@ -462,7 +467,8 @@ extension BluetoothManager: UNUserNotificationCenterDelegate {
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
-        // Present visual notification banner and play sound even in foreground
-        completionHandler([.banner, .sound, .badge])
+        // Play sound and badge in foreground, but do NOT show system banner 
+        // because we present our custom branded in-app toast banner instead!
+        completionHandler([.sound, .badge])
     }
 }
