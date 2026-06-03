@@ -50,11 +50,11 @@ struct DeviceDetailView: View {
     
     var body: some View {
         ZCenterContainer {
-            ScrollView {
-                VStack(spacing: 24) {
-                    
-                    // 1. DEVICE HEADER
+            List {
+                // 1. DEVICE HEADER
+                Section {
                     VStack(spacing: 12) {
+                        Spacer(minLength: 4)
                         DeviceIconView(icon: iconForType(device.type), color: .white)
                             .frame(width: 32, height: 32)
                             .frame(width: 72, height: 72)
@@ -71,98 +71,95 @@ struct DeviceDetailView: View {
                                 .font(.system(size: 12, design: .monospaced))
                                 .foregroundColor(.secondary)
                         }
+                        Spacer(minLength: 4)
                     }
-                    .padding(.top, 16)
-                    
-                    // 2. SIGNAL TREND (LINE CHART)
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Label("Signal strength over time", systemImage: "chart.line.uptrend.xyaxis")
-                                .font(.system(size: 14, weight: .bold, design: .rounded))
-                                .foregroundColor(.primary)
-                            Spacer()
-                            Text("\(currentRssi) dBm")
-                                .font(.system(size: 13, weight: .bold, design: .monospaced))
-                                .foregroundColor(proximityStatus.color)
-                        }
-                        
-                        // Live Signal Line Graph
-                        ZStack {
-                            Color.black.opacity(0.3)
-                                .cornerRadius(12)
-                            
-                            if rssiHistory.count > 1 {
-                                SignalHistoryChart(history: rssiHistory)
-                                    .stroke(proximityStatus.color.opacity(0.8), lineWidth: 2)
-                                    .padding(.vertical, 16)
-                                    .padding(.horizontal, 8)
-                            } else {
-                                Text("Calibrating BLE waves...")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.gray)
-                            }
-                        }
-                        .frame(height: 120)
+                    .frame(maxWidth: .infinity)
+                }
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets())
+                
+                // 2. SIGNAL TREND (LINE CHART)
+                Section(header: Text("Signal Strength")) {
+                    HStack {
+                        Label("Signal strength over time", systemImage: "chart.line.uptrend.xyaxis")
+                            .font(.system(size: 14, weight: .bold, design: .rounded))
+                            .foregroundColor(.primary)
+                        Spacer()
+                        Text("\(currentRssi) dBm")
+                            .font(.system(size: 13, weight: .bold, design: .monospaced))
+                            .foregroundColor(proximityStatus.color)
                     }
-                    .padding(16)
-                    .background(DesignSystem.cardBackground)
-                    .cornerRadius(16)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(DesignSystem.borderStroke, lineWidth: 1)
-                    )
-                    .padding(.horizontal, 20)
                     
-                    // 3. HOT & COLD PROXIMITY FINDER
-                    VStack(spacing: 16) {
-                        Text("PROXIMITY RADAR")
-                                .font(.system(size: 13, weight: .bold, design: .rounded))
-                                .foregroundColor(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                    // Live Signal Line Graph
+                    ZStack {
+                        Color.black.opacity(0.15)
+                            .cornerRadius(12)
                         
-                        ZStack {
-                            // Background Radar Rings
-                            Circle()
-                                .stroke(proximityStatus.color.opacity(0.15), lineWidth: 2)
-                                .frame(width: 160, height: 160)
-                            Circle()
-                                .stroke(proximityStatus.color.opacity(0.25), lineWidth: 2)
-                                .frame(width: 110, height: 110)
-                            Circle()
-                                .stroke(proximityStatus.color.opacity(0.4), lineWidth: 2)
-                                .frame(width: 60, height: 60)
-                            
-                            // Core locator ring
-                            Circle()
-                                .fill(proximityStatus.color)
-                                .frame(width: 24, height: 24)
-                                .scaleEffect(pulseScale)
-                                .shadow(color: proximityStatus.color, radius: 10)
-                                .onAppear {
-                                    withAnimation(Animation.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
-                                        pulseScale = 1.3
-                                    }
-                                }
-                        }
-                        .frame(height: 180)
-                        
-                        VStack(spacing: 6) {
-                            Text(proximityStatus.text)
-                                .font(.system(size: 16, weight: .black, design: .rounded))
-                                .foregroundColor(proximityStatus.color)
-                            
-                            Text("Estimated distance: ~\(String(format: "%.1f", estimatedDistance)) meters")
-                                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                .foregroundColor(.primary)
-                            
-                            Text(proximityStatus.description)
+                        if rssiHistory.count > 1 {
+                            SignalHistoryChart(history: rssiHistory)
+                                .stroke(proximityStatus.color.opacity(0.8), lineWidth: 2)
+                                .padding(.vertical, 16)
+                                .padding(.horizontal, 8)
+                        } else {
+                            Text("Calibrating BLE waves...")
                                 .font(.system(size: 12))
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 24)
+                                .foregroundColor(.gray)
                         }
+                    }
+                    .frame(height: 120)
+                    .listRowSeparator(.hidden)
+                    .padding(.vertical, 8)
+                }
+                
+                // 3. HOT & COLD PROXIMITY FINDER
+                Section(header: Text("PROXIMITY RADAR")) {
+                    ZStack {
+                        // Background Radar Rings
+                        Circle()
+                            .stroke(proximityStatus.color.opacity(0.15), lineWidth: 2)
+                            .frame(width: 140, height: 140)
+                        Circle()
+                            .stroke(proximityStatus.color.opacity(0.25), lineWidth: 2)
+                            .frame(width: 100, height: 100)
+                        Circle()
+                            .stroke(proximityStatus.color.opacity(0.4), lineWidth: 2)
+                            .frame(width: 60, height: 60)
                         
-                        // Audio feedback tracker toggle
+                        // Core locator ring
+                        Circle()
+                            .fill(proximityStatus.color)
+                            .frame(width: 20, height: 20)
+                            .scaleEffect(pulseScale)
+                            .shadow(color: proximityStatus.color, radius: 8)
+                            .onAppear {
+                                withAnimation(Animation.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
+                                    pulseScale = 1.3
+                                }
+                            }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 160)
+                    .listRowSeparator(.hidden)
+                    .padding(.vertical, 8)
+                    
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(proximityStatus.text)
+                            .font(.system(size: 15, weight: .black, design: .rounded))
+                            .foregroundColor(proximityStatus.color)
+                        
+                        Text("Estimated distance: ~\(String(format: "%.1f", estimatedDistance)) meters")
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .foregroundColor(.primary)
+                        
+                        Text(proximityStatus.description)
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.vertical, 4)
+                    
+                    // Audio feedback tracker toggle
+                    HStack {
+                        Spacer()
                         Button {
                             trackerActive.toggle()
                         } label: {
@@ -173,44 +170,26 @@ struct DeviceDetailView: View {
                             .font(.system(size: 14, weight: .bold, design: .rounded))
                             .foregroundColor(.white)
                             .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                            .background(trackerActive ? Color.green.opacity(0.8) : DesignSystem.primaryBlue.opacity(0.8))
-                            .cornerRadius(20)
+                            .padding(.vertical, 8)
+                            .background(trackerActive ? Color.green : colorForType(device.type))
+                            .cornerRadius(18)
                         }
+                        .buttonStyle(.plain)
+                        Spacer()
                     }
-                    .padding(18)
-                    .background(DesignSystem.cardBackground)
-                    .cornerRadius(16)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(DesignSystem.borderStroke, lineWidth: 1)
-                    )
-                    .padding(.horizontal, 20)
-                    
-                    // 4. PRIVACY RISK PROFILE
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text("PRIVACY THREAT PROFILE")
-                            .font(.system(size: 13, weight: .bold, design: .rounded))
-                            .foregroundColor(.secondary)
-                        
-                        VStack(alignment: .leading, spacing: 12) {
-                            riskRow(title: "Video Capture Capabilities", desc: videoDescription(for: device.type), danger: hasCamera(for: device.type))
-                            Divider().background(Color.white.opacity(0.08))
-                            riskRow(title: "Audio Capture Arrays", desc: audioDescription(for: device.type), danger: hasMic(for: device.type))
-                            Divider().background(Color.white.opacity(0.08))
-                            riskRow(title: "Display / HUD Capabilities", desc: hudDescription(for: device.type), danger: false)
-                        }
-                    }
-                    .padding(18)
-                    .background(DesignSystem.cardBackground)
-                    .cornerRadius(16)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(DesignSystem.borderStroke, lineWidth: 1)
-                    )
-                    .padding(.horizontal, 20)
-                    
-                    // 5. WHITELIST / IGNORE BUTTON
+                    .listRowSeparator(.hidden)
+                    .padding(.vertical, 4)
+                }
+                
+                // 4. PRIVACY RISK PROFILE
+                Section(header: Text("PRIVACY THREAT PROFILE")) {
+                    riskRow(title: "Video Capture Capabilities", desc: videoDescription(for: device.type), danger: hasCamera(for: device.type))
+                    riskRow(title: "Audio Capture Arrays", desc: audioDescription(for: device.type), danger: hasMic(for: device.type))
+                    riskRow(title: "Display / HUD Capabilities", desc: hudDescription(for: device.type), danger: false)
+                }
+                
+                // 5. WHITELIST / IGNORE BUTTON
+                Section {
                     Button(role: .destructive) {
                         // Add to ignoredDevices dictionary in BluetoothManager
                         let displayName = "\(displayNameForType(device.type)) (\(device.name))"
@@ -223,24 +202,17 @@ struct DeviceDetailView: View {
                         dismiss()
                     } label: {
                         HStack {
+                            Spacer()
                             Image(systemName: "eye.slash.fill")
                             Text("Ignore Device (Add to Whitelist)")
+                                .font(.system(size: 15, weight: .bold, design: .rounded))
+                            Spacer()
                         }
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
-                        .foregroundColor(.red)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 50)
-                        .background(DesignSystem.cardBackground)
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.red.opacity(0.3), lineWidth: 1)
-                        )
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 24)
                 }
             }
+            .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
         }
         .navigationTitle("Device Details")
         .navigationBarTitleDisplayMode(.inline)
@@ -355,6 +327,7 @@ struct DeviceDetailView: View {
                     .lineSpacing(2)
             }
         }
+        .padding(.vertical, 4)
     }
 }
 #Preview {
