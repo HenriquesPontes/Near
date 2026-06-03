@@ -61,22 +61,15 @@ struct DashboardView: View {
                     
                     // Radar Status Bar
                     if btManager.continueScanInBackground {
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack(spacing: 8) {
-                                Circle()
-                                    .fill(Color.green)
-                                    .frame(width: 8, height: 8)
-                                    .shadow(color: Color.green.opacity(0.5), radius: 3)
-                                
-                                Text("Privacy Awareness Active")
-                                    .font(.system(size: 15, weight: .bold, design: .rounded))
-                                    .foregroundColor(.primary)
-                            }
+                        HStack(spacing: 8) {
+                            Circle()
+                                .fill(Color.green)
+                                .frame(width: 8, height: 8)
+                                .shadow(color: Color.green.opacity(0.5), radius: 3)
                             
-                            Text("Your device is monitoring BLE radio emissions from wearable camera systems nearby.")
-                                .font(.system(size: 13, design: .rounded))
-                                .foregroundColor(.secondary)
-                                .lineLimit(2)
+                            Text("Privacy Awareness Active")
+                                .font(.system(size: 15, weight: .bold, design: .rounded))
+                                .foregroundColor(.primary)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 20)
