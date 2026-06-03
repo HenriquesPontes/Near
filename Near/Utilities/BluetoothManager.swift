@@ -312,13 +312,32 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         let locale = Locale(identifier: lang)
 
         let content = UNMutableNotificationContent()
-        content.title = String(localized: "Smart Glasses Nearby! ⚠️", locale: locale)
+        
+        // Dynamically select localized title based on device type
+        let title: String
+        switch device.type {
+        case "rayban_meta":
+            title = String(localized: "Ray-Ban Meta Nearby! ⚠️", locale: locale)
+        case "vision_pro":
+            title = String(localized: "Apple Vision Pro Nearby! ⚠️", locale: locale)
+        case "snap_spectacles":
+            title = String(localized: "Snapchat Spectacles Nearby! ⚠️", locale: locale)
+        default:
+            title = String(localized: "Unknown Wearable Nearby! ⚠️", locale: locale)
+        }
+        content.title = title
+
+        // Set dynamic localized subtitle as the device display name
+        let displayName: String
+        if device.name == "Unknown Device" {
+            displayName = String(localized: "Unknown Device", locale: locale)
+        } else {
+            displayName = device.name
+        }
+        content.subtitle = displayName
 
         let distanceStr = String(format: "%.1f", device.estimatedDistance)
-        let baseMsg = String(
-            localized:
-                "A \(device.name) has been detected approximately \(distanceStr) meters away.",
-            locale: locale)
+        let baseMsg = String(localized: "Detected approximately \(distanceStr) meters away.", locale: locale)
 
         var suffix = ""
         switch device.type {
