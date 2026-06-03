@@ -7,16 +7,20 @@
 
 import SwiftUI
 import SwiftData
+internal import CoreLocation
 
 struct ScanRadarView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.openURL) private var openURL
     @ObservedObject var btManager = BluetoothManager.shared
     
     @State private var rotationAngle: Double = 0.0
     @State private var rippleScale: CGFloat = 0.5
     @State private var rippleOpacity: Double = 0.8
     @State private var selectedDevice: BluetoothDevice? = nil
+    @State private var showLocationPermissionPrompt: Bool = false
+    @State private var showLocationSettingsPrompt: Bool = false
     
     var body: some View {
         ZCenterContainer {
@@ -144,39 +148,9 @@ struct ScanRadarView: View {
                             Button {
                                 selectedDevice = device
                             } label: {
-                                VStack(alignment: .leading, spacing: 6) {
-                                    HStack {
-                                        DeviceIconView(icon: iconForType(device.type), color: .white)
-                                            .frame(width: 14, height: 14)
-                                            .padding(6)
-                                            .background(colorForType(device.type).opacity(0.8))
-                                            .cornerRadius(6)
-                                        
-                                        Spacer()
-                                        
-                                        Text(String(format: "%.1f m", device.estimatedDistance))
-                                            .font(.system(size: 11, weight: .bold, design: .rounded))
-                                            .foregroundColor(DesignSystem.primaryBlue)
-                                    }
-                                    
-                                    Text(device.name)
-                                        .font(.system(size: 14, weight: .bold, design: .rounded))
-                                        .foregroundColor(.primary)
-                                        .lineLimit(1)
-                                    
-                                    Text("RSSI: \(device.rssi) dBm")
-                                        .font(.system(size: 11))
-                                        .foregroundColor(.secondary)
-                                }
-                                .padding(12)
-                                .frame(width: 140)
-                                .background(DesignSystem.itemBackground)
-                                .cornerRadius(12)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(DesignSystem.borderStroke, lineWidth: 1)
-                                )
+                                detectedDeviceCard(for: device)
                             }
+                            .buttonStyle(.plain)
                         }
                     }
                     .padding(.horizontal, 24)
@@ -186,11 +160,7 @@ struct ScanRadarView: View {
                 // PLAY / PAUSE BUTTON (Red styled at bottom)
                 Button {
                     withAnimation {
-                        if btManager.isScanning {
-                            btManager.stopScanning()
-                        } else {
-                            btManager.startScanning()
-                        }
+                        toggleScanningWithLocationCheck()
                     }
                 } label: {
                     HStack(spacing: 10) {
@@ -213,10 +183,35 @@ struct ScanRadarView: View {
         .navigationTitle("Scan")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            btManager.startScanning()
+            handleScanOnAppear()
+        }
+        .onChange(of: btManager.locationAuthorizationStatus) { newStatus in
+            if newStatus == .authorizedWhenInUse || newStatus == .authorizedAlways {
+                if !btManager.isScanning {
+                    btManager.startScanning()
+                }
+            }
         }
         .onDisappear {
             btManager.stopScanning()
+        }
+        .alert("Location Access Required", isPresented: $showLocationPermissionPrompt) {
+            Button("Allow Location") {
+                btManager.requestLocationPermission()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Nearby scanning uses location and Bluetooth to detect nearby devices. Please allow location access so scanning can start.")
+        }
+        .alert("Location Access Denied", isPresented: $showLocationSettingsPrompt) {
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    openURL(url)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Location permission is denied. Open Settings and grant location access to use the scan feature.")
         }
         .navigationDestination(item: $selectedDevice) { device in
             // Map the transient BluetoothDevice to a temporary DetectedDevice for the details view
@@ -234,7 +229,71 @@ struct ScanRadarView: View {
         }
     }
     
+    private func handleScanOnAppear() {
+        switch btManager.locationAuthorizationStatus {
+        case .authorizedWhenInUse, .authorizedAlways:
+            btManager.startScanning()
+        case .denied, .restricted:
+            showLocationSettingsPrompt = true
+        default:
+            showLocationPermissionPrompt = true
+        }
+    }
+    
+    private func toggleScanningWithLocationCheck() {
+        if btManager.isScanning {
+            btManager.stopScanning()
+            return
+        }
+        switch btManager.locationAuthorizationStatus {
+        case .authorizedWhenInUse, .authorizedAlways:
+            btManager.startScanning()
+        case .denied, .restricted:
+            showLocationSettingsPrompt = true
+        default:
+            showLocationPermissionPrompt = true
+        }
+    }
+    
     // Calculates dot position
+    private func detectedDeviceCard(for device: BluetoothDevice) -> some View {
+        let distanceLabel = String(format: "%.1f m", device.estimatedDistance)
+        let rssiLabel = "RSSI: \(device.rssi) dBm"
+        
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                DeviceIconView(icon: iconForType(device.type), color: .white)
+                    .frame(width: 14, height: 14)
+                    .padding(6)
+                    .background(colorForType(device.type).opacity(0.8))
+                    .cornerRadius(6)
+                
+                Spacer()
+                
+                Text(distanceLabel)
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .foregroundColor(DesignSystem.primaryBlue)
+            }
+            
+            Text(device.name)
+                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .foregroundColor(.primary)
+                .lineLimit(1)
+            
+            Text(rssiLabel)
+                .font(.system(size: 11))
+                .foregroundColor(.secondary)
+        }
+        .padding(12)
+        .frame(width: 140)
+        .background(DesignSystem.itemBackground)
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(DesignSystem.borderStroke, lineWidth: 1)
+        )
+    }
+    
     private func position(for device: BluetoothDevice, in size: CGSize) -> CGPoint {
         let center = CGPoint(x: size.width / 2, y: size.height / 2)
         

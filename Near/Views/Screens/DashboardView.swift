@@ -119,11 +119,6 @@ struct DashboardView: View {
             .navigationTitle("Nearby")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                // Top Left Edit Button
-                ToolbarItem(placement: .navigationBarLeading) {
-                    EditButton()
-                }
-                
                 // Top Right Radar Toggle Button
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {

@@ -14,6 +14,14 @@ struct SettingsView: View {
     @Query(sort: \DetectedDevice.timestamp, order: .reverse) private var historicalDevices: [DetectedDevice]
     @AppStorage("selectedLanguage") var selectedLanguage: String = Bundle.main.preferredLocalizations.first ?? "en"
     
+    private var appVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.2"
+    }
+    
+    private var appBuild: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "3"
+    }
+    
     var body: some View {
         List {
             // SECTION 1: GENERAL
@@ -142,7 +150,7 @@ struct SettingsView: View {
                     Text("Version")
                         .font(.system(size: 16, weight: .medium, design: .rounded))
                     Spacer()
-                    Text("1.0.0")
+                    Text(appVersion)
                         .font(.system(size: 15, design: .rounded))
                         .foregroundColor(.secondary)
                 }
@@ -156,7 +164,7 @@ struct SettingsView: View {
                     Text("Build")
                         .font(.system(size: 16, weight: .medium, design: .rounded))
                     Spacer()
-                    Text("1")
+                    Text(appBuild)
                         .font(.system(size: 15, design: .rounded))
                         .foregroundColor(.secondary)
                 }
@@ -206,7 +214,42 @@ struct ScanRangeSettingsView: View {
     var body: some View {
         List {
             // Radar Mode Toggle
-            Section(header: Text("Radar Mode")) {
+            Section(
+                header: Text("Radar Mode"),
+                footer: Group {
+                    #if os(iOS)
+                    if btManager.backgroundRefreshStatus == .denied {
+                        Button(action: {
+                            if let url = URL(string: UIApplication.openSettingsURLString) {
+                                UIApplication.shared.open(url)
+                            }
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(.orange)
+                                Text("Background App Refresh is disabled. Radar Mode cannot run in the background. Tap to open Settings.")
+                                    .font(.system(size: 13, design: .rounded))
+                                    .foregroundColor(.orange)
+                                    .multilineTextAlignment(.leading)
+                            }
+                        }
+                    } else if btManager.backgroundRefreshStatus == .restricted {
+                        HStack(spacing: 8) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.orange)
+                            Text("Background App Refresh is restricted on this device. Radar Mode cannot run in the background.")
+                                .font(.system(size: 13, design: .rounded))
+                                .foregroundColor(.orange)
+                                .multilineTextAlignment(.leading)
+                        }
+                    } else {
+                        Text("Radar Mode scans for smart wearable signals in the background, allowing the app to send alerts when in your pocket.")
+                    }
+                    #else
+                    Text("Radar Mode scans for smart wearable signals in the background, allowing the app to send alerts when in your pocket.")
+                    #endif
+                }
+            ) {
                 HStack(spacing: 16) {
                     Image(systemName: "antenna.radiowaves.left.and.right")
                         .foregroundColor(.blue)
@@ -401,6 +444,8 @@ struct PrivacySettingsView: View {
     @Environment(\.dismiss) private var dismiss
     let historicalDevices: [DetectedDevice]
     @Environment(\.colorScheme) var colorScheme
+    @State private var shareURL: URL?
+    @State private var showShareSheet = false
     
     var body: some View {
         List {
@@ -449,7 +494,11 @@ struct PrivacySettingsView: View {
         .listStyle(.insetGrouped)
         .navigationTitle("Privacy")
         .navigationBarTitleDisplayMode(.inline)
-
+        .sheet(isPresented: $showShareSheet) {
+            if let url = shareURL {
+                ActivityViewController(activityItems: [url])
+            }
+        }
     }
     
     private func exportCSVLog() {
@@ -457,15 +506,24 @@ struct PrivacySettingsView: View {
         let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("near_log_\(Date().timeIntervalSince1970).csv")
         do {
             try csv.write(to: tempURL, atomically: true, encoding: .utf8)
-            let activityVC = UIActivityViewController(activityItems: [tempURL], applicationActivities: nil)
-            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-               let root = scene.windows.first?.rootViewController {
-                root.present(activityVC, animated: true)
-            }
+            shareURL = tempURL
+            showShareSheet = true
         } catch {
             print("Failed to export CSV: \(error.localizedDescription)")
         }
     }
+}
+
+/// UIKit wrapper for UIActivityViewController presented as a SwiftUI sheet.
+struct ActivityViewController: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    var applicationActivities: [UIActivity]? = nil
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems, applicationActivities: applicationActivities)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 struct LicensesSettingsView: View {

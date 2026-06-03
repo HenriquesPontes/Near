@@ -1,1 +1,3 @@
 NSBluetoothAlwaysUsageDescription = "Diese App verwendet Bluetooth, um nach BLE-Werbeanzeigen in der Nähe zu suchen, solange die App geöffnet ist.";
+NSBluetoothPeripheralUsageDescription = "Diese App verwendet Bluetooth, um nach BLE-Werbeanzeigen in der Nähe zu suchen, solange die App geöffnet ist.";
+NSLocationWhenInUseUsageDescription = "Diese App verwendet den Standort, um die Bluetooth-Gerätesuche während der Nutzung zu unterstützen.";

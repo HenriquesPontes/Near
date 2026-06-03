@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreBluetooth
+internal import CoreLocation
 import UserNotifications
 import Combine
 import SwiftUI
@@ -48,7 +49,7 @@ struct BluetoothDevice: Identifiable, Hashable {
     }
 }
 
-class BluetoothManager: NSObject, ObservableObject {
+class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     static let shared = BluetoothManager()
     
     @Published var detectedDevices: [BluetoothDevice] = []
@@ -135,18 +136,28 @@ class BluetoothManager: NSObject, ObservableObject {
     }
     
     private var centralManager: CBCentralManager?
+    private var locationManager: CLLocationManager?
+    @Published var locationAuthorizationStatus: CLAuthorizationStatus = .notDetermined
+    #if os(iOS)
+    @Published var backgroundRefreshStatus: UIBackgroundRefreshStatus = .available
+    #endif
     private var lastNotifiedTimes: [String: Date] = [:]
     private var cleanupTimer: Timer?
     
     override init() {
         super.init()
+        self.locationManager = CLLocationManager()
+        self.locationManager?.delegate = self
         self.centralManager = CBCentralManager(delegate: self, queue: nil)
         UNUserNotificationCenter.current().delegate = self
         requestNotificationPermission()
+        requestLocationPermission()
         
         #if os(iOS)
         NotificationCenter.default.addObserver(self, selector: #selector(handleDidEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleBackgroundRefreshStatusChange), name: UIApplication.backgroundRefreshStatusDidChangeNotification, object: nil)
+        self.backgroundRefreshStatus = UIApplication.shared.backgroundRefreshStatus
         #endif
         
         // Auto-start scanning on launch if scan toggle is enabled
@@ -158,6 +169,23 @@ class BluetoothManager: NSObject, ObservableObject {
     
     deinit {
         cleanupTimer?.invalidate()
+    }
+    
+    func requestLocationPermission() {
+        guard CLLocationManager.locationServicesEnabled() else { return }
+        let status = CLLocationManager.authorizationStatus()
+        locationAuthorizationStatus = status
+        if status == .notDetermined {
+            locationManager?.requestWhenInUseAuthorization()
+        }
+    }
+    
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        locationAuthorizationStatus = manager.authorizationStatus
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        locationAuthorizationStatus = status
     }
     
     #if os(iOS)
@@ -184,6 +212,7 @@ class BluetoothManager: NSObject, ObservableObject {
     #endif
     
     func startScanning() {
+        requestLocationPermission()
         if !continueScanInBackground {
             continueScanInBackground = true
         }
@@ -229,6 +258,14 @@ class BluetoothManager: NSObject, ObservableObject {
             }
         }
     }
+    
+    #if os(iOS)
+    @objc private func handleBackgroundRefreshStatusChange() {
+        DispatchQueue.main.async {
+            self.backgroundRefreshStatus = UIApplication.shared.backgroundRefreshStatus
+        }
+    }
+    #endif
     
     private func checkAndTriggerAlert(for device: BluetoothDevice) {
         // Limit alerts: only alert if RSSI exceeds threshold and not notified recently (cooldown)
