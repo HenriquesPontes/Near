@@ -71,7 +71,7 @@ struct DashboardView: View {
                                 .font(.system(size: 15, weight: .bold, design: .rounded))
                                 .foregroundColor(.primary)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 4)
                         .transition(.opacity)
