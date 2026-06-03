@@ -1,0 +1,1 @@
+NSBluetoothAlwaysUsageDescription = "Cette application utilise le Bluetooth pour détecter les annonces BLE à proximité tant qu'elle est ouverte.";

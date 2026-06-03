@@ -1,0 +1,1 @@
+NSBluetoothAlwaysUsageDescription = "This app uses Bluetooth to scan for nearby BLE advertisements while the app is open.";

@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		84C495F42FD04B8D007803D4 /* Near.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Near.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		84C495F42FD04B8D007803D4 /* Nearbyglasses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nearbyglasses.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -40,7 +40,7 @@
 		84C495F52FD04B8D007803D4 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				84C495F42FD04B8D007803D4 /* Near.app */,
+				84C495F42FD04B8D007803D4 /* Nearbyglasses.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -67,7 +67,7 @@
 			packageProductDependencies = (
 			);
 			productName = Near;
-			productReference = 84C495F42FD04B8D007803D4 /* Near.app */;
+			productReference = 84C495F42FD04B8D007803D4 /* Nearbyglasses.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -91,6 +91,11 @@
 			knownRegions = (
 				en,
 				Base,
+				de,
+				fr,
+				es,
+				it,
+				pt,
 			);
 			mainGroup = 84C495EB2FD04B8D007803D4;
 			minimizedProjectReferenceProxies = 1;
@@ -251,10 +256,15 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = RN6ZQ9XYA8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Nearby;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Near scans for nearby smart glasses Bluetooth signals for privacy awareness.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIBackgroundModes = "bluetooth-central";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -264,7 +274,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.luvlu.Near;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Nearbyglasses;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -282,10 +292,15 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = RN6ZQ9XYA8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Nearby;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Near scans for nearby smart glasses Bluetooth signals for privacy awareness.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIBackgroundModes = "bluetooth-central";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -295,7 +310,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.luvlu.Near;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Nearbyglasses;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;

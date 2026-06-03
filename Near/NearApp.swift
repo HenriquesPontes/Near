@@ -10,9 +10,11 @@ import SwiftData
 
 @main
 struct NearApp: App {
+    @AppStorage("selectedLanguage") var selectedLanguage: String = Bundle.main.preferredLocalizations.first ?? "en"
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            DetectedDevice.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -26,6 +28,7 @@ struct NearApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(\.locale, Locale(identifier: selectedLanguage))
         }
         .modelContainer(sharedModelContainer)
     }
