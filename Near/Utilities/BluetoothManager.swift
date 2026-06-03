@@ -308,6 +308,17 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         content.body = baseMsg + suffix
         content.sound = .default
         
+        #if os(iOS)
+        if let image = UIImage(named: "notification_icon"),
+           let data = image.pngData() {
+            let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("notification_icon.png")
+            try? data.write(to: tempURL)
+            if let attachment = try? UNNotificationAttachment(identifier: "notification_icon", url: tempURL, options: nil) {
+                content.attachments = [attachment]
+            }
+        }
+        #endif
+        
         let request = UNNotificationRequest(
             identifier: UUID().uuidString,
             content: content,
