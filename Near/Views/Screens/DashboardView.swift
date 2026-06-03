@@ -39,9 +39,14 @@ struct DashboardView: View {
                         List {
                             ForEach(historicalDevices.prefix(10)) { device in
                                 NavigationLink(destination: DeviceDetailView(device: device)) {
-                                    Text(device.name)
-                                        .font(.system(size: 16, weight: .regular, design: .rounded))
-                                        .foregroundColor(.primary)
+                                    HStack(spacing: 12) {
+                                        DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
+                                            .frame(width: 24, height: 24)
+                                        
+                                        Text(device.name)
+                                            .font(.system(size: 16, weight: .regular, design: .rounded))
+                                            .foregroundColor(.primary)
+                                    }
                                 }
                             }
                             .onDelete(perform: deleteDevices)
@@ -188,9 +193,14 @@ struct AllResultsView: View {
         List {
             ForEach(historicalDevices) { device in
                 NavigationLink(destination: DeviceDetailView(device: device)) {
-                    Text(device.name)
-                        .font(.system(size: 16, weight: .regular, design: .rounded))
-                        .foregroundColor(.primary)
+                    HStack(spacing: 12) {
+                        DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
+                            .frame(width: 24, height: 24)
+                        
+                        Text(device.name)
+                            .font(.system(size: 16, weight: .regular, design: .rounded))
+                            .foregroundColor(.primary)
+                    }
                 }
             }
             .onDelete(perform: deleteDevices)
