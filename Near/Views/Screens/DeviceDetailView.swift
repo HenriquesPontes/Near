@@ -184,7 +184,7 @@ struct DeviceDetailView: View {
                                 Text(trackerActive ? "Audio Guidance Active" : "Enable Audio Guidance")
                             }
                             .font(.system(size: 14, weight: .bold, design: .rounded))
-                            .foregroundColor(.white)
+                            .foregroundColor(trackerActive ? .white : foregroundColorForType(device.type))
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
                             .background(trackerActive ? Color.green : colorForType(device.type))
@@ -210,6 +210,7 @@ struct DeviceDetailView: View {
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(colorForType(device.type))
+                        .foregroundStyle(foregroundColorForType(device.type))
                         .controlSize(.large)
                         
                         Text("Note: Distance tracking relies on Bluetooth signals which can fluctuate. False positives in distance estimation may occur due to physical obstructions.")

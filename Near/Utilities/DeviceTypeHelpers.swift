@@ -37,6 +37,12 @@ func colorForType(_ type: String) -> Color {
     }
 }
 
+/// Returns the optimal text color (black or white) to use on top of the brand color.
+func foregroundColorForType(_ type: String) -> Color {
+    let bg = colorForType(type)
+    return bg == .yellow ? .black : .white
+}
+
 /// Returns a human-readable display name for a device type string.
 func displayNameForType(_ type: String) -> String {
     switch type {
