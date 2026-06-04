@@ -45,8 +45,6 @@ struct DashboardView: View {
                                         HStack(spacing: 12) {
                                             DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
                                                 .frame(width: 32, height: 32)
-                                                .background(colorForType(device.type).opacity(0.1))
-                                                .cornerRadius(8)
                                             
                                             VStack(alignment: .leading, spacing: 4) {
                                                 Text(device.name)
@@ -86,8 +84,6 @@ struct DashboardView: View {
                                             HStack(spacing: 12) {
                                                 DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
                                                     .frame(width: 32, height: 32)
-                                                    .background(colorForType(device.type).opacity(0.1))
-                                                    .cornerRadius(8)
                                                 
                                                 VStack(alignment: .leading, spacing: 4) {
                                                     HStack(spacing: 4) {
@@ -314,8 +310,6 @@ struct AllResultsView: View {
                         DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
                             .frame(width: 20, height: 20)
                             .frame(width: 32, height: 32)
-                            .background(colorForType(device.type).opacity(0.1))
-                            .cornerRadius(8)
                         
                         VStack(alignment: .leading, spacing: 4) {
                             HStack(spacing: 4) {

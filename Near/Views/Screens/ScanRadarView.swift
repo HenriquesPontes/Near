@@ -277,11 +277,8 @@ struct ScanRadarView: View {
         
         return VStack(alignment: .leading, spacing: 6) {
             HStack {
-                DeviceIconView(icon: iconForType(device.type), color: .white)
-                    .frame(width: 14, height: 14)
-                    .padding(6)
-                    .background(colorForType(device.type).opacity(0.8))
-                    .cornerRadius(6)
+                DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
+                    .frame(width: 26, height: 26)
                 
                 Spacer()
                 

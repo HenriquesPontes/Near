@@ -65,9 +65,7 @@ struct DeviceIconView: View {
         if customIcons.contains(icon) {
             Image(icon)
                 .resizable()
-                .renderingMode(.template)
                 .aspectRatio(contentMode: .fit)
-                .foregroundColor(color)
         } else {
             Image(systemName: icon)
                 .resizable()

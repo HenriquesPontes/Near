@@ -44,12 +44,8 @@ struct DeviceDetailView: View {
                 Section {
                     VStack(spacing: 12) {
                         Spacer(minLength: 4)
-                        DeviceIconView(icon: iconForType(device.type), color: .white)
-                            .frame(width: 32, height: 32)
-                            .frame(width: 72, height: 72)
-                            .background(colorForType(device.type))
-                            .clipShape(Circle())
-                            .shadow(color: colorForType(device.type).opacity(0.4), radius: 12)
+                        DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
+                            .frame(width: 64, height: 64)
                         
                         VStack(spacing: 4) {
                             Text(device.name)
