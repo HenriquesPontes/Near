@@ -53,7 +53,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @AppStorage("alertOnNewDevices") var alertOnNewDevices: Bool = true
     @AppStorage("rssiThreshold") var rssiThreshold: Int = -75
     @AppStorage("autoStartScanning") var autoStartScanning: Bool = false
-    @AppStorage("continueScanInBackground") var continueScanInBackground: Bool = true {
+    @AppStorage("continueScanInBackground") var continueScanInBackground: Bool = false {
         willSet {
             objectWillChange.send()
         }
