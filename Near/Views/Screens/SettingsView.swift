@@ -316,6 +316,38 @@ struct DeviceFiltersSettingsView: View {
                 )
                 
                 SettingsFilterToggleRow(
+                    title: "Oakley Meta Series",
+                    description: "Sporty photo/video capturing",
+                    icon: iconForType("oakley_meta"),
+                    color: .red,
+                    isOn: bindingForType("oakley_meta")
+                )
+                
+                SettingsFilterToggleRow(
+                    title: "Project Aria",
+                    description: "Meta research sensor arrays",
+                    icon: iconForType("project_aria"),
+                    color: .red,
+                    isOn: bindingForType("project_aria")
+                )
+                
+                SettingsFilterToggleRow(
+                    title: "Meta Orion",
+                    description: "Advanced AR holographic glasses",
+                    icon: iconForType("meta_orion"),
+                    color: .red,
+                    isOn: bindingForType("meta_orion")
+                )
+                
+                SettingsFilterToggleRow(
+                    title: "Other Meta Glasses",
+                    description: "Generic Luxottica/Meta hardware",
+                    icon: iconForType("other_meta_glasses"),
+                    color: .red,
+                    isOn: bindingForType("other_meta_glasses")
+                )
+                
+                SettingsFilterToggleRow(
                     title: "Apple Vision Pro",
                     description: "Spatial video & high power AR logging",
                     icon: iconForType("vision_pro"),

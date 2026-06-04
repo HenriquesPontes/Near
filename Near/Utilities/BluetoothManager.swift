@@ -28,7 +28,7 @@ struct BluetoothDevice: Identifiable, Hashable {
 
     var threatLevel: String {
         switch type {
-        case "rayban_meta", "vision_pro", "google_glass", "samsung_glasses":
+        case "rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses", "vision_pro", "google_glass", "samsung_glasses":
             return "High"
         case "snap_spectacles":
             return "High"
@@ -80,7 +80,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         get {
             let raw = UserDefaults.standard.string(forKey: "enabledAlertTypes") ?? ""
             if raw.isEmpty {
-                return ["rayban_meta", "vision_pro", "snap_spectacles", "google_glass", "samsung_glasses", "unknown"]
+                return ["rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses", "vision_pro", "snap_spectacles", "google_glass", "samsung_glasses", "unknown"]
             }
             let arr = (try? JSONDecoder().decode([String].self, from: Data(raw.utf8))) ?? []
             return Set(arr)
@@ -334,6 +334,14 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         switch device.type {
         case "rayban_meta":
             title = String(localized: "Ray-Ban Meta Nearby! ⚠️", locale: locale)
+        case "oakley_meta":
+            title = String(localized: "Oakley Meta Nearby! ⚠️", locale: locale)
+        case "project_aria":
+            title = String(localized: "Project Aria Nearby! ⚠️", locale: locale)
+        case "meta_orion":
+            title = String(localized: "Meta Orion Nearby! ⚠️", locale: locale)
+        case "other_meta_glasses":
+            title = String(localized: "Meta Smart Glasses Nearby! ⚠️", locale: locale)
         case "vision_pro":
             title = String(localized: "Apple Vision Pro Nearby! ⚠️", locale: locale)
         case "snap_spectacles":
@@ -365,12 +373,26 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 
         var suffix = ""
         switch device.type {
-        case "rayban_meta":
+        case "rayban_meta", "oakley_meta", "other_meta_glasses":
             suffix =
                 " "
                 + String(
                     localized:
                         "Be aware: this device can capture high-res video and audio discrete recording.",
+                    locale: locale)
+        case "project_aria":
+            suffix =
+                " "
+                + String(
+                    localized:
+                        "Be aware: this research device captures extensive environmental and sensor data.",
+                    locale: locale)
+        case "meta_orion":
+            suffix =
+                " "
+                + String(
+                    localized:
+                        "Be aware: AR holographic glasses with spatial tracking active.",
                     locale: locale)
         case "vision_pro":
             suffix =
@@ -515,14 +537,24 @@ extension BluetoothManager: CBCentralManagerDelegate {
         }
 
         // 2. Categorize by Name or Company ID
-        // Note: For Meta, we check explicit ray-ban names OR the company IDs (since we filtered out "quest" above)
-        // We avoid just matching "meta" because it matches "Metal", "Metadata", etc.
         let isMetaCompany = (discoveredCompanyID == 0x058E || discoveredCompanyID == 0x01AB || discoveredCompanyID == 0x0D53)
         let isExplicitRayBan = lowerName.contains("ray-ban") || lowerName.contains("rb-meta") || lowerName.contains("rayban")
+        let isExplicitOakley = lowerName.contains("oakley")
+        let isExplicitAria = lowerName.contains("aria")
+        let isExplicitOrion = lowerName.contains("orion")
         let isMetaWithKeywords = lowerName.contains("meta") && (isMetaCompany || lowerName.contains("glasses") || lowerName.contains("smart"))
         
-        if isExplicitRayBan || isMetaCompany || isMetaWithKeywords {
+        if isExplicitRayBan {
             detectedType = "rayban_meta"
+        } else if isExplicitOakley {
+            detectedType = "oakley_meta"
+        } else if isExplicitAria {
+            detectedType = "project_aria"
+        } else if isExplicitOrion {
+            detectedType = "meta_orion"
+        } else if isMetaCompany || isMetaWithKeywords {
+            // Fallback for other Meta devices
+            detectedType = "other_meta_glasses"
         } else if (lowerName.contains("vision pro") || lowerName.contains("apple vision"))
             || ((lowerName.contains("vision") || lowerName.contains("glass"))
                 && discoveredCompanyID == 0x004C)

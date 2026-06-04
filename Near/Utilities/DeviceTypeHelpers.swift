@@ -14,7 +14,7 @@ import SwiftUI
 /// Returns the appropriate SF Symbol name for a device type string.
 func iconForType(_ type: String) -> String {
     switch type {
-    case "rayban_meta": return "eyeglasses"
+    case "rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses": return "eyeglasses"
     case "vision_pro": return "apple.logo"
     case "snap_spectacles": return "snapchat_icon"
     case "google_glass": return "g.circle.fill"
@@ -26,7 +26,7 @@ func iconForType(_ type: String) -> String {
 /// Returns the brand color associated with a device type string.
 func colorForType(_ type: String) -> Color {
     switch type {
-    case "rayban_meta": return .red
+    case "rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses": return .red
     case "vision_pro": return .purple
     case "snap_spectacles": return .yellow
     case "google_glass": return .green
@@ -39,6 +39,10 @@ func colorForType(_ type: String) -> Color {
 func displayNameForType(_ type: String) -> String {
     switch type {
     case "rayban_meta": return "Ray-Ban Meta"
+    case "oakley_meta": return "Oakley Meta"
+    case "project_aria": return "Project Aria"
+    case "meta_orion": return "Meta Orion"
+    case "other_meta_glasses": return "Meta Smart Glasses"
     case "vision_pro": return "Apple Vision Pro"
     case "snap_spectacles": return "Snapchat Spectacles"
     case "google_glass": return "Google Glass"
