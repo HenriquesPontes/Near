@@ -572,7 +572,7 @@ extension BluetoothManager: CBCentralManagerDelegate {
                 || discoveredCompanyID == 0x0D53)
         let isExplicitRayBan =
             lowerName.contains("ray-ban") || lowerName.contains("rb-meta")
-            || lowerName.contains("rayban")
+            || lowerName.contains("rayban") || discoveredCompanyID == 0x01AB
         let isExplicitOakley = lowerName.contains("oakley")
         let isExplicitAria = lowerName.contains("aria")
         let isExplicitOrion = lowerName.contains("orion")
