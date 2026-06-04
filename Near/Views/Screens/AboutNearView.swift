@@ -18,9 +18,7 @@ The app’s author Henriques Pontes takes no liability whatsoever for this app n
             
             Section(header: Text("⚠ DO NOT HARASS ANYONE ⚠")) {
                 Text("""
-HARASSING someone because you think they are wearing a covert surveillance device can be a criminal offence. It may even be a more serious offence than using such a device. Please seek legal advice regarding your local laws on this matter.
-
-Use with extreme caution! As stated before: There is no guarantee that detected smart glasses are really nearby. It might be another device looking technically (on the BLE adv level) similar to smart glasses.
+Any form of harassment or confrontation based on the suspicion of covert surveillance is unacceptable and may be illegal. *Near* relies on Bluetooth Low Energy (BLE) heuristics that can produce false positives—such as mistaking a VR headset or smartwatch for smart glasses. This app is designed solely for personal situational awareness. Always act responsibly and familiarize yourself with your local privacy laws.
 
 Please do not act rashly. Think before you act upon any messages (not only from this app).
 """)
