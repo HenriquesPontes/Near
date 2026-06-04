@@ -449,6 +449,9 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 
         content.body = baseMsg + suffix
         content.sound = .default
+        if #available(iOS 15.0, *) {
+            content.interruptionLevel = .timeSensitive
+        }
 
         let request = UNNotificationRequest(
             identifier: UUID().uuidString,
@@ -745,6 +748,6 @@ extension BluetoothManager: UNUserNotificationCenterDelegate {
             @escaping (UNNotificationPresentationOptions) -> Void
     ) {
         // Present visual native iOS notification banner and play sound even in foreground
-        completionHandler([.banner, .sound, .badge])
+        completionHandler([.banner, .list, .sound, .badge])
     }
 }
