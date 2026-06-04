@@ -3,8 +3,8 @@
 An iOS application designed to detect nearby smart glasses and provide privacy awareness through Bluetooth Low Energy (BLE) scanning.
 
 > [!WARNING]
-> **DO NOT HARASS ANYONE AT ALL.**
-> Harassing someone because you think they are wearing a covert surveillance device can be a criminal offence. The app relies on BLE identifiers which can produce false positives (e.g., detecting VR headsets from the same manufacturer). Please act responsibly and seek legal advice regarding your local laws on privacy and surveillance.
+> **DO NOT HARASS ANYONE.**
+> Any form of harassment or confrontation based on the suspicion of covert surveillance is unacceptable and may be illegal. *Near* relies on Bluetooth Low Energy (BLE) heuristics that can produce false positives—such as mistaking a VR headset or smartwatch for smart glasses. This app is designed solely for personal situational awareness. Always act responsibly and familiarize yourself with your local privacy laws.
 
 ---
 
