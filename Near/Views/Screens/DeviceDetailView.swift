@@ -260,7 +260,13 @@ struct DeviceDetailView: View {
         trackingTask = Task {
             while !Task.isCancelled {
                 // Find if there is an active BLE update for this device ID
-                if let activeDev = btManager.detectedDevices.first(where: { $0.deviceId == device.deviceId }) {
+                var targetDev = btManager.detectedDevices.first(where: { $0.deviceId == device.deviceId })
+                if targetDev == nil {
+                    // Fallback to closest device of same type if MAC rotated
+                    targetDev = btManager.detectedDevices.filter({ $0.type == device.type }).max(by: { $0.rssi < $1.rssi })
+                }
+                
+                if let activeDev = targetDev {
                     currentRssi = activeDev.rssi
                 }
                 

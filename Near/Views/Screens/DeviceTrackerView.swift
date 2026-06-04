@@ -145,6 +145,10 @@ struct DeviceTrackerView: View {
     #endif
     
     private func startTracking() {
+        if !btManager.isScanning {
+            btManager.startScanning()
+        }
+        
         // Animate Rings
         withAnimation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
             pulseScale = 1.05
@@ -154,7 +158,13 @@ struct DeviceTrackerView: View {
         trackingTask = Task {
             while !Task.isCancelled {
                 // Poll BluetoothManager for the latest raw RSSI of this device
-                if let activeDev = btManager.detectedDevices.first(where: { $0.deviceId == device.deviceId }) {
+                var targetDev = btManager.detectedDevices.first(where: { $0.deviceId == device.deviceId })
+                if targetDev == nil {
+                    // Fallback to tracking the closest device of the exact same type if original MAC rotated
+                    targetDev = btManager.detectedDevices.filter({ $0.type == device.type }).max(by: { $0.rssi < $1.rssi })
+                }
+                
+                if let activeDev = targetDev {
                     smoother.add(rssi: activeDev.rssi)
                 }
                 
