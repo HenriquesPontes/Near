@@ -13,7 +13,8 @@ struct DashboardView: View {
     @Query(sort: \DetectedDevice.timestamp, order: .reverse) private var historicalDevices: [DetectedDevice]
     @ObservedObject var btManager = BluetoothManager.shared
     
-
+    @AppStorage("hasAcceptedRadarModeWarning") private var hasAcceptedRadarModeWarning = false
+    @State private var showRadarWarning = false
     
     var body: some View {
         NavigationStack {
@@ -169,8 +170,12 @@ struct DashboardView: View {
                 // Top Right Radar Toggle Button
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        withAnimation(.spring(response: 0.35, dampingFraction: 0.6, blendDuration: 0)) {
-                            btManager.continueScanInBackground.toggle()
+                        if !btManager.continueScanInBackground && !hasAcceptedRadarModeWarning {
+                            showRadarWarning = true
+                        } else {
+                            withAnimation(.spring(response: 0.35, dampingFraction: 0.6, blendDuration: 0)) {
+                                btManager.continueScanInBackground.toggle()
+                            }
                         }
                     } label: {
                         Image(systemName: btManager.continueScanInBackground ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash")
@@ -178,6 +183,18 @@ struct DashboardView: View {
                             .font(.system(size: 17))
                     }
                 }
+            }
+            .alert("Enable Radar Mode?", isPresented: $showRadarWarning) {
+                Button("Cancel", role: .cancel) {
+                }
+                Button("Accept") {
+                    hasAcceptedRadarModeWarning = true
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.6, blendDuration: 0)) {
+                        btManager.continueScanInBackground = true
+                    }
+                }
+            } message: {
+                Text("The app will scan for devices in the background and app notifies you when smart glasses are nearby")
             }
 
             // Listen to BLE Manager alerts
