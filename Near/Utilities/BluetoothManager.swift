@@ -548,6 +548,11 @@ extension BluetoothManager: CBCentralManagerDelegate {
         {
             discoveredCompanyID = UInt16(manufacturerData[0]) | (UInt16(manufacturerData[1]) << 8)
         }
+        
+        var hasMetaServiceUUID = false
+        if let serviceUUIDs = advertisementData[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID] {
+            hasMetaServiceUUID = serviceUUIDs.contains(CBUUID(string: "FD60"))
+        }
 
         // Resolve manufacturer name from company ID
         var manufacturerName: String? = nil
@@ -556,9 +561,10 @@ extension BluetoothManager: CBCentralManagerDelegate {
         }
 
         // 1. Categorize by Name or Company ID FIRST
-        let isMetaCompany =
+        let isMetaCompany = hasMetaServiceUUID || 
             (discoveredCompanyID == 0x058E || discoveredCompanyID == 0x01AB
-                || discoveredCompanyID == 0x0D53)
+                || discoveredCompanyID == 0x0D53 || discoveredCompanyID == 0x05FD 
+                || discoveredCompanyID == 0xFD60 || discoveredCompanyID == 0x027D)
         let isExplicitRayBan =
             lowerName.contains("ray-ban") || lowerName.contains("rb-meta")
             || lowerName.contains("rayban")
