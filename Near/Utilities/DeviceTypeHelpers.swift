@@ -17,6 +17,8 @@ func iconForType(_ type: String) -> String {
     case "rayban_meta": return "eyeglasses"
     case "vision_pro": return "apple.logo"
     case "snap_spectacles": return "snapchat_icon"
+    case "google_glass": return "g.circle.fill"
+    case "samsung_glasses": return "s.circle.fill"
     default: return "questionmark.circle.fill"
     }
 }
@@ -27,6 +29,8 @@ func colorForType(_ type: String) -> Color {
     case "rayban_meta": return .red
     case "vision_pro": return .purple
     case "snap_spectacles": return .yellow
+    case "google_glass": return .green
+    case "samsung_glasses": return .blue
     default: return .gray
     }
 }
@@ -37,6 +41,8 @@ func displayNameForType(_ type: String) -> String {
     case "rayban_meta": return "Ray-Ban Meta"
     case "vision_pro": return "Apple Vision Pro"
     case "snap_spectacles": return "Snapchat Spectacles"
+    case "google_glass": return "Google Glass"
+    case "samsung_glasses": return "Samsung Smart Glasses"
     default: return "Unknown Device"
     }
 }
@@ -61,3 +67,31 @@ struct DeviceIconView: View {
         }
     }
 }
+
+// MARK: - Signal Strength & Proximity Utilities
+
+/// Estimates the distance in meters based on the RSSI value.
+func estimatedDistance(for rssi: Int) -> Double {
+    let txPower = -59.0
+    if rssi == 0 { return -1.0 }
+    let ratio = Double(rssi) * 1.0 / txPower
+    if ratio < 1.0 {
+        return pow(ratio, 10.0)
+    } else {
+        return (0.89976) * pow(ratio, 7.7095) + 0.111
+    }
+}
+
+/// Returns the color associated with a given RSSI signal strength.
+func colorForRssi(_ rssi: Int) -> Color {
+    if rssi >= -60 {
+        return .red
+    } else if rssi >= -75 {
+        return .orange
+    } else if rssi >= -88 {
+        return .yellow
+    } else {
+        return .blue
+    }
+}
+

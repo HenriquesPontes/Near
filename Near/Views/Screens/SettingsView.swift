@@ -119,7 +119,7 @@ struct SettingsView: View {
                             .foregroundColor(.blue)
                             .font(.system(size: 18))
                             .frame(width: 24, height: 24)
-                        Text("Device Filters")
+                        Text("Device Channels")
                             .font(.system(size: 16, weight: .medium, design: .rounded))
                     }
                 }
@@ -127,20 +127,6 @@ struct SettingsView: View {
             
             // SECTION 3: ABOUT
             Section(header: Text("About")) {
-                // About Near Row
-                NavigationLink {
-                    PrivacyInfoView()
-                } label: {
-                    HStack(spacing: 16) {
-                        Image(systemName: "info.circle.fill")
-                            .foregroundColor(.blue)
-                            .font(.system(size: 18))
-                            .frame(width: 24, height: 24)
-                        Text("About Near")
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
-                    }
-                }
-                
                 // Version Row
                 HStack(spacing: 16) {
                     Image(systemName: "number")
@@ -150,23 +136,23 @@ struct SettingsView: View {
                     Text("Version")
                         .font(.system(size: 16, weight: .medium, design: .rounded))
                     Spacer()
-                    Text(appVersion)
+                    Text("\(appVersion) (\(appBuild))")
                         .font(.system(size: 15, design: .rounded))
                         .foregroundColor(.secondary)
                 }
                 
-                // Build Row
-                HStack(spacing: 16) {
-                    Image(systemName: "hammer.fill")
-                        .foregroundColor(.blue)
-                        .font(.system(size: 18))
-                        .frame(width: 24, height: 24)
-                    Text("Build")
-                        .font(.system(size: 16, weight: .medium, design: .rounded))
-                    Spacer()
-                    Text(appBuild)
-                        .font(.system(size: 15, design: .rounded))
-                        .foregroundColor(.secondary)
+                // About Near Row
+                NavigationLink {
+                    AboutNearView()
+                } label: {
+                    HStack(spacing: 16) {
+                        Image(systemName: "info.circle.fill")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                            .frame(width: 24, height: 24)
+                        Text("About Near")
+                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                    }
                 }
                 
                 // Licences Row
@@ -346,6 +332,22 @@ struct DeviceFiltersSettingsView: View {
                 )
                 
                 SettingsFilterToggleRow(
+                    title: "Google Glass",
+                    description: "First-person POV video and HUD",
+                    icon: iconForType("google_glass"),
+                    color: .green,
+                    isOn: bindingForType("google_glass")
+                )
+                
+                SettingsFilterToggleRow(
+                    title: "Samsung Smart Glasses",
+                    description: "Samsung wearable HUD and cameras",
+                    icon: iconForType("samsung_glasses"),
+                    color: .blue,
+                    isOn: bindingForType("samsung_glasses")
+                )
+                
+                SettingsFilterToggleRow(
                     title: "Unknown Smart Devices",
                     description: "Generic smart wear emissions",
                     icon: iconForType("unknown"),
@@ -390,7 +392,7 @@ struct DeviceFiltersSettingsView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle("Device Filters")
+        .navigationTitle("Device Channels")
         .navigationBarTitleDisplayMode(.inline)
 
     }
@@ -576,68 +578,6 @@ This License will be governed by and construed in accordance with the laws of th
     }
 }
 
-// Info / About Screen
-struct PrivacyInfoView: View {
-    var body: some View {
-        ZCenterContainer {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    Text("Near App Privacy Awareness")
-                        .font(.system(size: 22, weight: .bold, design: .rounded))
-                        .foregroundColor(.primary)
-                        .padding(.top, 10)
-                    
-                    Text("Near is a utility designed to detect and log radio emissions from nearby smart glasses and optical wearables.")
-                        .font(.system(size: 14))
-                        .foregroundColor(.secondary)
-                        .lineSpacing(4)
-                    
-                    Text("Why is this needed?")
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .foregroundColor(.primary)
-                        .padding(.top, 10)
-                    
-                    Text("Camera-integrated smart glasses make it incredibly easy to record audio and video discreetly in public spaces, gyms, and private environments. Near continuously monitors BLE advertisements to identify these devices before they capture your image.")
-                        .font(.system(size: 14))
-                        .foregroundColor(.secondary)
-                        .lineSpacing(4)
-                    
-                    Text("How to respond if alerted:")
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .foregroundColor(.primary)
-                        .padding(.top, 10)
-                    
-                    VStack(alignment: .leading, spacing: 12) {
-                        bulletPoint(number: "1", text: "Visually scan for the device. Look for someone wearing glasses with thicker frames or a tiny lens on the corner hinges.")
-                        bulletPoint(number: "2", text: "Look for recording indicators. Devices like Ray-Ban Meta glasses have a capture LED light on the frame. If it's solid white, it is actively recording or streaming.")
-                        bulletPoint(number: "3", text: "Politely ask the wearer to cover the camera or remove their glasses if in a private space where recording is prohibited.")
-                    }
-                    
-                    Spacer()
-                }
-                .padding(24)
-            }
-        }
-        .navigationTitle("About Near")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-    
-    private func bulletPoint(number: String, text: LocalizedStringKey) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Text(number)
-                .font(.system(size: 12, weight: .black))
-                .foregroundColor(.white)
-                .frame(width: 24, height: 24)
-                .background(Color.blue)
-                .clipShape(Circle())
-            
-            Text(text)
-                .font(.system(size: 13))
-                .foregroundColor(.secondary)
-                .lineSpacing(2)
-        }
-    }
-}
 
 struct CooldownSettingsView: View {
     @ObservedObject var btManager = BluetoothManager.shared

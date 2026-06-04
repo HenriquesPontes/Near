@@ -7,7 +7,20 @@
 		<key>Near.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>0</integer>
+			<integer>1</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>84C495F32FD04B8D007803D4</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>F638C587CBCAE5203737FE60</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>

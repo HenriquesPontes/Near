@@ -113,9 +113,7 @@ RSSI drops roughly according to:
 
 ---
 
-## ToDos
-- Add an option to set false positives to an ignore whitelist.
-- Add **more manufacturer IDs** of smart glasses. Right now, oakley and snap are supported. If you have logs from other camera-integrated glasses, please send them in!
+
 
 ---
 

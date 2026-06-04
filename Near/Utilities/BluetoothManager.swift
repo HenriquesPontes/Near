@@ -10,13 +10,15 @@ import CoreBluetooth
 internal import CoreLocation
 import Foundation
 import SwiftUI
+import UIKit
 import UserNotifications
+
 
 struct BluetoothDevice: Identifiable, Hashable {
     var id: UUID = UUID()
     var deviceId: String
     var name: String
-    var type: String  // "rayban_meta", "vision_pro", "snap_spectacles", "unknown"
+    var type: String  // "rayban_meta", "vision_pro", "snap_spectacles", "google_glass", "samsung_glasses", "unknown"
     var rssi: Int
     var lastSeen: Date = Date()
     var isStarred: Bool = false
@@ -26,7 +28,7 @@ struct BluetoothDevice: Identifiable, Hashable {
 
     var threatLevel: String {
         switch type {
-        case "rayban_meta", "vision_pro":
+        case "rayban_meta", "vision_pro", "google_glass", "samsung_glasses":
             return "High"
         case "snap_spectacles":
             return "High"
@@ -36,18 +38,7 @@ struct BluetoothDevice: Identifiable, Hashable {
     }
 
     var estimatedDistance: Double {
-        // Distance calculation based on RSSI
-        // TxPower at 1m is typically -59dBm
-        let txPower = -59.0
-        if rssi == 0 {
-            return -1.0
-        }
-        let ratio = Double(rssi) * 1.0 / txPower
-        if ratio < 1.0 {
-            return pow(ratio, 10.0)
-        } else {
-            return (0.89976) * pow(ratio, 7.7095) + 0.111
-        }
+        return Nearbyglasses.estimatedDistance(for: rssi)
     }
 }
 
@@ -89,7 +80,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         get {
             let raw = UserDefaults.standard.string(forKey: "enabledAlertTypes") ?? ""
             if raw.isEmpty {
-                return ["rayban_meta", "vision_pro", "snap_spectacles", "unknown"]
+                return ["rayban_meta", "vision_pro", "snap_spectacles", "google_glass", "samsung_glasses", "unknown"]
             }
             let arr = (try? JSONDecoder().decode([String].self, from: Data(raw.utf8))) ?? []
             return Set(arr)
@@ -326,7 +317,9 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         lastNotifiedTimes[device.deviceId] = now
         sendPrivacyAlert(for: device)
         saveToSwiftDataHistory(device: device)
+        AnalyticsManager.shared.trackDetection(device: device)
     }
+
 
     private func sendPrivacyAlert(for device: BluetoothDevice) {
         let lang =
@@ -336,7 +329,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 
         let content = UNMutableNotificationContent()
         
-        // Dynamically select localized title based on device type
+        // Dynamically select localized title based on device type or manufacturer
         let title: String
         switch device.type {
         case "rayban_meta":
@@ -345,8 +338,16 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             title = String(localized: "Apple Vision Pro Nearby! ⚠️", locale: locale)
         case "snap_spectacles":
             title = String(localized: "Snapchat Spectacles Nearby! ⚠️", locale: locale)
+        case "google_glass":
+            title = String(localized: "Google Glass Nearby! ⚠️", locale: locale)
+        case "samsung_glasses":
+            title = String(localized: "Samsung Smart Glasses Nearby! ⚠️", locale: locale)
         default:
-            title = String(localized: "Unknown Wearable Nearby! ⚠️", locale: locale)
+            if let manufacturer = device.manufacturer, !manufacturer.isEmpty {
+                title = String(localized: "\(manufacturer) Device Nearby! ⚠️", locale: locale)
+            } else {
+                title = String(localized: "Unknown Wearable Nearby! ⚠️", locale: locale)
+            }
         }
         content.title = title
 
@@ -382,6 +383,16 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
                 " "
                 + String(
                     localized: "Be aware: AR filming and micro-cameras are active.", locale: locale)
+        case "google_glass":
+            suffix =
+                " "
+                + String(
+                    localized: "Be aware: First-person video capture may be active.", locale: locale)
+        case "samsung_glasses":
+            suffix =
+                " "
+                + String(
+                    localized: "Be aware: Smart eyewear with potential recording active.", locale: locale)
         default:
             suffix =
                 " "
@@ -494,30 +505,38 @@ extension BluetoothManager: CBCentralManagerDelegate {
             manufacturerName = companyName(for: companyID)
         }
 
-        // Categorize by Name or Company ID
-        if lowerName.contains("ray-ban") || lowerName.contains("meta")
-            || lowerName.contains("rb-meta") || discoveredCompanyID == 0x058E
-            || discoveredCompanyID == 0x01AB || discoveredCompanyID == 0x0D53
-        {
+        // 1. Filter out general Bluetooth devices first (to prevent false positives)
+        // We use a regular expression with word boundaries (\b) so short words like "tv" or "car"
+        // don't accidentally match substrings in valid names (e.g. "SmartVision" containing "tv").
+        let genericDevicesRegex = "\\b(keyboard|mouse|headphones|airpods|beats|watch|tv|speaker|tile|trackpad|iphone|ipad|macbook|mac mini|mac studio|imac|mac pro|pencil|homepod|appletv|quest|oculus|tracker|tag|smarttag|display|audio|nintendo|playstation|xbox|car|ford|toyota|honda|bmw|tesla)\\b"
+        
+        if lowerName.range(of: genericDevicesRegex, options: .regularExpression) != nil {
+            return  // Filter out standard accessories and non-glasses devices
+        }
+
+        // 2. Categorize by Name or Company ID
+        // Note: For Meta, we check explicit ray-ban names OR the company IDs (since we filtered out "quest" above)
+        // We avoid just matching "meta" because it matches "Metal", "Metadata", etc.
+        let isMetaCompany = (discoveredCompanyID == 0x058E || discoveredCompanyID == 0x01AB || discoveredCompanyID == 0x0D53)
+        let isExplicitRayBan = lowerName.contains("ray-ban") || lowerName.contains("rb-meta") || lowerName.contains("rayban")
+        let isMetaWithKeywords = lowerName.contains("meta") && (isMetaCompany || lowerName.contains("glasses") || lowerName.contains("smart"))
+        
+        if isExplicitRayBan || isMetaCompany || isMetaWithKeywords {
             detectedType = "rayban_meta"
         } else if (lowerName.contains("vision pro") || lowerName.contains("apple vision"))
             || ((lowerName.contains("vision") || lowerName.contains("glass"))
                 && discoveredCompanyID == 0x004C)
         {
             detectedType = "vision_pro"
-        } else if lowerName.contains("spectacles") || lowerName.contains("snapchat")
+        } else if lowerName.contains("spectacles") || (lowerName.contains("snapchat") && !lowerName.contains("pixy"))
             || discoveredCompanyID == 0x03C2
         {
             detectedType = "snap_spectacles"
+        } else if lowerName.contains("google glass") || (lowerName.contains("glass") && (discoveredCompanyID == 0x018E || discoveredCompanyID == 0x00E0)) {
+            detectedType = "google_glass"
+        } else if (lowerName.contains("samsung") && lowerName.contains("glass")) || (lowerName.contains("glass") && (discoveredCompanyID == 0x02DE || discoveredCompanyID == 0x0075)) {
+            detectedType = "samsung_glasses"
         } else {
-            // Filter out general Bluetooth devices (keyboards, headphones)
-            let genericServices = [
-                "keyboard", "mouse", "headphones", "airpods", "beats", "watch", "tv", "speaker",
-                "tile", "trackpad",
-            ]
-            if genericServices.contains(where: { lowerName.contains($0) }) {
-                return  // Filter out standard accessories
-            }
             detectedType = "unknown"
         }
 

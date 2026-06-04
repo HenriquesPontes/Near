@@ -9,8 +9,14 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
+    @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
+    
     var body: some View {
-        DashboardView()
+        if hasSeenOnboarding {
+            DashboardView()
+        } else {
+            OnboardingView()
+        }
     }
 }
 

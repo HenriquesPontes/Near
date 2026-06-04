@@ -24,6 +24,10 @@ struct NearApp: App {
         }
     }
 
+    init() {
+        _ = PerformanceMonitor.shared
+    }
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             DetectedDevice.self,

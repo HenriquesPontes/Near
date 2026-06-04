@@ -19,6 +19,8 @@ struct DevicePingNode: View {
         case "rayban_meta": return .red
         case "vision_pro": return .purple
         case "snap_spectacles": return .yellow
+        case "google_glass": return .green
+        case "samsung_glasses": return .blue
         default: return .gray
         }
     }

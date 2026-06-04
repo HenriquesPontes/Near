@@ -6,8 +6,61 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		0420780AC69099D0BC3507AA /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 4293F1AF141A0C26F1F83FFA /* Supabase */; };
+		289817BA734F572231F1C45B /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = "TEMP_39E0F2B6-B9B3-4F3B-A3DD-1C6C97AC35C2" /* Supabase */; };
+		2CFA2F8A5259E6144142DD8D /* NearWidget/NearWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A23786C8B41D77B3ADA4F2 /* NearWidget/NearWidget.swift */; };
+		32154EAE93C15F98C21AA6EF /* NearWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AFE7D13441CB9B7ED2898C13 /* NearWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		6579E0033DD00082509C9162 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA6586A37491B8E86641FE7 /* Supabase */; };
+		7EBB09D8145B6AE5CFCFB9D9 /* NearTests/DeviceTypeHelpersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E58DDDAA0C7A8F2A8EAB75BF /* NearTests/DeviceTypeHelpersTests.swift */; };
+		84D665602FD1742C00123C64 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 84D6655F2FD1742C00123C64 /* Auth */; };
+		84D665622FD1742C00123C64 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 84D665612FD1742C00123C64 /* Functions */; };
+		84D665642FD1742C00123C64 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 84D665632FD1742C00123C64 /* PostgREST */; };
+		84D665662FD1742C00123C64 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 84D665652FD1742C00123C64 /* Realtime */; };
+		84D665682FD1742C00123C64 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 84D665672FD1742C00123C64 /* Storage */; };
+		84D6656A2FD1742C00123C64 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 84D665692FD1742C00123C64 /* Supabase */; };
+		B64E5DAE44F8AF2896BAAFD9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 941660B4C7809CF8D7A757CC /* Foundation.framework */; };
+		DE8D693401FBC35254318A16 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 941660B4C7809CF8D7A757CC /* Foundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A796D07319F187888D4FF4EF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84C495EC2FD04B8D007803D4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 84C495F32FD04B8D007803D4;
+			remoteInfo = Near;
+		};
+		D7C9CAF8C305CC866F306434 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84C495EC2FD04B8D007803D4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F638C587CBCAE5203737FE60;
+			remoteInfo = NearWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8B268417080D1A4DC795BB33 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				32154EAE93C15F98C21AA6EF /* NearWidget.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		641CDDB8CA5BE0D6522C4BCF /* NearTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NearTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		83A23786C8B41D77B3ADA4F2 /* NearWidget/NearWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NearWidget/NearWidget.swift; sourceTree = "<group>"; };
 		84C495F42FD04B8D007803D4 /* Nearbyglasses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nearbyglasses.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		941660B4C7809CF8D7A757CC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		AFE7D13441CB9B7ED2898C13 /* NearWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NearWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E58DDDAA0C7A8F2A8EAB75BF /* NearTests/DeviceTypeHelpersTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NearTests/DeviceTypeHelpersTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -19,21 +72,65 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		5BB1680371DF1306AB7465F9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DE8D693401FBC35254318A16 /* Foundation.framework in Frameworks */,
+				0420780AC69099D0BC3507AA /* Supabase in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		84C495F12FD04B8D007803D4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84D665642FD1742C00123C64 /* PostgREST in Frameworks */,
+				84D665622FD1742C00123C64 /* Functions in Frameworks */,
+				84D6656A2FD1742C00123C64 /* Supabase in Frameworks */,
+				84D665602FD1742C00123C64 /* Auth in Frameworks */,
+				84D665682FD1742C00123C64 /* Storage in Frameworks */,
+				84D665662FD1742C00123C64 /* Realtime in Frameworks */,
+				289817BA734F572231F1C45B /* Supabase in Frameworks */,
+				6579E0033DD00082509C9162 /* Supabase in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C2EDEF6678D4A6B6D9D40445 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B64E5DAE44F8AF2896BAAFD9 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3A3C0809D9A71ADB763DBB0B /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				941660B4C7809CF8D7A757CC /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		723BD7952E242A0A3DB1A990 /* NearWidget */ = {
+			isa = PBXGroup;
+			children = (
+				83A23786C8B41D77B3ADA4F2 /* NearWidget/NearWidget.swift */,
+			);
+			name = NearWidget;
+			sourceTree = "<group>";
+		};
 		84C495EB2FD04B8D007803D4 = {
 			isa = PBXGroup;
 			children = (
 				84C495F62FD04B8D007803D4 /* Near */,
 				84C495F52FD04B8D007803D4 /* Products */,
+				889EEF366FAFB9B2464BC1C8 /* Frameworks */,
+				9FDBD22BDDC81F06AB566350 /* NearTests */,
+				723BD7952E242A0A3DB1A990 /* NearWidget */,
 			);
 			sourceTree = "<group>";
 		};
@@ -41,13 +138,49 @@
 			isa = PBXGroup;
 			children = (
 				84C495F42FD04B8D007803D4 /* Nearbyglasses.app */,
+				641CDDB8CA5BE0D6522C4BCF /* NearTests.xctest */,
+				AFE7D13441CB9B7ED2898C13 /* NearWidget.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		889EEF366FAFB9B2464BC1C8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3A3C0809D9A71ADB763DBB0B /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9FDBD22BDDC81F06AB566350 /* NearTests */ = {
+			isa = PBXGroup;
+			children = (
+				E58DDDAA0C7A8F2A8EAB75BF /* NearTests/DeviceTypeHelpersTests.swift */,
+			);
+			name = NearTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		299C3A0B885F68A6E5F1036C /* NearTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 09C2853558D387EBB26E88C8 /* Build configuration list for PBXNativeTarget "NearTests" */;
+			buildPhases = (
+				18FFE4ADB8902BE367BED8C2 /* Sources */,
+				C2EDEF6678D4A6B6D9D40445 /* Frameworks */,
+				A3D01134D2284E84925569FE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3E5C3D79337236EC3DCB98E2 /* PBXTargetDependency */,
+			);
+			name = NearTests;
+			productName = NearTests;
+			productReference = 641CDDB8CA5BE0D6522C4BCF /* NearTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		84C495F32FD04B8D007803D4 /* Near */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 84C496012FD04B8E007803D4 /* Build configuration list for PBXNativeTarget "Near" */;
@@ -55,20 +188,43 @@
 				84C495F02FD04B8D007803D4 /* Sources */,
 				84C495F12FD04B8D007803D4 /* Frameworks */,
 				84C495F22FD04B8D007803D4 /* Resources */,
+				8B268417080D1A4DC795BB33 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				C4B0367663C5C6AE3FCEE623 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				84C495F62FD04B8D007803D4 /* Near */,
 			);
 			name = Near;
 			packageProductDependencies = (
+				5BA6586A37491B8E86641FE7 /* Supabase */,
 			);
 			productName = Near;
 			productReference = 84C495F42FD04B8D007803D4 /* Nearbyglasses.app */;
 			productType = "com.apple.product-type.application";
+		};
+		F638C587CBCAE5203737FE60 /* NearWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0A7DDB82EE78AD0FC1DB0CC6 /* Build configuration list for PBXNativeTarget "NearWidget" */;
+			buildPhases = (
+				6A53AD53E884127EDA6C0A54 /* Sources */,
+				5BB1680371DF1306AB7465F9 /* Frameworks */,
+				AEDDE1D7B0C22724F2A157F5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NearWidget;
+			packageProductDependencies = (
+				4293F1AF141A0C26F1F83FFA /* Supabase */,
+			);
+			productName = NearWidget;
+			productReference = AFE7D13441CB9B7ED2898C13 /* NearWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -99,12 +255,18 @@
 			);
 			mainGroup = 84C495EB2FD04B8D007803D4;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				84D6655E2FD1742C00123C64 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				FE74D98194C9A0B43B398D3B /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 84C495F52FD04B8D007803D4 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				84C495F32FD04B8D007803D4 /* Near */,
+				299C3A0B885F68A6E5F1036C /* NearTests */,
+				F638C587CBCAE5203737FE60 /* NearWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -117,9 +279,39 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A3D01134D2284E84925569FE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AEDDE1D7B0C22724F2A157F5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		18FFE4ADB8902BE367BED8C2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7EBB09D8145B6AE5CFCFB9D9 /* NearTests/DeviceTypeHelpersTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6A53AD53E884127EDA6C0A54 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2CFA2F8A5259E6144142DD8D /* NearWidget/NearWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		84C495F02FD04B8D007803D4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -128,6 +320,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3E5C3D79337236EC3DCB98E2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Near;
+			target = 84C495F32FD04B8D007803D4 /* Near */;
+			targetProxy = A796D07319F187888D4FF4EF /* PBXContainerItemProxy */;
+		};
+		C4B0367663C5C6AE3FCEE623 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = NearWidget;
+			target = F638C587CBCAE5203737FE60 /* NearWidget */;
+			targetProxy = D7C9CAF8C305CC866F306434 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		84C495FF2FD04B8E007803D4 /* Debug */ = {
@@ -255,7 +462,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2606040102;
+				CURRENT_PROJECT_VERSION = 2606041203;
 				DEVELOPMENT_TEAM = RN6ZQ9XYA8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -275,7 +482,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.luvlu.Near;
 				PRODUCT_NAME = Nearbyglasses;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -294,7 +501,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2606040102;
+				CURRENT_PROJECT_VERSION = 2606041203;
 				DEVELOPMENT_TEAM = RN6ZQ9XYA8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -312,7 +519,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.luvlu.Near;
 				PRODUCT_NAME = Nearbyglasses;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -325,9 +532,93 @@
 			};
 			name = Release;
 		};
+		C9716BD20B0A23B496DC65B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				INFOPLIST_FILE = NearTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				PRODUCT_BUNDLE_IDENTIFIER = com.luvlu.NearTests;
+				PRODUCT_NAME = NearTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nearbyglasses.app/Nearbyglasses";
+			};
+			name = Debug;
+		};
+		D020A2972BDC1717AE82E4D3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				DEVELOPMENT_TEAM = RN6ZQ9XYA8;
+				INFOPLIST_FILE = NearWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				PRODUCT_BUNDLE_IDENTIFIER = com.luvlu.Near.NearWidget;
+				PRODUCT_NAME = NearWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		DF50FCD22A57234B5E494F67 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				INFOPLIST_FILE = NearTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				PRODUCT_BUNDLE_IDENTIFIER = com.luvlu.NearTests;
+				PRODUCT_NAME = NearTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nearbyglasses.app/Nearbyglasses";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		ED197DCEB248480B8C2AC51B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				DEVELOPMENT_TEAM = RN6ZQ9XYA8;
+				INFOPLIST_FILE = NearWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				PRODUCT_BUNDLE_IDENTIFIER = com.luvlu.Near.NearWidget;
+				PRODUCT_NAME = NearWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		09C2853558D387EBB26E88C8 /* Build configuration list for PBXNativeTarget "NearTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DF50FCD22A57234B5E494F67 /* Release */,
+				C9716BD20B0A23B496DC65B9 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0A7DDB82EE78AD0FC1DB0CC6 /* Build configuration list for PBXNativeTarget "NearWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ED197DCEB248480B8C2AC51B /* Release */,
+				D020A2972BDC1717AE82E4D3 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		84C495EF2FD04B8D007803D4 /* Build configuration list for PBXProject "Near" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -347,6 +638,73 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		84D6655E2FD1742C00123C64 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+		FE74D98194C9A0B43B398D3B /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4293F1AF141A0C26F1F83FFA /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FE74D98194C9A0B43B398D3B /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+		5BA6586A37491B8E86641FE7 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FE74D98194C9A0B43B398D3B /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+		84D6655F2FD1742C00123C64 /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 84D6655E2FD1742C00123C64 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		84D665612FD1742C00123C64 /* Functions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 84D6655E2FD1742C00123C64 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Functions;
+		};
+		84D665632FD1742C00123C64 /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 84D6655E2FD1742C00123C64 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		84D665652FD1742C00123C64 /* Realtime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 84D6655E2FD1742C00123C64 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Realtime;
+		};
+		84D665672FD1742C00123C64 /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 84D6655E2FD1742C00123C64 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+		84D665692FD1742C00123C64 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 84D6655E2FD1742C00123C64 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+		"TEMP_39E0F2B6-B9B3-4F3B-A3DD-1C6C97AC35C2" /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FE74D98194C9A0B43B398D3B /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 84C495EC2FD04B8D007803D4 /* Project object */;
 }

@@ -19,21 +19,11 @@ struct DeviceDetailView: View {
     
     @State private var currentRssi: Int = -80
     @State private var rssiHistory: [Int] = []
-    @State private var timer: Timer? = nil
+    @State private var trackingTask: Task<Void, Never>? = nil
     @State private var trackerActive = false
     @State private var pulseScale: CGFloat = 1.0
     
-    // Convert current RSSI to estimated distance
-    private var estimatedDistance: Double {
-        let txPower = -59.0
-        if currentRssi == 0 { return -1.0 }
-        let ratio = Double(currentRssi) * 1.0 / txPower
-        if ratio < 1.0 {
-            return pow(ratio, 10.0)
-        } else {
-            return (0.89976) * pow(ratio, 7.7095) + 0.111
-        }
-    }
+
     
     // Proximity Category (Hot & Cold)
     private var proximityStatus: (text: LocalizedStringKey, color: Color, description: LocalizedStringKey) {
@@ -49,7 +39,6 @@ struct DeviceDetailView: View {
     }
     
     var body: some View {
-        ZCenterContainer {
             List {
                 // 1. DEVICE HEADER
                 Section {
@@ -173,7 +162,7 @@ struct DeviceDetailView: View {
                             .font(.system(size: 15, weight: .black, design: .rounded))
                             .foregroundColor(proximityStatus.color)
                         
-                        Text("Estimated distance: ~\(String(format: "%.1f", estimatedDistance)) meters")
+                        Text("Estimated distance: ~\(String(format: "%.1f", estimatedDistance(for: currentRssi))) meters")
                             .font(.system(size: 14, weight: .semibold, design: .rounded))
                             .foregroundColor(.primary)
                         
@@ -238,10 +227,19 @@ struct DeviceDetailView: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .scrollContentBackground(.hidden)
-        }
         .navigationTitle("Device Details")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    device.isStarred.toggle()
+                    try? modelContext.save()
+                } label: {
+                    Image(systemName: device.isStarred ? "star.fill" : "star")
+                        .foregroundColor(device.isStarred ? .yellow : .gray)
+                }
+            }
+        }
         .onAppear {
             currentRssi = device.rssi
             rssiHistory = Array(repeating: device.rssi, count: 10)
@@ -253,28 +251,44 @@ struct DeviceDetailView: View {
     }
     
     private func startTracking() {
-        timer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { _ in
-            // Find if there is an active BLE update for this device ID
-            if let activeDev = btManager.detectedDevices.first(where: { $0.deviceId == device.deviceId }) {
-                currentRssi = activeDev.rssi
-            }
-            
-            // Append and maintain last 20 signals
-            rssiHistory.append(currentRssi)
-            if rssiHistory.count > 20 {
-                rssiHistory.removeFirst()
-            }
-            
-            // Play ping tone if guidance is active
-            if trackerActive {
-                playGuidanceBeep()
+        trackingTask = Task {
+            while !Task.isCancelled {
+                // Find if there is an active BLE update for this device ID
+                if let activeDev = btManager.detectedDevices.first(where: { $0.deviceId == device.deviceId }) {
+                    currentRssi = activeDev.rssi
+                }
+                
+                // Append and maintain last 20 signals
+                rssiHistory.append(currentRssi)
+                if rssiHistory.count > 20 {
+                    rssiHistory.removeFirst()
+                }
+                
+                // Play ping tone if guidance is active
+                if trackerActive {
+                    playGuidanceBeep()
+                }
+                
+                // Dynamic interval based on proximity
+                let interval: Double
+                if currentRssi >= -60 {
+                    interval = 0.2
+                } else if currentRssi >= -75 {
+                    interval = 0.5
+                } else if currentRssi >= -88 {
+                    interval = 1.0
+                } else {
+                    interval = 2.0
+                }
+                
+                try? await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
             }
         }
     }
     
     private func stopTracking() {
-        timer?.invalidate()
-        timer = nil
+        trackingTask?.cancel()
+        trackingTask = nil
     }
     
     private func playGuidanceBeep() {
@@ -290,7 +304,7 @@ struct DeviceDetailView: View {
     
     
     private func hasCamera(for type: String) -> Bool {
-        return type == "rayban_meta" || type == "vision_pro" || type == "snap_spectacles"
+        return type == "rayban_meta" || type == "vision_pro" || type == "snap_spectacles" || type == "google_glass" || type == "samsung_glasses"
     }
     
     private func hasMic(for type: String) -> Bool {
@@ -305,6 +319,10 @@ struct DeviceDetailView: View {
             return "Stereoscopic 3D cameras. Captures spatial videos and environment depth data continuously for digital twinning."
         case "snap_spectacles":
             return "AR capture cameras. Auto-syncs shorts directly to Snapchat cloud networks."
+        case "google_glass":
+            return "POV camera capable of recording 720p/1080p video and photos directly to local storage."
+        case "samsung_glasses":
+            return "Smart eyewear camera. Potential for discrete photo or video recording."
         default:
             return "Unknown camera system. May capture pictures or video streams anonymously."
         }
@@ -318,6 +336,10 @@ struct DeviceDetailView: View {
             return "Dual-driver audio pods with spatial audio calibration. Multi-microphone recording."
         case "snap_spectacles":
             return "Dual microphones for voice recognition and voice clip logging."
+        case "google_glass":
+            return "Built-in microphone for voice commands and audio recording."
+        case "samsung_glasses":
+            return "Microphone array for voice assistance and environmental audio capturing."
         default:
             return "Standard microphone system. Capable of surrounding room conversation recording."
         }
@@ -331,6 +353,10 @@ struct DeviceDetailView: View {
             return "Dual micro-OLED displays (4K resolution per eye). Includes external EyeSight screen showing digital eyes."
         case "snap_spectacles":
             return "Dual Waveguide displays with 2000 nits brightness showing augmented reality projections."
+        case "google_glass":
+            return "Prism projector display creating a semi-transparent HUD in the wearer's peripheral vision."
+        case "samsung_glasses":
+            return "Likely features a micro-projector or waveguide HUD for augmented reality."
         default:
             return "No display HUD detected. Audio/Radio communication channel only."
         }

@@ -182,6 +182,16 @@ struct ScanRadarView: View {
         }
         .navigationTitle("Scan")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    DeviceFiltersSettingsView()
+                } label: {
+                    Image(systemName: "slider.horizontal.3")
+                        .foregroundColor(.primary)
+                }
+            }
+        }
         .onAppear {
             handleScanOnAppear()
         }
