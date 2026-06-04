@@ -26,6 +26,7 @@ struct DashboardView: View {
                             Image(systemName: "shield.slash")
                                 .font(.system(size: 48))
                                 .foregroundColor(.secondary.opacity(0.6))
+                                .symbolEffect(.pulse, options: .repeating)
                             Text("No smart glasses detected yet")
                                 .font(.system(size: 16, weight: .bold, design: .rounded))
                                 .foregroundColor(.primary.opacity(0.8))
