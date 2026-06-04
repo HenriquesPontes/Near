@@ -146,10 +146,9 @@ struct DeviceDetailView: View {
                             .frame(width: 20, height: 20)
                             .scaleEffect(pulseScale)
                             .shadow(color: proximityStatus.color, radius: 8)
+                            .animation(Animation.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: pulseScale)
                             .onAppear {
-                                withAnimation(Animation.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
-                                    pulseScale = 1.3
-                                }
+                                pulseScale = 1.3
                             }
                     }
                     .frame(maxWidth: .infinity)
