@@ -64,49 +64,52 @@ struct DeviceTrackerView: View {
                 
                 VStack {
                     Spacer()
-                
-                // Device Icon
-                DeviceIconView(icon: iconForType(device.type), color: trackingColor)
-                    .frame(width: 80, height: 80)
-                    .padding(.bottom, 20)
-                
-                Text(distanceText)
-                    .font(.system(size: 48, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                    .minimumScaleFactor(0.5)
-                    .lineLimit(1)
-                
-                Text(instructionalText)
-                    .font(.system(size: 16))
-                    .foregroundColor(.white.opacity(0.7))
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
-                    .padding(.top, 8)
-                
-                Spacer()
-                
-                // Radar Rings
-                ZStack {
-                    ForEach(0..<4, id: \.self) { index in
-                        Circle()
-                            .stroke(trackingColor.opacity(index < ringCount ? 0.8 : 0.2), lineWidth: index < ringCount ? 4 : 2)
-                            .frame(width: CGFloat(100 + (index * 60)), height: CGFloat(100 + (index * 60)))
-                            .scaleEffect(index == ringCount - 1 ? pulseScale : 1.0)
-                            .opacity(index == ringCount - 1 ? pulseOpacity : 1.0)
+                    
+                    // Device Icon
+                    DeviceIconView(icon: iconForType(device.type), color: trackingColor)
+                        .frame(width: 80, height: 80)
+                        .padding(.bottom, 20)
+                    
+                    Text(distanceText)
+                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                        .minimumScaleFactor(0.5)
+                        .lineLimit(1)
+                    
+                    Text(instructionalText)
+                        .font(.system(size: 16))
+                        .foregroundColor(.white.opacity(0.7))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
+                        .padding(.top, 8)
+                    
+                    Spacer()
+                    
+                    // Radar Rings
+                    ZStack {
+                        ForEach(0..<4, id: \.self) { index in
+                            Circle()
+                                .stroke(trackingColor.opacity(index < ringCount ? 0.8 : 0.2), lineWidth: index < ringCount ? 4 : 2)
+                                .frame(width: CGFloat(100 + (index * 60)), height: CGFloat(100 + (index * 60)))
+                                .scaleEffect(index == ringCount - 1 ? pulseScale : 1.0)
+                                .opacity(index == ringCount - 1 ? pulseOpacity : 1.0)
+                        }
                     }
+                    .frame(height: 300)
+                    
+                    Spacer()
                 }
-                .frame(height: 300)
-                
-                Spacer()
             }
             .navigationTitle("Tracing Device")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Done") {
-                        dismiss()
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .symbolRenderingMode(.palette)
+                            .foregroundStyle(.white.opacity(0.8), Color(UIColor.tertiarySystemFill))
+                            .font(.system(size: 28))
                     }
-                    .fontWeight(.semibold)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { enableHaptics.toggle() }) {
@@ -115,8 +118,11 @@ struct DeviceTrackerView: View {
                     }
                 }
             }
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(.black, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .preferredColorScheme(.dark)
         }
-        .preferredColorScheme(.dark)
         .onAppear {
             startTracking()
         }
