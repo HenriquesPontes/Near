@@ -70,16 +70,32 @@ struct DeviceIconView: View {
     let icon: String
     let color: Color
     
+    @Environment(\.colorScheme) var colorScheme
+    
     private let customIcons = ["snapchat_icon", "Apple", "Meta", "Samsung", "Google"]
     
     var body: some View {
         if customIcons.contains(icon) {
-            if icon == "Apple" || icon == "Samsung" {
+            if icon == "Apple" {
                 Image(icon)
                     .renderingMode(.template)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .foregroundColor(.primary)
+            } else if icon == "Samsung" {
+                // The Samsung image is likely an opaque black circle with white text.
+                // Template rendering makes it a solid shape.
+                // To make it adapt: in light mode, invert it so it becomes a white circle with black text.
+                if colorScheme == .light {
+                    Image(icon)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .colorInvert()
+                } else {
+                    Image(icon)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                }
             } else if icon == "snapchat_icon" {
                 Image(icon)
                     .renderingMode(.template)
