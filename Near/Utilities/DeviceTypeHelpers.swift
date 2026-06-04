@@ -74,9 +74,23 @@ struct DeviceIconView: View {
     
     var body: some View {
         if customIcons.contains(icon) {
-            Image(icon)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
+            if icon == "Apple" {
+                Image(icon)
+                    .renderingMode(.template)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .foregroundColor(.primary)
+            } else if icon == "snapchat_icon" {
+                Image(icon)
+                    .renderingMode(.template)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .foregroundColor(.yellow)
+            } else {
+                Image(icon)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+            }
         } else {
             Image(systemName: icon)
                 .resizable()
