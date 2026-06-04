@@ -308,51 +308,19 @@ struct DeviceFiltersSettingsView: View {
         List {
             Section(header: Text("Detected Glasses Channel")) {
                 SettingsFilterToggleRow(
-                    title: "Ray-Ban Meta Series",
-                    description: "Discreet photo/video capturing",
+                    title: "Meta AI Glasses",
+                    description: "Ray-Ban Meta, Oakley Meta, Project Aria, Orion",
                     icon: iconForType("rayban_meta"),
                     color: .red,
-                    isOn: bindingForType("rayban_meta")
+                    isOn: bindingForTypes(["rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses"])
                 )
                 
                 SettingsFilterToggleRow(
-                    title: "Oakley Meta Series",
-                    description: "Sporty photo/video capturing",
-                    icon: iconForType("oakley_meta"),
-                    color: .red,
-                    isOn: bindingForType("oakley_meta")
-                )
-                
-                SettingsFilterToggleRow(
-                    title: "Project Aria",
-                    description: "Meta research sensor arrays",
-                    icon: iconForType("project_aria"),
-                    color: .red,
-                    isOn: bindingForType("project_aria")
-                )
-                
-                SettingsFilterToggleRow(
-                    title: "Meta Orion",
-                    description: "Advanced AR holographic glasses",
-                    icon: iconForType("meta_orion"),
-                    color: .red,
-                    isOn: bindingForType("meta_orion")
-                )
-                
-                SettingsFilterToggleRow(
-                    title: "Other Meta Glasses",
-                    description: "Generic Luxottica/Meta hardware",
-                    icon: iconForType("other_meta_glasses"),
-                    color: .red,
-                    isOn: bindingForType("other_meta_glasses")
-                )
-                
-                SettingsFilterToggleRow(
-                    title: "Apple Vision Pro",
-                    description: "Spatial video & high power AR logging",
+                    title: "Apple Smart Glasses",
+                    description: "Apple Vision Pro & AR Devices",
                     icon: iconForType("vision_pro"),
                     color: .purple,
-                    isOn: bindingForType("vision_pro")
+                    isOn: bindingForTypes(["vision_pro"])
                 )
                 
                 SettingsFilterToggleRow(
@@ -360,55 +328,31 @@ struct DeviceFiltersSettingsView: View {
                     description: "AR recording and sharing HUD",
                     icon: iconForType("snap_spectacles"),
                     color: .yellow,
-                    isOn: bindingForType("snap_spectacles")
+                    isOn: bindingForTypes(["snap_spectacles"])
                 )
                 
                 SettingsFilterToggleRow(
-                    title: "Google Glass",
-                    description: "First-person POV video and HUD",
+                    title: "Google AI Glasses",
+                    description: "Google Glass, Gentle Monster, Warby Parker, XREAL",
                     icon: iconForType("google_glass"),
                     color: .green,
-                    isOn: bindingForType("google_glass")
+                    isOn: bindingForTypes(["google_glass", "google_gentle_monster", "google_warby_parker", "google_xreal"])
                 )
                 
                 SettingsFilterToggleRow(
-                    title: "Google x Gentle Monster",
-                    description: "Gemini-powered AI glasses",
-                    icon: iconForType("google_gentle_monster"),
-                    color: .green,
-                    isOn: bindingForType("google_gentle_monster")
-                )
-                
-                SettingsFilterToggleRow(
-                    title: "Google x Warby Parker",
-                    description: "Gemini-powered AI glasses",
-                    icon: iconForType("google_warby_parker"),
-                    color: .green,
-                    isOn: bindingForType("google_warby_parker")
-                )
-                
-                SettingsFilterToggleRow(
-                    title: "Google XREAL/Aura",
-                    description: "Android XR display glasses",
-                    icon: iconForType("google_xreal"),
-                    color: .green,
-                    isOn: bindingForType("google_xreal")
-                )
-                
-                SettingsFilterToggleRow(
-                    title: "Samsung Smart Glasses",
+                    title: "Samsung Smartglasses",
                     description: "Samsung wearable HUD and cameras",
                     icon: iconForType("samsung_glasses"),
                     color: .blue,
-                    isOn: bindingForType("samsung_glasses")
+                    isOn: bindingForTypes(["samsung_glasses"])
                 )
                 
                 SettingsFilterToggleRow(
-                    title: "Unknown Smart Devices",
+                    title: "Unknown Devices",
                     description: "Generic smart wear emissions",
                     icon: iconForType("unknown"),
                     color: .gray,
-                    isOn: bindingForType("unknown")
+                    isOn: bindingForTypes(["unknown"])
                 )
             }
             
@@ -453,14 +397,18 @@ struct DeviceFiltersSettingsView: View {
 
     }
     
-    private func bindingForType(_ type: String) -> Binding<Bool> {
+    private func bindingForTypes(_ types: [String]) -> Binding<Bool> {
         Binding(
-            get: { btManager.enabledAlertTypes.contains(type) },
+            get: { types.allSatisfy { btManager.enabledAlertTypes.contains($0) } },
             set: { enabled in
                 if enabled {
-                    btManager.enabledAlertTypes.insert(type)
+                    for type in types {
+                        btManager.enabledAlertTypes.insert(type)
+                    }
                 } else {
-                    btManager.enabledAlertTypes.remove(type)
+                    for type in types {
+                        btManager.enabledAlertTypes.remove(type)
+                    }
                 }
             }
         )
