@@ -50,7 +50,7 @@ func displayNameForType(_ type: String) -> String {
     case "oakley_meta": return "Oakley Meta glasses"
     case "project_aria": return "Project Aria"
     case "meta_orion": return "Meta Orion"
-    case "other_meta_glasses": return "Meta Glasses"
+    case "other_meta_glasses": return "Meta AI Glasses"
     case "vision_pro": return "Apple Vision Pro"
     case "snap_spectacles": return "Snapchat Spectacles"
     case "google_glass": return "Google Glass"
