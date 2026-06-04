@@ -119,7 +119,7 @@ struct SettingsView: View {
                             .foregroundColor(.blue)
                             .font(.system(size: 18))
                             .frame(width: 24, height: 24)
-                        Text("Device Channels")
+                        Text("Device Channel")
                             .font(.system(size: 16, weight: .medium, design: .rounded))
                     }
                 }
@@ -306,7 +306,7 @@ struct DeviceFiltersSettingsView: View {
     
     var body: some View {
         List {
-            Section(header: Text("Detected Glasses Channels")) {
+            Section(header: Text("Detected Glasses Channel")) {
                 SettingsFilterToggleRow(
                     title: "Ray-Ban Meta Series",
                     description: "Discreet photo/video capturing",
@@ -448,7 +448,7 @@ struct DeviceFiltersSettingsView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle("Device Channels")
+        .navigationTitle("Device Channel")
         .navigationBarTitleDisplayMode(.inline)
 
     }
