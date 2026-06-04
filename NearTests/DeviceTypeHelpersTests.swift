@@ -13,9 +13,9 @@ final class DeviceTypeHelpersTests: XCTestCase {
     }
 
     func testDisplayNameForType() throws {
-        XCTAssertEqual(displayNameForType("rayban_meta"), "Ray-Ban Meta")
-        XCTAssertEqual(displayNameForType("vision_pro"), "Apple Vision Pro")
-        XCTAssertEqual(displayNameForType("snap_spectacles"), "Snapchat Spectacles")
+        XCTAssertEqual(displayNameForType("rayban_meta"), String(localized: "Ray-Ban Meta glasses"))
+        XCTAssertEqual(displayNameForType("vision_pro"), String(localized: "Apple Vision Pro"))
+        XCTAssertEqual(displayNameForType("snap_spectacles"), String(localized: "Snapchat Spectacles"))
     }
 
     func testEstimatedDistance() throws {

@@ -14,10 +14,12 @@ import SwiftUI
 /// Returns the appropriate SF Symbol name for a device type string.
 func iconForType(_ type: String) -> String {
     switch type {
-    case "rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses": return "Meta"
+    case "rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses":
+        return "Meta"
     case "vision_pro": return "Apple"
     case "snap_spectacles": return "snapchat_icon"
-    case "google_glass", "google_gentle_monster", "google_warby_parker", "google_xreal": return "Google"
+    case "google_glass", "google_gentle_monster", "google_warby_parker", "google_xreal":
+        return "Google"
     case "samsung_glasses": return "Samsung"
     case "oho_sunshine", "ivue_glasses", "brilliant_labs": return "camera.viewfinder"
     default: return "questionmark.circle.fill"
@@ -27,10 +29,12 @@ func iconForType(_ type: String) -> String {
 /// Returns the brand color associated with a device type string.
 func colorForType(_ type: String) -> Color {
     switch type {
-    case "rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses": return .red
+    case "rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses":
+        return .red
     case "vision_pro": return .purple
     case "snap_spectacles": return .yellow
-    case "google_glass", "google_gentle_monster", "google_warby_parker", "google_xreal": return .green
+    case "google_glass", "google_gentle_monster", "google_warby_parker", "google_xreal":
+        return .green
     case "samsung_glasses": return .blue
     case "oho_sunshine", "ivue_glasses", "brilliant_labs": return .teal
     default: return .gray
@@ -46,22 +50,22 @@ func foregroundColorForType(_ type: String) -> Color {
 /// Returns a human-readable display name for a device type string.
 func displayNameForType(_ type: String) -> String {
     switch type {
-    case "rayban_meta": return "Ray-Ban Meta glasses"
-    case "oakley_meta": return "Oakley Meta glasses"
-    case "project_aria": return "Project Aria"
-    case "meta_orion": return "Meta Orion"
-    case "other_meta_glasses": return "Meta AI Glasses"
-    case "vision_pro": return "Apple Vision Pro"
-    case "snap_spectacles": return "Snapchat Spectacles"
-    case "google_glass": return "Google Glass"
-    case "google_gentle_monster": return "Google x Gentle Monster"
-    case "google_warby_parker": return "Google x Warby Parker"
-    case "google_xreal": return "Google XREAL/Aura"
-    case "samsung_glasses": return "Samsung Smart Glasses"
-    case "oho_sunshine": return "OhO Camera Glasses"
-    case "ivue_glasses": return "iVue Camera Glasses"
-    case "brilliant_labs": return "Brilliant Labs Glasses"
-    default: return "Unknown Device"
+    case "rayban_meta": return String(localized: "Ray-Ban Meta glasses")
+    case "oakley_meta": return String(localized: "Oakley Meta glasses")
+    case "project_aria": return String(localized: "Meta Ray-Ban Display")
+    case "meta_orion": return String(localized: "Meta Orion")
+    case "other_meta_glasses": return String(localized: "Meta AI Glasses")
+    case "vision_pro": return String(localized: "Apple Vision Pro")
+    case "snap_spectacles": return String(localized: "Snapchat Spectacles")
+    case "google_glass": return String(localized: "Google Glass")
+    case "google_gentle_monster": return String(localized: "Google x Gentle Monster")
+    case "google_warby_parker": return String(localized: "Google x Warby Parker")
+    case "google_xreal": return String(localized: "Google XREAL/Aura")
+    case "samsung_glasses": return String(localized: "Samsung Smart Glasses")
+    case "oho_sunshine": return String(localized: "OhO Camera Glasses")
+    case "ivue_glasses": return String(localized: "iVue Camera Glasses")
+    case "brilliant_labs": return String(localized: "Brilliant Labs Glasses")
+    default: return String(localized: "Unknown Device")
     }
 }
 
@@ -69,11 +73,11 @@ func displayNameForType(_ type: String) -> String {
 struct DeviceIconView: View {
     let icon: String
     let color: Color
-    
+
     @Environment(\.colorScheme) var colorScheme
-    
+
     private let customIcons = ["snapchat_icon", "Apple", "Meta", "Samsung", "Google"]
-    
+
     var body: some View {
         if customIcons.contains(icon) {
             if icon == "Apple" {
@@ -139,4 +143,3 @@ func colorForRssi(_ rssi: Int) -> Color {
         return .blue
     }
 }
-
