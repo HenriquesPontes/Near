@@ -637,7 +637,7 @@ struct LicensesSettingsView: View {
     var body: some View {
         List {
             Section(header: Text("Near Software License Agreement")) {
-                Text("""
+                Text(LocalizedStringKey("""
 Copyright (c) 2026 Henriques Pontes. All rights reserved.
 
 IMPORTANT: PLEASE READ THIS SOFTWARE LICENSE AGREEMENT ("AGREEMENT") CAREFULLY BEFORE USING THE NEAR APP ("SOFTWARE"). BY USING THE SOFTWARE, YOU ARE AGREEING TO BE BOUND BY THE TERMS OF THIS LICENSE.
@@ -668,7 +668,7 @@ TO THE EXTENT NOT PROHIBITED BY LAW, IN NO EVENT SHALL LICENSOR BE LIABLE FOR PE
 
 8. Governing Law
 This License will be governed by and construed in accordance with the laws of the jurisdiction in which the Licensor resides, excluding its conflict of law principles. Any dispute arising out of or in connection with this License shall be subject to the exclusive jurisdiction of the courts located in that jurisdiction.
-""")
+"""))
                 .font(.system(size: 13, design: .rounded))
                 .foregroundColor(.secondary)
                 .lineSpacing(5)
