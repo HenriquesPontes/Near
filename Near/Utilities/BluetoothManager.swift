@@ -489,9 +489,11 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     private func cleanupExpiredDevices() {
         let now = Date()
-        let cooldownSeconds = notificationCooldown / 1000.0
+        // Devices should remain active for longer than the notification cooldown (e.g., 60 seconds)
+        // because BLE advertisements might be sparse when connected.
+        let expirationSeconds: TimeInterval = 60.0 
         let filtered = detectedDevices.filter {
-            now.timeIntervalSince($0.lastSeen) <= cooldownSeconds
+            now.timeIntervalSince($0.lastSeen) <= expirationSeconds
         }
         if filtered.count != detectedDevices.count {
             self.detectedDevices = filtered
@@ -553,17 +555,7 @@ extension BluetoothManager: CBCentralManagerDelegate {
             manufacturerName = companyName(for: companyID)
         }
 
-        // 1. Filter out general Bluetooth devices first (to prevent false positives)
-        // We use a regular expression with word boundaries (\b) so short words like "tv" or "car"
-        // don't accidentally match substrings in valid names (e.g. "SmartVision" containing "tv").
-        let genericDevicesRegex =
-            "\\b(keyboard|mouse|headphones|airpods|beats|watch|tv|speaker|tile|trackpad|iphone|ipad|macbook|mac mini|mac studio|imac|mac pro|pencil|homepod|appletv|quest|oculus|tracker|tag|smarttag|display|audio|nintendo|playstation|xbox|car|ford|toyota|honda|bmw|tesla)\\b"
-
-        if lowerName.range(of: genericDevicesRegex, options: .regularExpression) != nil {
-            return  // Filter out standard accessories and non-glasses devices
-        }
-
-        // 2. Categorize by Name or Company ID
+        // 1. Categorize by Name or Company ID FIRST
         let isMetaCompany =
             (discoveredCompanyID == 0x058E || discoveredCompanyID == 0x01AB
                 || discoveredCompanyID == 0x0D53)
@@ -628,6 +620,18 @@ extension BluetoothManager: CBCentralManagerDelegate {
             detectedType = "brilliant_labs"
         } else {
             detectedType = "unknown"
+        }
+
+        // 2. Filter out general Bluetooth devices if we couldn't strongly identify it
+        // We use a regular expression with word boundaries (\b) so short words like "tv" or "car"
+        // don't accidentally match substrings in valid names (e.g. "SmartVision" containing "tv").
+        if detectedType == "unknown" {
+            let genericDevicesRegex =
+                "\\b(keyboard|mouse|headphones|airpods|beats|watch|tv|speaker|tile|trackpad|iphone|ipad|macbook|mac mini|mac studio|imac|mac pro|pencil|homepod|appletv|quest|oculus|tracker|tag|smarttag|display|audio|nintendo|playstation|xbox|car|ford|toyota|honda|bmw|tesla)\\b"
+
+            if lowerName.range(of: genericDevicesRegex, options: .regularExpression) != nil {
+                return  // Filter out standard accessories and non-glasses devices
+            }
         }
 
         // Check if type is enabled in Settings
