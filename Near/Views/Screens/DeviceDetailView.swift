@@ -59,23 +59,6 @@ struct DeviceDetailView: View {
                                 .font(.system(size: 12, design: .monospaced))
                                 .foregroundColor(.secondary)
                         }
-                        Spacer(minLength: 4)
-                        
-                        Button {
-                            showTrackerView = true
-                        } label: {
-                            HStack {
-                                Image(systemName: "location.fill")
-                                Text("Find Device")
-                                    .fontWeight(.bold)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(colorForType(device.type).opacity(0.15))
-                            .foregroundColor(colorForType(device.type))
-                            .cornerRadius(12)
-                        }
-                        .padding(.horizontal, 16)
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -212,6 +195,31 @@ struct DeviceDetailView: View {
                     }
                     .listRowSeparator(.hidden)
                     .padding(.vertical, 4)
+                    
+                    // Precision Finding Button
+                    VStack(spacing: 8) {
+                        Button {
+                            showTrackerView = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "location.viewfinder")
+                                Text("Trace Device")
+                                    .fontWeight(.bold)
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(colorForType(device.type))
+                        .controlSize(.large)
+                        
+                        Text("Note: Distance tracking relies on Bluetooth signals which can fluctuate. False positives in distance estimation may occur due to physical obstructions.")
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 8)
+                    }
+                    .listRowSeparator(.hidden)
+                    .padding(.bottom, 8)
                 }
                 
                 // 4. PRIVACY RISK PROFILE
