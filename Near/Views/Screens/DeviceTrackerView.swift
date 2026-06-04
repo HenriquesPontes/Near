@@ -58,27 +58,12 @@ struct DeviceTrackerView: View {
     }
 
     var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-            
-            VStack {
-                // Header
-                HStack {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 28))
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                    Spacer()
-                    Button(action: { enableHaptics.toggle() }) {
-                        Image(systemName: enableHaptics ? "iphone.radiowaves.left.and.right" : "iphone.slash")
-                            .font(.system(size: 24))
-                            .foregroundColor(enableHaptics ? .green : .white.opacity(0.5))
-                    }
-                }
-                .padding()
+        NavigationStack {
+            ZStack {
+                Color.black.ignoresSafeArea()
                 
-                Spacer()
+                VStack {
+                    Spacer()
                 
                 // Device Icon
                 DeviceIconView(icon: iconForType(device.type), color: trackingColor)
@@ -114,7 +99,24 @@ struct DeviceTrackerView: View {
                 
                 Spacer()
             }
+            .navigationTitle("Tracing Device")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { enableHaptics.toggle() }) {
+                        Image(systemName: enableHaptics ? "iphone.radiowaves.left.and.right" : "iphone.slash")
+                            .foregroundColor(enableHaptics ? .green : .gray)
+                    }
+                }
+            }
         }
+        .preferredColorScheme(.dark)
         .onAppear {
             startTracking()
         }
