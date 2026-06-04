@@ -332,35 +332,21 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         // Dynamically select localized title based on device type or manufacturer
         let title: String
         switch device.type {
-        case "rayban_meta":
-            title = String(localized: "Ray-Ban Meta Nearby! ⚠️", locale: locale)
-        case "oakley_meta":
-            title = String(localized: "Oakley Meta Nearby! ⚠️", locale: locale)
-        case "project_aria":
-            title = String(localized: "Project Aria Nearby! ⚠️", locale: locale)
-        case "meta_orion":
-            title = String(localized: "Meta Orion Nearby! ⚠️", locale: locale)
-        case "other_meta_glasses":
-            title = String(localized: "Meta Smart Glasses Nearby! ⚠️", locale: locale)
+        case "rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses":
+            title = String(localized: "Meta AI Glasses Nearby! ⚠️", locale: locale)
         case "vision_pro":
-            title = String(localized: "Apple Vision Pro Nearby! ⚠️", locale: locale)
+            title = String(localized: "Apple Smart Glasses Nearby! ⚠️", locale: locale)
         case "snap_spectacles":
             title = String(localized: "Snapchat Spectacles Nearby! ⚠️", locale: locale)
-        case "google_glass":
-            title = String(localized: "Google Glass Nearby! ⚠️", locale: locale)
-        case "google_gentle_monster":
-            title = String(localized: "Google Gentle Monster Nearby! ⚠️", locale: locale)
-        case "google_warby_parker":
-            title = String(localized: "Google Warby Parker Nearby! ⚠️", locale: locale)
-        case "google_xreal":
-            title = String(localized: "Google XREAL/Aura Nearby! ⚠️", locale: locale)
+        case "google_glass", "google_gentle_monster", "google_warby_parker", "google_xreal":
+            title = String(localized: "Google AI Glasses Nearby! ⚠️", locale: locale)
         case "samsung_glasses":
-            title = String(localized: "Samsung Smart Glasses Nearby! ⚠️", locale: locale)
+            title = String(localized: "Samsung Smartglasses Nearby! ⚠️", locale: locale)
         default:
             if let manufacturer = device.manufacturer, !manufacturer.isEmpty {
                 title = String(localized: "\(manufacturer) Device Nearby! ⚠️", locale: locale)
             } else {
-                title = String(localized: "Unknown Wearable Nearby! ⚠️", locale: locale)
+                title = String(localized: "Unknown Device Nearby! ⚠️", locale: locale)
             }
         }
         content.title = title
