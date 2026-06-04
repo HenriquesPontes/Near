@@ -168,7 +168,7 @@ struct SettingsView: View {
                     }
                 }
                 
-                // About Near Row
+                // About NearbyGlasses Row
                 NavigationLink {
                     AboutNearView()
                 } label: {
@@ -177,7 +177,7 @@ struct SettingsView: View {
                             .foregroundColor(.blue)
                             .font(.system(size: 18))
                             .frame(width: 24, height: 24)
-                        Text("About Near")
+                        Text("About NearbyGlasses")
                             .font(.system(size: 16, weight: .medium, design: .rounded))
                     }
                 }
@@ -588,7 +588,7 @@ struct PrivacySettingsView: View {
                         .foregroundColor(.secondary)
                         .lineSpacing(4)
                     
-                    Text("The Near app continuously parses Bluetooth Low Energy advertisements. Ray-Ban Meta glasses emit periodic BLE pulses to negotiate data transfers, letting us detect them even if recording is not actively running.")
+                    Text("The NearbyGlasses app continuously parses Bluetooth Low Energy advertisements. Ray-Ban Meta glasses emit periodic BLE pulses to negotiate data transfers, letting us detect them even if recording is not actively running.")
                         .font(.system(size: 13, weight: .regular, design: .rounded))
                         .foregroundColor(.secondary)
                         .lineSpacing(4)
@@ -636,7 +636,7 @@ struct LicensesSettingsView: View {
     
     var body: some View {
         List {
-            Section(header: Text("Near Software License Agreement")) {
+            Section(header: Text("NearbyGlasses Software License Agreement")) {
                 Text(LocalizedStringKey("""
 Copyright (c) 2026 Henriques Pontes. All rights reserved.
 

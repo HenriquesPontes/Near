@@ -17,17 +17,17 @@ struct OnboardingView: View {
             // Header Icon
             ZStack {
                 Circle()
-                    .fill(Color.blue.opacity(0.15))
+                    .fill(Color.primary)
                     .frame(width: 100, height: 100)
                 
                 Image(systemName: "eyeglasses")
                     .font(.system(size: 40))
-                    .foregroundColor(.blue)
+                    .foregroundColor(Color(UIColor.systemBackground))
             }
             .padding(.bottom, 30)
             
             // Title
-            Text("Welcome to Near")
+            Text("Welcome to NearbyGlasses")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
                 .foregroundColor(.primary)
                 .multilineTextAlignment(.center)
@@ -61,7 +61,7 @@ struct OnboardingView: View {
                     icon: "lock.shield.fill",
                     color: .green,
                     title: "Privacy First",
-                    description: "Near doesn't collect your data. Everything happens entirely on your device."
+                    description: "NearbyGlasses doesn't collect your data. Everything happens entirely on your device."
                 )
             }
             .padding(.horizontal, 32)
@@ -69,7 +69,7 @@ struct OnboardingView: View {
             Spacer()
             
             // Disclaimer
-            Text("Near uses Bluetooth to estimate proximity. It requires permission to scan for devices. False positives are possible.")
+            Text("NearbyGlasses uses Bluetooth to estimate proximity. It requires permission to scan for devices. False positives are possible.")
                 .font(.system(size: 12))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
@@ -82,15 +82,13 @@ struct OnboardingView: View {
                     hasSeenOnboarding = true
                 }
             } label: {
-                Text("Continue & Grant Permission")
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
+                Text("Grant Permission")
+                    .font(.headline)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(Color.blue)
-                    .cornerRadius(16)
-                    .padding(.horizontal, 24)
             }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
         .background(Color(.systemGroupedBackground))
