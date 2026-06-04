@@ -42,9 +42,7 @@ struct DashboardView: View {
                             if !btManager.detectedDevices.isEmpty {
                                 Section(header: Text("Currently Nearby").font(.subheadline).foregroundColor(.secondary)) {
                                     ForEach(btManager.detectedDevices) { device in
-                                        let historyDevice = historicalDevices.first(where: { $0.deviceId == device.deviceId }) ?? DetectedDevice(deviceId: device.deviceId, name: device.name, type: device.type, rssi: device.rssi)
-                                        
-                                        NavigationLink(destination: DeviceDetailView(device: historyDevice)) {
+                                        NavigationLink(value: device) {
                                             HStack(spacing: 12) {
                                                 DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
                                                     .frame(width: 32, height: 32)
@@ -53,6 +51,13 @@ struct DashboardView: View {
                                                     Text(device.name)
                                                         .font(.system(size: 16, weight: .semibold, design: .rounded))
                                                         .foregroundColor(.primary)
+                                                    
+                                                    let typeName = displayNameForType(device.type)
+                                                    if !device.name.contains(typeName) {
+                                                        Text(typeName)
+                                                            .font(.system(size: 13, weight: .medium, design: .rounded))
+                                                            .foregroundColor(.secondary)
+                                                    }
                                                     
                                                     HStack(spacing: 6) {
                                                         Image(systemName: "wifi")
@@ -100,6 +105,13 @@ struct DashboardView: View {
                                                                 .foregroundColor(.yellow)
                                                                 .font(.system(size: 12))
                                                         }
+                                                    }
+                                                    
+                                                    let typeName = displayNameForType(device.type)
+                                                    if !device.name.contains(typeName) {
+                                                        Text(typeName)
+                                                            .font(.system(size: 13, weight: .medium, design: .rounded))
+                                                            .foregroundColor(.secondary)
                                                     }
                                                     
                                                     HStack(spacing: 6) {
@@ -153,6 +165,20 @@ struct DashboardView: View {
                             }
                         }
                         .listStyle(.insetGrouped)
+                        .navigationDestination(for: BluetoothDevice.self) { device in
+                            let historyDevice = historicalDevices.first(where: { $0.deviceId == device.deviceId }) ?? DetectedDevice(
+                                deviceId: device.deviceId,
+                                name: device.name,
+                                type: device.type,
+                                rssi: device.rssi,
+                                isStarred: false,
+                                threatLevel: device.threatLevel,
+                                isSimulated: device.isSimulated,
+                                companyID: device.companyID,
+                                manufacturer: device.manufacturer
+                            )
+                            DeviceDetailView(device: historyDevice)
+                        }
                     }
                 }
                 .safeAreaInset(edge: .bottom) {

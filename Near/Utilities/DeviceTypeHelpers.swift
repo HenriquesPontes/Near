@@ -46,11 +46,11 @@ func foregroundColorForType(_ type: String) -> Color {
 /// Returns a human-readable display name for a device type string.
 func displayNameForType(_ type: String) -> String {
     switch type {
-    case "rayban_meta": return "Ray-Ban Meta"
-    case "oakley_meta": return "Oakley Meta"
+    case "rayban_meta": return "Ray-Ban Meta glasses"
+    case "oakley_meta": return "Oakley Meta glasses"
     case "project_aria": return "Project Aria"
     case "meta_orion": return "Meta Orion"
-    case "other_meta_glasses": return "Meta Smart Glasses"
+    case "other_meta_glasses": return "Meta Glasses"
     case "vision_pro": return "Apple Vision Pro"
     case "snap_spectacles": return "Snapchat Spectacles"
     case "google_glass": return "Google Glass"
@@ -83,10 +83,7 @@ struct DeviceIconView: View {
                     .aspectRatio(contentMode: .fit)
                     .foregroundColor(.primary)
             } else if icon == "Samsung" {
-                // The Samsung image is likely an opaque black circle with white text.
-                // Template rendering makes it a solid shape.
-                // To make it adapt: in light mode, invert it so it becomes a white circle with black text.
-                if colorScheme == .light {
+                if colorScheme == .dark {
                     Image(icon)
                         .resizable()
                         .aspectRatio(contentMode: .fit)

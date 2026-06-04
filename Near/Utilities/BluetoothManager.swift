@@ -643,10 +643,12 @@ extension BluetoothManager: CBCentralManagerDelegate {
         // Check if type is enabled in Settings
         guard enabledAlertTypes.contains(detectedType) else { return }
 
-        // Improve name if it is Unknown Device but we have a manufacturer
+        // Improve name if it is Unknown Device but we have a manufacturer or known type
         var deviceName = name
         if deviceName == "Unknown Device" || deviceName.isEmpty {
-            if let manufacturer = manufacturerName {
+            if detectedType != "unknown" {
+                deviceName = displayNameForType(detectedType)
+            } else if let manufacturer = manufacturerName {
                 deviceName = "\(manufacturer) Device"
             }
         }
