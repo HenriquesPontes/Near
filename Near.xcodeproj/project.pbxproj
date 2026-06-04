@@ -191,7 +191,6 @@
 				84C495F12FD04B8D007803D4 /* Frameworks */,
 				84C495F22FD04B8D007803D4 /* Resources */,
 				8B268417080D1A4DC795BB33 /* Embed App Extensions */,
-				7CF950891043B54E9E261EDD /* Fix Info.plist Background Modes */,
 			);
 			buildRules = (
 			);
@@ -297,27 +296,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		7CF950891043B54E9E261EDD /* Fix Info.plist Background Modes */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Fix Info.plist Background Modes";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "#!/bin/sh\nPLIST_PATH=\"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Add :UIBackgroundModes array\" \"$PLIST_PATH\" || true\n/usr/libexec/PlistBuddy -c \"Add :UIBackgroundModes:0 string bluetooth-central\" \"$PLIST_PATH\" || true\n/usr/libexec/PlistBuddy -c \"Add :UIBackgroundModes:1 string location\" \"$PLIST_PATH\" || true\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		18FFE4ADB8902BE367BED8C2 /* Sources */ = {
@@ -486,10 +464,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2606050059;
+				CURRENT_PROJECT_VERSION = 2606050107;
 				DEVELOPMENT_TEAM = RN6ZQ9XYA8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Near/Custom-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Nearby;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Near scans for nearby smart glasses Bluetooth signals for privacy awareness.";
@@ -499,7 +478,6 @@
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "NearbyGlasses uses location permission to help scan for nearby Bluetooth devices.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UIBackgroundModes = "bluetooth-central";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -527,10 +505,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2606050059;
+				CURRENT_PROJECT_VERSION = 2606050107;
 				DEVELOPMENT_TEAM = RN6ZQ9XYA8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Near/Custom-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Nearby;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Near scans for nearby smart glasses Bluetooth signals for privacy awareness.";
@@ -538,7 +517,6 @@
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "\"NearbyGlasses uses your location to keep the app active in the background, allowing it to continuously scan for smart glasses.\"";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "\"NearbyGlasses uses your location to keep the app active in the background, allowing it to continuously scan for smart glasses.\"";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "NearbyGlasses uses location permission to help scan for nearby Bluetooth devices.";
-				INFOPLIST_KEY_UIBackgroundModes = "bluetooth-central";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
