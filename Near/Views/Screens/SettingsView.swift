@@ -199,6 +199,21 @@ struct ScanRangeSettingsView: View {
     @ObservedObject var btManager = BluetoothManager.shared
     @Environment(\.dismiss) private var dismiss
     @State private var showCooldownSheet = false
+    @AppStorage("hasAcceptedRadarModeWarning") private var hasAcceptedRadarModeWarning = false
+    @State private var showRadarWarning = false
+    
+    var radarModeBinding: Binding<Bool> {
+        Binding(
+            get: { btManager.continueScanInBackground },
+            set: { newValue in
+                if newValue && !hasAcceptedRadarModeWarning {
+                    showRadarWarning = true
+                } else {
+                    btManager.continueScanInBackground = newValue
+                }
+            }
+        )
+    }
     
     var body: some View {
         List {
@@ -247,7 +262,7 @@ struct ScanRangeSettingsView: View {
                     Text("Radar Mode")
                         .font(.system(size: 16, weight: .medium, design: .rounded))
                     Spacer()
-                    Toggle("", isOn: $btManager.continueScanInBackground)
+                    Toggle("", isOn: radarModeBinding)
                         .toggleStyle(SwitchToggleStyle(tint: .green))
                         .labelsHidden()
                 }
@@ -282,7 +297,16 @@ struct ScanRangeSettingsView: View {
             }
             .presentationDetents([.height(300), .medium])
         }
-
+        .alert("Enable Radar Mode?", isPresented: $showRadarWarning) {
+            Button("Cancel", role: .cancel) {
+            }
+            Button("Accept") {
+                hasAcceptedRadarModeWarning = true
+                btManager.continueScanInBackground = true
+            }
+        } message: {
+            Text("The app will scan for devices in the background and send user notifications.")
+        }
     }
 }
 
