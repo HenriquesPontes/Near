@@ -13,7 +13,6 @@ import SwiftUI
 import UIKit
 import UserNotifications
 
-
 struct BluetoothDevice: Identifiable, Hashable {
     var id: UUID = UUID()
     var deviceId: String
@@ -28,7 +27,9 @@ struct BluetoothDevice: Identifiable, Hashable {
 
     var threatLevel: String {
         switch type {
-        case "rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses", "vision_pro", "google_glass", "google_gentle_monster", "google_warby_parker", "google_xreal", "samsung_glasses":
+        case "rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses",
+            "vision_pro", "google_glass", "google_gentle_monster", "google_warby_parker",
+            "google_xreal", "samsung_glasses":
             return "High"
         case "snap_spectacles":
             return "High"
@@ -80,7 +81,12 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         get {
             let raw = UserDefaults.standard.string(forKey: "enabledAlertTypes") ?? ""
             if raw.isEmpty {
-                return ["rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses", "vision_pro", "snap_spectacles", "google_glass", "google_gentle_monster", "google_warby_parker", "google_xreal", "samsung_glasses", "unknown"]
+                return [
+                    "rayban_meta", "oakley_meta", "project_aria", "meta_orion",
+                    "other_meta_glasses", "vision_pro", "snap_spectacles", "google_glass",
+                    "google_gentle_monster", "google_warby_parker", "google_xreal",
+                    "samsung_glasses", "unknown",
+                ]
             }
             let arr = (try? JSONDecoder().decode([String].self, from: Data(raw.utf8))) ?? []
             return Set(arr)
@@ -143,7 +149,8 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private var companyIdentifiers: [String: String] = [:]
 
     private func loadCompanyIdentifiers() {
-        guard let url = Bundle.main.url(forResource: "company_identifiers", withExtension: "json") else {
+        guard let url = Bundle.main.url(forResource: "company_identifiers", withExtension: "json")
+        else {
             print("company_identifiers.json not found in Bundle")
             return
         }
@@ -196,11 +203,11 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 
     func requestLocationPermission() {
-        guard CLLocationManager.locationServicesEnabled() else { return }
-        let status = CLLocationManager.authorizationStatus()
+        guard let manager = locationManager else { return }
+        let status = manager.authorizationStatus
         locationAuthorizationStatus = status
         if status == .notDetermined {
-            locationManager?.requestWhenInUseAuthorization()
+            manager.requestWhenInUseAuthorization()
         }
     }
 
@@ -320,7 +327,6 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         AnalyticsManager.shared.trackDetection(device: device)
     }
 
-
     private func sendPrivacyAlert(for device: BluetoothDevice) {
         let lang =
             UserDefaults.standard.string(forKey: "selectedLanguage") ?? Bundle.main
@@ -328,7 +334,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         let locale = Locale(identifier: lang)
 
         let content = UNMutableNotificationContent()
-        
+
         // Dynamically select localized title based on device type or manufacturer
         let title: String
         switch device.type {
@@ -341,7 +347,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         case "google_glass", "google_gentle_monster", "google_warby_parker", "google_xreal":
             title = String(localized: "Google AI Glasses Nearby! ⚠️", locale: locale)
         case "samsung_glasses":
-            title = String(localized: "Samsung Smartglasses Nearby! ⚠️", locale: locale)
+            title = String(localized: "Samsung Smart Glasses Nearby! ⚠️", locale: locale)
         default:
             if let manufacturer = device.manufacturer, !manufacturer.isEmpty {
                 title = String(localized: "\(manufacturer) Device Nearby! ⚠️", locale: locale)
@@ -361,7 +367,8 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         content.subtitle = displayName
 
         let distanceStr = String(format: "%.1f", device.estimatedDistance)
-        let baseMsg = String(localized: "Detected approximately \(distanceStr) meters away.", locale: locale)
+        let baseMsg = String(
+            localized: "Detected approximately \(distanceStr) meters away.", locale: locale)
 
         var suffix = ""
         switch device.type {
@@ -401,17 +408,20 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             suffix =
                 " "
                 + String(
-                    localized: "Be aware: First-person AI assistant and camera may be active.", locale: locale)
+                    localized: "Be aware: First-person AI assistant and camera may be active.",
+                    locale: locale)
         case "google_xreal":
             suffix =
                 " "
                 + String(
-                    localized: "Be aware: Display-equipped XR glasses with spatial tracking.", locale: locale)
+                    localized: "Be aware: Display-equipped XR glasses with spatial tracking.",
+                    locale: locale)
         case "samsung_glasses":
             suffix =
                 " "
                 + String(
-                    localized: "Be aware: Smart eyewear with potential recording active.", locale: locale)
+                    localized: "Be aware: Smart eyewear with potential recording active.",
+                    locale: locale)
         default:
             suffix =
                 " "
@@ -527,20 +537,27 @@ extension BluetoothManager: CBCentralManagerDelegate {
         // 1. Filter out general Bluetooth devices first (to prevent false positives)
         // We use a regular expression with word boundaries (\b) so short words like "tv" or "car"
         // don't accidentally match substrings in valid names (e.g. "SmartVision" containing "tv").
-        let genericDevicesRegex = "\\b(keyboard|mouse|headphones|airpods|beats|watch|tv|speaker|tile|trackpad|iphone|ipad|macbook|mac mini|mac studio|imac|mac pro|pencil|homepod|appletv|quest|oculus|tracker|tag|smarttag|display|audio|nintendo|playstation|xbox|car|ford|toyota|honda|bmw|tesla)\\b"
-        
+        let genericDevicesRegex =
+            "\\b(keyboard|mouse|headphones|airpods|beats|watch|tv|speaker|tile|trackpad|iphone|ipad|macbook|mac mini|mac studio|imac|mac pro|pencil|homepod|appletv|quest|oculus|tracker|tag|smarttag|display|audio|nintendo|playstation|xbox|car|ford|toyota|honda|bmw|tesla)\\b"
+
         if lowerName.range(of: genericDevicesRegex, options: .regularExpression) != nil {
             return  // Filter out standard accessories and non-glasses devices
         }
 
         // 2. Categorize by Name or Company ID
-        let isMetaCompany = (discoveredCompanyID == 0x058E || discoveredCompanyID == 0x01AB || discoveredCompanyID == 0x0D53)
-        let isExplicitRayBan = lowerName.contains("ray-ban") || lowerName.contains("rb-meta") || lowerName.contains("rayban")
+        let isMetaCompany =
+            (discoveredCompanyID == 0x058E || discoveredCompanyID == 0x01AB
+                || discoveredCompanyID == 0x0D53)
+        let isExplicitRayBan =
+            lowerName.contains("ray-ban") || lowerName.contains("rb-meta")
+            || lowerName.contains("rayban")
         let isExplicitOakley = lowerName.contains("oakley")
         let isExplicitAria = lowerName.contains("aria")
         let isExplicitOrion = lowerName.contains("orion")
-        let isMetaWithKeywords = lowerName.contains("meta") && (isMetaCompany || lowerName.contains("glasses") || lowerName.contains("smart"))
-        
+        let isMetaWithKeywords =
+            lowerName.contains("meta")
+            && (isMetaCompany || lowerName.contains("glasses") || lowerName.contains("smart"))
+
         if isExplicitRayBan {
             detectedType = "rayban_meta"
         } else if isExplicitOakley {
@@ -557,19 +574,32 @@ extension BluetoothManager: CBCentralManagerDelegate {
                 && discoveredCompanyID == 0x004C)
         {
             detectedType = "vision_pro"
-        } else if lowerName.contains("spectacles") || (lowerName.contains("snapchat") && !lowerName.contains("pixy"))
+        } else if lowerName.contains("spectacles")
+            || (lowerName.contains("snapchat") && !lowerName.contains("pixy"))
             || discoveredCompanyID == 0x03C2
         {
             detectedType = "snap_spectacles"
-        } else if lowerName.contains("google glass") || (lowerName.contains("glass") && (discoveredCompanyID == 0x018E || discoveredCompanyID == 0x00E0)) {
+        } else if lowerName.contains("google glass")
+            || (lowerName.contains("glass")
+                && (discoveredCompanyID == 0x018E || discoveredCompanyID == 0x00E0))
+        {
             detectedType = "google_glass"
-        } else if lowerName.contains("gentle monster") || (lowerName.contains("monster") && discoveredCompanyID == 0x00E0) {
+        } else if lowerName.contains("gentle monster")
+            || (lowerName.contains("monster") && discoveredCompanyID == 0x00E0)
+        {
             detectedType = "google_gentle_monster"
-        } else if lowerName.contains("warby parker") || (lowerName.contains("warby") && discoveredCompanyID == 0x00E0) {
+        } else if lowerName.contains("warby parker")
+            || (lowerName.contains("warby") && discoveredCompanyID == 0x00E0)
+        {
             detectedType = "google_warby_parker"
-        } else if lowerName.contains("xreal") || lowerName.contains("project aura") || (lowerName.contains("aura") && discoveredCompanyID == 0x00E0) {
+        } else if lowerName.contains("xreal") || lowerName.contains("project aura")
+            || (lowerName.contains("aura") && discoveredCompanyID == 0x00E0)
+        {
             detectedType = "google_xreal"
-        } else if (lowerName.contains("samsung") && lowerName.contains("glass")) || (lowerName.contains("glass") && (discoveredCompanyID == 0x02DE || discoveredCompanyID == 0x0075)) {
+        } else if (lowerName.contains("samsung") && lowerName.contains("glass"))
+            || (lowerName.contains("glass")
+                && (discoveredCompanyID == 0x02DE || discoveredCompanyID == 0x0075))
+        {
             detectedType = "samsung_glasses"
         } else {
             detectedType = "unknown"
