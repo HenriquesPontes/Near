@@ -232,11 +232,16 @@ struct DeviceDetailView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
-                    device.isStarred.toggle()
+                    var transaction = Transaction()
+                    transaction.disablesAnimations = true
+                    withTransaction(transaction) {
+                        device.isStarred.toggle()
+                    }
                     try? modelContext.save()
                 } label: {
                     Image(systemName: device.isStarred ? "star.fill" : "star")
                         .foregroundColor(device.isStarred ? .yellow : .gray)
+                        .animation(nil, value: device.isStarred)
                 }
             }
         }
