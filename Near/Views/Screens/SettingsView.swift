@@ -198,6 +198,7 @@ struct SettingsView: View {
 struct ScanRangeSettingsView: View {
     @ObservedObject var btManager = BluetoothManager.shared
     @Environment(\.dismiss) private var dismiss
+    @State private var showCooldownSheet = false
     
     var body: some View {
         List {
@@ -253,8 +254,8 @@ struct ScanRangeSettingsView: View {
             }
             // Notification Cooldown
             Section(header: Text("Notification Cooldown")) {
-                NavigationLink {
-                    CooldownSettingsView()
+                Button {
+                    showCooldownSheet = true
                 } label: {
                     HStack(spacing: 16) {
                         Image(systemName: "timer")
@@ -263,6 +264,7 @@ struct ScanRangeSettingsView: View {
                             .frame(width: 24, height: 24)
                         Text("Notification Cooldown")
                             .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .foregroundColor(.primary)
                         Spacer()
                         Text("\(Int(btManager.notificationCooldown / 1000))s")
                             .font(.system(size: 15, design: .rounded))
@@ -274,6 +276,12 @@ struct ScanRangeSettingsView: View {
         .listStyle(.insetGrouped)
         .navigationTitle("Scan Preference")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showCooldownSheet) {
+            NavigationStack {
+                CooldownSettingsView()
+            }
+            .presentationDetents([.height(300), .medium])
+        }
 
     }
 }
