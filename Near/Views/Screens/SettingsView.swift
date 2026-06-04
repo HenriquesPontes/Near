@@ -78,6 +78,19 @@ struct SettingsView: View {
                     .pickerStyle(.menu)
                     .labelsHidden()
                 }
+                // History Row
+                NavigationLink {
+                    AllResultsView()
+                } label: {
+                    HStack(spacing: 16) {
+                        Image(systemName: "clock.fill")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                            .frame(width: 24, height: 24)
+                        Text("History")
+                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                    }
+                }
                 
                 // Privacy Row
                 NavigationLink {
