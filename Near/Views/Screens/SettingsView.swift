@@ -298,24 +298,22 @@ struct DeviceFiltersSettingsView: View {
         List {
             // Detection Sensitivity
             Section(header: Text("Detection Sensitivity")) {
-                HStack {
-                    Text("Current sensitivity:")
-                        .font(.system(size: 15, design: .rounded))
-                    Spacer()
-                    Text(sensitivityLabel)
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
-                        .foregroundColor(.blue)
+                NavigationLink {
+                    SensitivitySettingsView()
+                } label: {
+                    HStack(spacing: 16) {
+                        Image(systemName: "slider.horizontal.3")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                            .frame(width: 24, height: 24)
+                        Text("Detection Sensitivity")
+                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                        Spacer()
+                        Text(sensitivityLabel)
+                            .font(.system(size: 15, design: .rounded))
+                            .foregroundColor(.secondary)
+                    }
                 }
-                
-                Slider(value: Binding(
-                    get: { Double(btManager.rssiThreshold) },
-                    set: { btManager.rssiThreshold = Int($0) }
-                ), in: -95...(-55), step: 5)
-                .accentColor(.blue)
-            }
-            
-            Section(footer: Text("Higher sensitivity alerts you even for weak/distant signals, but increases potential false triggers.")) {
-                EmptyView()
             }
             
             Section(header: Text("Detected Glasses Channel")) {
@@ -620,6 +618,48 @@ struct CooldownSettingsView: View {
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Notification Cooldown")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+struct SensitivitySettingsView: View {
+    @ObservedObject var btManager = BluetoothManager.shared
+    
+    private var sensitivityLabel: LocalizedStringKey {
+        switch btManager.rssiThreshold {
+        case -60...(-40):
+            return "Near (Direct proximity, ~2m)"
+        case -79...(-61):
+            return "Medium (Same room, ~5m)"
+        default:
+            return "Far (Long range, ~15m)"
+        }
+    }
+    
+    var body: some View {
+        List {
+            Section(
+                header: Text("Detection Sensitivity"),
+                footer: Text("Higher sensitivity alerts you even for weak/distant signals, but increases potential false triggers.")
+            ) {
+                HStack {
+                    Text("Current sensitivity:")
+                        .font(.system(size: 15, design: .rounded))
+                    Spacer()
+                    Text(sensitivityLabel)
+                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .foregroundColor(.blue)
+                }
+                
+                Slider(value: Binding(
+                    get: { Double(btManager.rssiThreshold) },
+                    set: { btManager.rssiThreshold = Int($0) }
+                ), in: -95...(-55), step: 5)
+                .accentColor(.blue)
+            }
+        }
+        .listStyle(.insetGrouped)
+        .navigationTitle("Sensitivity")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
