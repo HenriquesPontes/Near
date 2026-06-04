@@ -14,11 +14,11 @@ import SwiftUI
 /// Returns the appropriate SF Symbol name for a device type string.
 func iconForType(_ type: String) -> String {
     switch type {
-    case "rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses": return "eyeglasses"
-    case "vision_pro": return "apple.logo"
+    case "rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses": return "Meta"
+    case "vision_pro": return "Apple"
     case "snap_spectacles": return "snapchat_icon"
-    case "google_glass", "google_gentle_monster", "google_warby_parker", "google_xreal": return "g.circle.fill"
-    case "samsung_glasses": return "s.circle.fill"
+    case "google_glass", "google_gentle_monster", "google_warby_parker", "google_xreal": return "Google"
+    case "samsung_glasses": return "Samsung"
     default: return "questionmark.circle.fill"
     }
 }
@@ -59,9 +59,11 @@ struct DeviceIconView: View {
     let icon: String
     let color: Color
     
+    private let customIcons = ["snapchat_icon", "Apple", "Meta", "Samsung", "Google"]
+    
     var body: some View {
-        if icon == "snapchat_icon" {
-            Image("snapchat_icon")
+        if customIcons.contains(icon) {
+            Image(icon)
                 .resizable()
                 .renderingMode(.template)
                 .aspectRatio(contentMode: .fit)
