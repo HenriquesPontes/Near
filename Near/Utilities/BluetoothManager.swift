@@ -650,10 +650,10 @@ extension BluetoothManager: CBCentralManagerDelegate {
 
         // Improve name if it is Unknown Device but we have a manufacturer or known type
         var deviceName = name
-        if deviceName == "Unknown Device" || deviceName.isEmpty {
-            if detectedType != "unknown" {
-                deviceName = displayNameForType(detectedType)
-            } else if let manufacturer = manufacturerName {
+        if detectedType != "unknown" {
+            deviceName = displayNameForType(detectedType)
+        } else if deviceName == "Unknown Device" || deviceName.isEmpty {
+            if let manufacturer = manufacturerName {
                 deviceName = "\(manufacturer) Device"
             }
         }
