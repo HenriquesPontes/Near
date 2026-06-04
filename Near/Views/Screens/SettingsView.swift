@@ -305,7 +305,7 @@ struct ScanRangeSettingsView: View {
                 btManager.continueScanInBackground = true
             }
         } message: {
-            Text("The app will scan for devices in the background and send user notifications.")
+            Text("The app will scan for devices in the background and app notifies you when smart glasses are nearby")
         }
     }
 }
