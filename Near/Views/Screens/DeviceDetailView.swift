@@ -23,6 +23,9 @@ struct DeviceDetailView: View {
     @State private var trackerActive = false
     @State private var pulseScale: CGFloat = 1.0
     
+    // For Tracking UI
+    @State private var showTrackerView = false
+    
 
     
     // Proximity Category (Hot & Cold)
@@ -57,11 +60,30 @@ struct DeviceDetailView: View {
                                 .foregroundColor(.secondary)
                         }
                         Spacer(minLength: 4)
+                        
+                        Button {
+                            showTrackerView = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "location.fill")
+                                Text("Find Device")
+                                    .fontWeight(.bold)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(colorForType(device.type).opacity(0.15))
+                            .foregroundColor(colorForType(device.type))
+                            .cornerRadius(12)
+                        }
+                        .padding(.horizontal, 16)
                     }
                     .frame(maxWidth: .infinity)
                 }
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets())
+                .fullScreenCover(isPresented: $showTrackerView) {
+                    DeviceTrackerView(device: device)
+                }
                 
                 // DEVICE INFO
                 if device.manufacturer != nil || device.companyID != nil {
