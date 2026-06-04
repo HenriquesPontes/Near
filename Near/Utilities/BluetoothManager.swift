@@ -569,8 +569,7 @@ extension BluetoothManager: CBCentralManagerDelegate {
         // 1. Categorize by Name or Company ID FIRST
         let isMetaCompany = hasMetaServiceUUID || 
             (discoveredCompanyID == 0x058E || discoveredCompanyID == 0x01AB
-                || discoveredCompanyID == 0x0D53 || discoveredCompanyID == 0x05FD 
-                || discoveredCompanyID == 0xFD60 || discoveredCompanyID == 0x027D)
+                || discoveredCompanyID == 0x0D53)
         let isExplicitRayBan =
             lowerName.contains("ray-ban") || lowerName.contains("rb-meta")
             || lowerName.contains("rayban")
