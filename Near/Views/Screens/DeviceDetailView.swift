@@ -20,7 +20,6 @@ struct DeviceDetailView: View {
     @State private var currentRssi: Int = -80
     @State private var rssiHistory: [Int] = []
     @State private var trackingTask: Task<Void, Never>? = nil
-    @State private var trackerActive = false
     @State private var pulseScale: CGFloat = 1.0
     
     // For Tracking UI
@@ -173,28 +172,6 @@ struct DeviceDetailView: View {
                     }
                     .padding(.vertical, 4)
                     
-                    // Audio feedback tracker toggle
-                    HStack {
-                        Spacer()
-                        Button {
-                            trackerActive.toggle()
-                        } label: {
-                            HStack {
-                                Image(systemName: trackerActive ? "volume.3.fill" : "volume.slash.fill")
-                                Text(trackerActive ? "Audio Guidance Active" : "Enable Audio Guidance")
-                            }
-                            .font(.system(size: 14, weight: .bold, design: .rounded))
-                            .foregroundColor(trackerActive ? .white : foregroundColorForType(device.type))
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(trackerActive ? Color.green : colorForType(device.type))
-                            .cornerRadius(18)
-                        }
-                        .buttonStyle(.plain)
-                        Spacer()
-                    }
-                    .listRowSeparator(.hidden)
-                    .padding(.vertical, 4)
                     
                     // Precision Finding Button
                     VStack(spacing: 8) {
@@ -294,10 +271,6 @@ struct DeviceDetailView: View {
                     rssiHistory.removeFirst()
                 }
                 
-                // Play ping tone if guidance is active
-                if trackerActive {
-                    playGuidanceBeep()
-                }
                 
                 // Dynamic interval based on proximity
                 let interval: Double
@@ -321,16 +294,6 @@ struct DeviceDetailView: View {
         trackingTask = nil
     }
     
-    private func playGuidanceBeep() {
-        // Emit visual feedback or trigger system beep sounds.
-        // On simulator, we can simulate audio frequency speed matching the RSSI:
-        // Strong RSSI (-50) -> very fast double beeps
-        // Weak RSSI (-95) -> slow, lazy single beeps
-        let systemSoundID: UInt32 = 1104 // Standard system click/tap sound
-        #if os(iOS)
-        AudioServicesPlaySystemSound(systemSoundID)
-        #endif
-    }
     
     
     private func hasCamera(for type: String) -> Bool {
