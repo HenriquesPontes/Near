@@ -536,7 +536,8 @@ extension BluetoothManager: CBCentralManagerDelegate {
         guard !ignoredDevices.keys.contains(deviceId) else { return }
 
         // Filter and categorize device
-        let name = peripheral.name ?? "Unknown Device"
+        let advName = advertisementData[CBAdvertisementDataLocalNameKey] as? String
+        let name = advName ?? peripheral.name ?? "Unknown Device"
         var detectedType = "unknown"
 
         let lowerName = name.lowercased()
@@ -552,6 +553,11 @@ extension BluetoothManager: CBCentralManagerDelegate {
         var hasMetaServiceUUID = false
         if let serviceUUIDs = advertisementData[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID] {
             hasMetaServiceUUID = serviceUUIDs.contains(CBUUID(string: "FD60"))
+        }
+        if let serviceData = advertisementData[CBAdvertisementDataServiceDataKey] as? [CBUUID: Any] {
+            if serviceData.keys.contains(CBUUID(string: "FD60")) {
+                hasMetaServiceUUID = true
+            }
         }
 
         // Resolve manufacturer name from company ID
