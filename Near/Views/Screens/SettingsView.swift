@@ -13,6 +13,8 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Query(sort: \DetectedDevice.timestamp, order: .reverse) private var historicalDevices: [DetectedDevice]
     @AppStorage("selectedLanguage") var selectedLanguage: String = Bundle.main.preferredLocalizations.first ?? "en"
+    @AppStorage("isDeveloperModeEnabled") private var isDeveloperModeEnabled = false
+    @State private var versionTapCount = 0
     
     private var appVersion: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.2"
@@ -153,6 +155,18 @@ struct SettingsView: View {
                         .font(.system(size: 15, design: .rounded))
                         .foregroundColor(.secondary)
                 }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    if !isDeveloperModeEnabled {
+                        versionTapCount += 1
+                        if versionTapCount >= 5 {
+                            withAnimation {
+                                isDeveloperModeEnabled = true
+                            }
+                            versionTapCount = 0
+                        }
+                    }
+                }
                 
                 // About Near Row
                 NavigationLink {
@@ -179,6 +193,34 @@ struct SettingsView: View {
                             .frame(width: 24, height: 24)
                         Text("Licences")
                             .font(.system(size: 16, weight: .medium, design: .rounded))
+                    }
+                }
+            } // Close About section
+            
+            if isDeveloperModeEnabled {
+                // SECTION 4: DEVELOPER
+                Section(header: Text("Developer")) {
+                    HStack(spacing: 16) {
+                        Image(systemName: "ladybug.fill")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                            .frame(width: 24, height: 24)
+                        Toggle("Developer Mode", isOn: $isDeveloperModeEnabled.animation())
+                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .tint(.blue)
+                    }
+                    Button(action: {
+                        btManager.simulateAllNotifications()
+                    }) {
+                        HStack(spacing: 16) {
+                            Image(systemName: "bell.badge.fill")
+                                .foregroundColor(.blue)
+                                .font(.system(size: 18))
+                                .frame(width: 24, height: 24)
+                            Text("Simulate Detections (Test Notifications)")
+                                .font(.system(size: 16, weight: .medium, design: .rounded))
+                                .foregroundColor(.primary)
+                        }
                     }
                 }
             }

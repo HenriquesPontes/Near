@@ -658,6 +658,42 @@ extension BluetoothManager: CBCentralManagerDelegate {
 
 // MARK: - UNUserNotificationCenterDelegate
 extension BluetoothManager: UNUserNotificationCenterDelegate {
+    
+    // Developer tool to test notifications
+    func simulateAllNotifications() {
+        let types = [
+            ("rayban_meta", "Meta Glasses (Simulated)"),
+            ("vision_pro", "Apple Vision Pro (Simulated)"),
+            ("snap_spectacles", "Spectacles (Simulated)"),
+            ("google_glass", "Google Glass (Simulated)"),
+            ("samsung_glasses", "Samsung Smartglasses (Simulated)"),
+            ("unknown", "Unknown Device (Simulated)")
+        ]
+        
+        for (index, info) in types.enumerated() {
+            let device = BluetoothDevice(
+                deviceId: UUID().uuidString,
+                name: info.1,
+                type: info.0,
+                rssi: -50,
+                lastSeen: Date(),
+                isSimulated: true,
+                companyID: nil,
+                manufacturer: nil
+            )
+            // Stagger notifications slightly
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 1.0) {
+                self.sendPrivacyAlert(for: device)
+                
+                // Add to current session dashboard
+                if !self.detectedDevices.contains(where: { $0.deviceId == device.deviceId }) {
+                    self.detectedDevices.append(device)
+                }
+                self.saveToSwiftDataHistory(device: device)
+            }
+        }
+    }
+    
     func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification,
