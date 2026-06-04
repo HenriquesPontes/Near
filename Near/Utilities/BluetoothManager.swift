@@ -28,7 +28,7 @@ struct BluetoothDevice: Identifiable, Hashable {
 
     var threatLevel: String {
         switch type {
-        case "rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses", "vision_pro", "google_glass", "samsung_glasses":
+        case "rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses", "vision_pro", "google_glass", "google_gentle_monster", "google_warby_parker", "google_xreal", "samsung_glasses":
             return "High"
         case "snap_spectacles":
             return "High"
@@ -80,7 +80,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         get {
             let raw = UserDefaults.standard.string(forKey: "enabledAlertTypes") ?? ""
             if raw.isEmpty {
-                return ["rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses", "vision_pro", "snap_spectacles", "google_glass", "samsung_glasses", "unknown"]
+                return ["rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses", "vision_pro", "snap_spectacles", "google_glass", "google_gentle_monster", "google_warby_parker", "google_xreal", "samsung_glasses", "unknown"]
             }
             let arr = (try? JSONDecoder().decode([String].self, from: Data(raw.utf8))) ?? []
             return Set(arr)
@@ -348,6 +348,12 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             title = String(localized: "Snapchat Spectacles Nearby! ⚠️", locale: locale)
         case "google_glass":
             title = String(localized: "Google Glass Nearby! ⚠️", locale: locale)
+        case "google_gentle_monster":
+            title = String(localized: "Google Gentle Monster Nearby! ⚠️", locale: locale)
+        case "google_warby_parker":
+            title = String(localized: "Google Warby Parker Nearby! ⚠️", locale: locale)
+        case "google_xreal":
+            title = String(localized: "Google XREAL/Aura Nearby! ⚠️", locale: locale)
         case "samsung_glasses":
             title = String(localized: "Samsung Smart Glasses Nearby! ⚠️", locale: locale)
         default:
@@ -405,11 +411,16 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
                 " "
                 + String(
                     localized: "Be aware: AR filming and micro-cameras are active.", locale: locale)
-        case "google_glass":
+        case "google_glass", "google_gentle_monster", "google_warby_parker":
             suffix =
                 " "
                 + String(
-                    localized: "Be aware: First-person video capture may be active.", locale: locale)
+                    localized: "Be aware: First-person AI assistant and camera may be active.", locale: locale)
+        case "google_xreal":
+            suffix =
+                " "
+                + String(
+                    localized: "Be aware: Display-equipped XR glasses with spatial tracking.", locale: locale)
         case "samsung_glasses":
             suffix =
                 " "
@@ -566,6 +577,12 @@ extension BluetoothManager: CBCentralManagerDelegate {
             detectedType = "snap_spectacles"
         } else if lowerName.contains("google glass") || (lowerName.contains("glass") && (discoveredCompanyID == 0x018E || discoveredCompanyID == 0x00E0)) {
             detectedType = "google_glass"
+        } else if lowerName.contains("gentle monster") || (lowerName.contains("monster") && discoveredCompanyID == 0x00E0) {
+            detectedType = "google_gentle_monster"
+        } else if lowerName.contains("warby parker") || (lowerName.contains("warby") && discoveredCompanyID == 0x00E0) {
+            detectedType = "google_warby_parker"
+        } else if lowerName.contains("xreal") || lowerName.contains("project aura") || (lowerName.contains("aura") && discoveredCompanyID == 0x00E0) {
+            detectedType = "google_xreal"
         } else if (lowerName.contains("samsung") && lowerName.contains("glass")) || (lowerName.contains("glass") && (discoveredCompanyID == 0x02DE || discoveredCompanyID == 0x0075)) {
             detectedType = "samsung_glasses"
         } else {

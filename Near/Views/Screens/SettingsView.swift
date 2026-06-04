@@ -372,6 +372,30 @@ struct DeviceFiltersSettingsView: View {
                 )
                 
                 SettingsFilterToggleRow(
+                    title: "Google x Gentle Monster",
+                    description: "Gemini-powered AI glasses",
+                    icon: iconForType("google_gentle_monster"),
+                    color: .green,
+                    isOn: bindingForType("google_gentle_monster")
+                )
+                
+                SettingsFilterToggleRow(
+                    title: "Google x Warby Parker",
+                    description: "Gemini-powered AI glasses",
+                    icon: iconForType("google_warby_parker"),
+                    color: .green,
+                    isOn: bindingForType("google_warby_parker")
+                )
+                
+                SettingsFilterToggleRow(
+                    title: "Google XREAL/Aura",
+                    description: "Android XR display glasses",
+                    icon: iconForType("google_xreal"),
+                    color: .green,
+                    isOn: bindingForType("google_xreal")
+                )
+                
+                SettingsFilterToggleRow(
                     title: "Samsung Smart Glasses",
                     description: "Samsung wearable HUD and cameras",
                     icon: iconForType("samsung_glasses"),
