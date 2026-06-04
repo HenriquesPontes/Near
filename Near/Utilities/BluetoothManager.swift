@@ -173,6 +173,9 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         loadCompanyIdentifiers()
         self.locationManager = CLLocationManager()
         self.locationManager?.delegate = self
+        self.locationManager?.allowsBackgroundLocationUpdates = true
+        self.locationManager?.showsBackgroundLocationIndicator = true
+        self.locationManager?.pausesLocationUpdatesAutomatically = false
         self.centralManager = CBCentralManager(delegate: self, queue: nil)
         UNUserNotificationCenter.current().delegate = self
         requestNotificationPermission()
@@ -207,7 +210,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         let status = manager.authorizationStatus
         locationAuthorizationStatus = status
         if status == .notDetermined {
-            manager.requestWhenInUseAuthorization()
+            manager.requestAlwaysAuthorization()
         }
     }
 
@@ -231,22 +234,21 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
                 let request = UNNotificationRequest(identifier: "RadarModeBackground", content: content, trigger: nil)
                 UNUserNotificationCenter.current().add(request)
                 
-                // Transition scanning to background-compatible mode using specific service UUIDs
-                centralManager?.stopScan()
-                let backgroundServices = [
-                    CBUUID(string: "180F"),  // Battery Service
-                    CBUUID(string: "180A"),  // Device Information
-                    CBUUID(string: "FEAA"),  // Eddystone
-                ]
-                centralManager?.scanForPeripherals(
-                    withServices: backgroundServices,
-                    options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
+                // Start location updates to keep the app executing in the background (like a foreground service)
+                locationManager?.startUpdatingLocation()
+                
+                // Note: We deliberately do NOT stop the generic scan here. By keeping the app 
+                // alive via location tracking, the existing scanForPeripherals(withServices: nil) 
+                // might continue functioning depending on iOS enforcement behavior.
             }
         }
 
         @objc private func handleWillEnterForeground() {
             if continueScanInBackground && isScanning {
-                // Restore full generic scanning in foreground
+                // Stop location updates since we are back in the foreground
+                locationManager?.stopUpdatingLocation()
+                
+                // Restore full generic scanning in foreground just in case it was paused
                 centralManager?.stopScan()
                 centralManager?.scanForPeripherals(
                     withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey: true]
@@ -264,15 +266,8 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         if centralManager?.state == .poweredOn {
             #if os(iOS)
                 if UIApplication.shared.applicationState == .background {
-                    let backgroundServices = [
-                        CBUUID(string: "180F"),  // Battery Service
-                        CBUUID(string: "180A"),  // Device Information
-                        CBUUID(string: "FEAA"),  // Eddystone
-                    ]
-                    centralManager?.scanForPeripherals(
-                        withServices: backgroundServices,
-                        options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
-                    return
+                    // Start location tracking to keep the background scanning alive
+                    locationManager?.startUpdatingLocation()
                 }
             #endif
             centralManager?.scanForPeripherals(
@@ -285,6 +280,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         isScanning = false
         stopCleanupTimer()
         centralManager?.stopScan()
+        locationManager?.stopUpdatingLocation()
         DispatchQueue.main.async {
             self.detectedDevices = []
         }
