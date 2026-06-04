@@ -104,12 +104,10 @@ struct DeviceTrackerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .symbolRenderingMode(.palette)
-                            .foregroundStyle(.white.opacity(0.8), Color(UIColor.tertiarySystemFill))
-                            .font(.system(size: 28))
+                    Button("Done") {
+                        dismiss()
                     }
+                    .fontWeight(.semibold)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { enableHaptics.toggle() }) {

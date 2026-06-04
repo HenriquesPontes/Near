@@ -258,17 +258,15 @@ struct DeviceDetailView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
-                    var transaction = Transaction()
-                    transaction.disablesAnimations = true
-                    withTransaction(transaction) {
-                        device.isStarred.toggle()
-                    }
+                    device.isStarred.toggle()
                     try? modelContext.save()
                 } label: {
                     Image(systemName: device.isStarred ? "star.fill" : "star")
                         .foregroundColor(device.isStarred ? .yellow : .gray)
-                        .animation(nil, value: device.isStarred)
+                        .contentTransition(.identity)
                 }
+                .buttonStyle(.plain)
+                .animation(nil, value: device.isStarred)
             }
         }
         .onAppear {
