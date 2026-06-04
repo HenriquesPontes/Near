@@ -19,6 +19,7 @@ func iconForType(_ type: String) -> String {
     case "snap_spectacles": return "snapchat_icon"
     case "google_glass", "google_gentle_monster", "google_warby_parker", "google_xreal": return "Google"
     case "samsung_glasses": return "Samsung"
+    case "oho_sunshine", "ivue_glasses", "brilliant_labs": return "camera.viewfinder"
     default: return "questionmark.circle.fill"
     }
 }
@@ -31,6 +32,7 @@ func colorForType(_ type: String) -> Color {
     case "snap_spectacles": return .yellow
     case "google_glass", "google_gentle_monster", "google_warby_parker", "google_xreal": return .green
     case "samsung_glasses": return .blue
+    case "oho_sunshine", "ivue_glasses", "brilliant_labs": return .teal
     default: return .gray
     }
 }
@@ -50,6 +52,9 @@ func displayNameForType(_ type: String) -> String {
     case "google_warby_parker": return "Google x Warby Parker"
     case "google_xreal": return "Google XREAL/Aura"
     case "samsung_glasses": return "Samsung Smart Glasses"
+    case "oho_sunshine": return "OhO Camera Glasses"
+    case "ivue_glasses": return "iVue Camera Glasses"
+    case "brilliant_labs": return "Brilliant Labs Glasses"
     default: return "Unknown Device"
     }
 }

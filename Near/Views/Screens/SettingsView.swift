@@ -434,6 +434,14 @@ struct DeviceFiltersSettingsView: View {
                 )
                 
                 SettingsFilterToggleRow(
+                    title: "Other Camera Glasses",
+                    description: "OhO Sunshine, iVue, Brilliant Labs",
+                    icon: iconForType("oho_sunshine"),
+                    color: .teal,
+                    isOn: bindingForTypes(["oho_sunshine", "ivue_glasses", "brilliant_labs"])
+                )
+                
+                SettingsFilterToggleRow(
                     title: "Unknown Devices",
                     description: "Generic smart wear emissions",
                     icon: iconForType("unknown"),

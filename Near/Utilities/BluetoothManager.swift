@@ -85,7 +85,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
                     "rayban_meta", "oakley_meta", "project_aria", "meta_orion",
                     "other_meta_glasses", "vision_pro", "snap_spectacles", "google_glass",
                     "google_gentle_monster", "google_warby_parker", "google_xreal",
-                    "samsung_glasses", "unknown",
+                    "samsung_glasses", "oho_sunshine", "ivue_glasses", "brilliant_labs", "unknown",
                 ]
             }
             let arr = (try? JSONDecoder().decode([String].self, from: Data(raw.utf8))) ?? []
@@ -348,7 +348,13 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         case "google_glass", "google_gentle_monster", "google_warby_parker", "google_xreal":
             title = String(localized: "Google AI Glasses Nearby! ⚠️", locale: locale)
         case "samsung_glasses":
-            title = String(localized: "Samsung Smart Glasses Nearby! ⚠️", locale: locale)
+            title = String(localized: "Samsung Smartglasses Nearby! ⚠️", locale: locale)
+        case "oho_sunshine":
+            title = String(localized: "OhO Camera Glasses Nearby! ⚠️", locale: locale)
+        case "ivue_glasses":
+            title = String(localized: "iVue Camera Glasses Nearby! ⚠️", locale: locale)
+        case "brilliant_labs":
+            title = String(localized: "Brilliant Labs Glasses Nearby! ⚠️", locale: locale)
         default:
             if let manufacturer = device.manufacturer, !manufacturer.isEmpty {
                 title = String(localized: "\(manufacturer) Device Nearby! ⚠️", locale: locale)
@@ -422,6 +428,18 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
                 " "
                 + String(
                     localized: "Be aware: Smart eyewear with potential recording active.",
+                    locale: locale)
+        case "oho_sunshine", "ivue_glasses":
+            suffix =
+                " "
+                + String(
+                    localized: "Be aware: Wearable camera glasses designed for recording.",
+                    locale: locale)
+        case "brilliant_labs":
+            suffix =
+                " "
+                + String(
+                    localized: "Be aware: Multimodal AI-powered smart glasses active.",
                     locale: locale)
         default:
             suffix =
@@ -602,6 +620,12 @@ extension BluetoothManager: CBCentralManagerDelegate {
                 && (discoveredCompanyID == 0x02DE || discoveredCompanyID == 0x0075))
         {
             detectedType = "samsung_glasses"
+        } else if lowerName.contains("oho sunshine") {
+            detectedType = "oho_sunshine"
+        } else if lowerName.contains("ivue") {
+            detectedType = "ivue_glasses"
+        } else if lowerName.contains("brilliant") && (lowerName.contains("labs") || lowerName.contains("frame") || lowerName.contains("halo")) {
+            detectedType = "brilliant_labs"
         } else {
             detectedType = "unknown"
         }
@@ -667,6 +691,9 @@ extension BluetoothManager: UNUserNotificationCenterDelegate {
             ("snap_spectacles", "Spectacles (Simulated)"),
             ("google_glass", "Google Glass (Simulated)"),
             ("samsung_glasses", "Samsung Smartglasses (Simulated)"),
+            ("oho_sunshine", "OhO Camera Glasses (Simulated)"),
+            ("ivue_glasses", "iVue Camera Glasses (Simulated)"),
+            ("brilliant_labs", "Brilliant Labs Glasses (Simulated)"),
             ("unknown", "Unknown Device (Simulated)")
         ]
         
