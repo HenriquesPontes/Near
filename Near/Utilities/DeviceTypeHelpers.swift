@@ -74,7 +74,7 @@ struct DeviceIconView: View {
     
     var body: some View {
         if customIcons.contains(icon) {
-            if icon == "Apple" {
+            if icon == "Apple" || icon == "Samsung" {
                 Image(icon)
                     .renderingMode(.template)
                     .resizable()
