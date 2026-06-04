@@ -446,7 +446,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         content.body = baseMsg + suffix
         content.sound = .default
         if #available(iOS 15.0, *) {
-            content.interruptionLevel = .timeSensitive
+            content.interruptionLevel = .active
         }
 
         let request = UNNotificationRequest(
