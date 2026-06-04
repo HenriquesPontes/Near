@@ -186,17 +186,6 @@ struct ScanRangeSettingsView: View {
     @ObservedObject var btManager = BluetoothManager.shared
     @Environment(\.dismiss) private var dismiss
     
-    private var sensitivityLabel: LocalizedStringKey {
-        switch btManager.rssiThreshold {
-        case -60...(-40):
-            return "Near (Direct proximity, ~2m)"
-        case -79...(-61):
-            return "Medium (Same room, ~5m)"
-        default:
-            return "Far (Long range, ~15m)"
-        }
-    }
-    
     var body: some View {
         List {
             // Radar Mode Toggle
@@ -249,29 +238,6 @@ struct ScanRangeSettingsView: View {
                         .labelsHidden()
                 }
             }
-            
-            // Detection Sensitivity
-            Section(header: Text("Detection Sensitivity")) {
-                HStack {
-                    Text("Current sensitivity:")
-                        .font(.system(size: 15, design: .rounded))
-                    Spacer()
-                    Text(sensitivityLabel)
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
-                        .foregroundColor(.blue)
-                }
-                
-                Slider(value: Binding(
-                    get: { Double(btManager.rssiThreshold) },
-                    set: { btManager.rssiThreshold = Int($0) }
-                ), in: -95...(-55), step: 5)
-                .accentColor(.blue)
-            }
-            
-            Section(footer: Text("Higher sensitivity alerts you even for weak/distant signals, but increases potential false triggers.")) {
-                EmptyView()
-            }
-            
             // Notification Cooldown
             Section(header: Text("Notification Cooldown")) {
                 NavigationLink {
@@ -304,8 +270,41 @@ struct DeviceFiltersSettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     
+    private var sensitivityLabel: LocalizedStringKey {
+        switch btManager.rssiThreshold {
+        case -60...(-40):
+            return "Near (Direct proximity, ~2m)"
+        case -79...(-61):
+            return "Medium (Same room, ~5m)"
+        default:
+            return "Far (Long range, ~15m)"
+        }
+    }
+    
     var body: some View {
         List {
+            // Detection Sensitivity
+            Section(header: Text("Detection Sensitivity")) {
+                HStack {
+                    Text("Current sensitivity:")
+                        .font(.system(size: 15, design: .rounded))
+                    Spacer()
+                    Text(sensitivityLabel)
+                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .foregroundColor(.blue)
+                }
+                
+                Slider(value: Binding(
+                    get: { Double(btManager.rssiThreshold) },
+                    set: { btManager.rssiThreshold = Int($0) }
+                ), in: -95...(-55), step: 5)
+                .accentColor(.blue)
+            }
+            
+            Section(footer: Text("Higher sensitivity alerts you even for weak/distant signals, but increases potential false triggers.")) {
+                EmptyView()
+            }
+            
             Section(header: Text("Detected Glasses Channel")) {
                 SettingsFilterToggleRow(
                     title: "Meta AI Glasses",
