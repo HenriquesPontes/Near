@@ -282,6 +282,7 @@ struct DeviceFiltersSettingsView: View {
     @ObservedObject var btManager = BluetoothManager.shared
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
+    @State private var showSensitivitySheet = false
     
     private var sensitivityLabel: LocalizedStringKey {
         switch btManager.rssiThreshold {
@@ -298,8 +299,8 @@ struct DeviceFiltersSettingsView: View {
         List {
             // Detection Sensitivity
             Section(header: Text("Detection Sensitivity")) {
-                NavigationLink {
-                    SensitivitySettingsView()
+                Button {
+                    showSensitivitySheet = true
                 } label: {
                     HStack(spacing: 16) {
                         Image(systemName: "slider.horizontal.3")
@@ -308,6 +309,7 @@ struct DeviceFiltersSettingsView: View {
                             .frame(width: 24, height: 24)
                         Text("Detection Sensitivity")
                             .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .foregroundColor(.primary)
                         Spacer()
                         Text(sensitivityLabel)
                             .font(.system(size: 15, design: .rounded))
@@ -404,7 +406,12 @@ struct DeviceFiltersSettingsView: View {
         .listStyle(.insetGrouped)
         .navigationTitle("Device Channel")
         .navigationBarTitleDisplayMode(.inline)
-
+        .sheet(isPresented: $showSensitivitySheet) {
+            NavigationStack {
+                SensitivitySettingsView()
+            }
+            .presentationDetents([.height(300), .medium])
+        }
     }
     
     private func bindingForTypes(_ types: [String]) -> Binding<Bool> {
