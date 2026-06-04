@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+internal import CoreLocation
 
 struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
@@ -15,6 +16,7 @@ struct DashboardView: View {
     
     @AppStorage("hasAcceptedRadarModeWarning") private var hasAcceptedRadarModeWarning = false
     @State private var showRadarWarning = false
+    @State private var showLocationSettingsAlert = false
     
     var body: some View {
         NavigationStack {
@@ -240,11 +242,21 @@ struct DashboardView: View {
                 // Top Right Radar Toggle Button
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        if !btManager.continueScanInBackground && !hasAcceptedRadarModeWarning {
-                            showRadarWarning = true
+                        if !btManager.continueScanInBackground {
+                            if btManager.locationAuthorizationStatus == .notDetermined {
+                                btManager.requestLocationPermission()
+                            } else if btManager.locationAuthorizationStatus != .authorizedAlways {
+                                showLocationSettingsAlert = true
+                            } else if !hasAcceptedRadarModeWarning {
+                                showRadarWarning = true
+                            } else {
+                                withAnimation(.spring(response: 0.35, dampingFraction: 0.6, blendDuration: 0)) {
+                                    btManager.continueScanInBackground = true
+                                }
+                            }
                         } else {
                             withAnimation(.spring(response: 0.35, dampingFraction: 0.6, blendDuration: 0)) {
-                                btManager.continueScanInBackground.toggle()
+                                btManager.continueScanInBackground = false
                             }
                         }
                     } label: {
@@ -265,6 +277,16 @@ struct DashboardView: View {
                 }
             } message: {
                 Text("The app will scan for devices in the background and app notifies you when smart glasses are nearby")
+            }
+            .alert("Location Access Required", isPresented: $showLocationSettingsAlert) {
+                Button("Cancel", role: .cancel) { }
+                Button("Settings") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }
+            } message: {
+                Text("Radar Mode requires 'Always' location access to scan in the background. Please change this in Settings.")
             }
 
             // Listen to BLE Manager alerts

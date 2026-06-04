@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+internal import CoreLocation
 import SwiftData
 
 struct SettingsView: View {
@@ -243,13 +244,23 @@ struct ScanRangeSettingsView: View {
     @State private var showCooldownSheet = false
     @AppStorage("hasAcceptedRadarModeWarning") private var hasAcceptedRadarModeWarning = false
     @State private var showRadarWarning = false
+    @State private var showLocationSettingsAlert = false
     
     var radarModeBinding: Binding<Bool> {
         Binding(
             get: { btManager.continueScanInBackground },
             set: { newValue in
-                if newValue && !hasAcceptedRadarModeWarning {
-                    showRadarWarning = true
+                if newValue {
+                    if btManager.locationAuthorizationStatus == .notDetermined {
+                        btManager.requestLocationPermission()
+                        btManager.continueScanInBackground = false // wait for permission
+                    } else if btManager.locationAuthorizationStatus != .authorizedAlways {
+                        showLocationSettingsAlert = true
+                    } else if !hasAcceptedRadarModeWarning {
+                        showRadarWarning = true
+                    } else {
+                        btManager.continueScanInBackground = newValue
+                    }
                 } else {
                     btManager.continueScanInBackground = newValue
                 }
@@ -348,6 +359,16 @@ struct ScanRangeSettingsView: View {
             }
         } message: {
             Text("The app will scan for devices in the background and app notifies you when smart glasses are nearby")
+        }
+        .alert("Location Access Required", isPresented: $showLocationSettingsAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+        } message: {
+            Text("Radar Mode requires 'Always' location access to scan in the background. Please change this in Settings.")
         }
     }
 }
