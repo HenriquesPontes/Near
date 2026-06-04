@@ -224,6 +224,13 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     #if os(iOS)
         @objc private func handleDidEnterBackground() {
             if continueScanInBackground && isScanning {
+                // Send background notification reminder
+                let content = UNMutableNotificationContent()
+                content.title = String(localized: "Radar Mode Active")
+                content.body = String(localized: "Radar Mode scans for smart wearable signals in the background, allowing the app to send alerts when in your pocket.")
+                let request = UNNotificationRequest(identifier: "RadarModeBackground", content: content, trigger: nil)
+                UNUserNotificationCenter.current().add(request)
+                
                 // Transition scanning to background-compatible mode using specific service UUIDs
                 centralManager?.stopScan()
                 let backgroundServices = [
@@ -250,9 +257,6 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     func startScanning() {
         requestLocationPermission()
-        if !continueScanInBackground {
-            continueScanInBackground = true
-        }
         guard !isScanning else { return }
         isScanning = true
         startCleanupTimer()
@@ -277,9 +281,6 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 
     func stopScanning() {
-        if continueScanInBackground {
-            continueScanInBackground = false
-        }
         guard isScanning else { return }
         isScanning = false
         stopCleanupTimer()

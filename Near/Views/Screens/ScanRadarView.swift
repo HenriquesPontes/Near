@@ -203,7 +203,9 @@ struct ScanRadarView: View {
             }
         }
         .onDisappear {
-            btManager.stopScanning()
+            if !btManager.continueScanInBackground {
+                btManager.stopScanning()
+            }
         }
         .alert("Location Access Required", isPresented: $showLocationPermissionPrompt) {
             Button("Allow Location") {
@@ -254,6 +256,7 @@ struct ScanRadarView: View {
     
     private func toggleScanningWithLocationCheck() {
         if btManager.isScanning {
+            btManager.continueScanInBackground = false
             btManager.stopScanning()
             return
         }

@@ -20,7 +20,7 @@ struct DashboardView: View {
         NavigationStack {
             ZCenterContainer {
                 Group {
-                    if historicalDevices.isEmpty {
+                    if historicalDevices.isEmpty && btManager.detectedDevices.isEmpty {
                         VStack(spacing: 12) {
                             Spacer()
                             Image(systemName: "shield.slash")
@@ -39,73 +39,116 @@ struct DashboardView: View {
                         }
                     } else {
                         List {
-                            ForEach(historicalDevices.prefix(10)) { device in
-                                NavigationLink(destination: DeviceDetailView(device: device)) {
-                                    HStack(spacing: 12) {
-                                        DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
-                                            .frame(width: 20, height: 20)
-                                            .frame(width: 32, height: 32)
-                                            .background(colorForType(device.type).opacity(0.1))
-                                            .cornerRadius(8)
-                                        
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            HStack(spacing: 4) {
+                            if !btManager.detectedDevices.isEmpty {
+                                Section(header: Text("Currently Nearby").font(.subheadline).foregroundColor(.secondary)) {
+                                    ForEach(btManager.detectedDevices) { device in
+                                        HStack(spacing: 12) {
+                                            DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
+                                                .frame(width: 32, height: 32)
+                                                .background(colorForType(device.type).opacity(0.1))
+                                                .cornerRadius(8)
+                                            
+                                            VStack(alignment: .leading, spacing: 4) {
                                                 Text(device.name)
                                                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                                                     .foregroundColor(.primary)
                                                 
-                                                if device.isStarred {
-                                                    Image(systemName: "star.fill")
-                                                        .foregroundColor(.yellow)
-                                                        .font(.system(size: 12))
+                                                HStack(spacing: 6) {
+                                                    Image(systemName: "wifi")
+                                                        .font(.system(size: 10))
+                                                        .foregroundColor(colorForRssi(device.rssi))
+                                                    Text("\(device.rssi) dBm")
+                                                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                                                        .foregroundColor(colorForRssi(device.rssi))
+                                                    
+                                                    Text("•")
+                                                        .font(.system(size: 11))
+                                                        .foregroundColor(.secondary.opacity(0.5))
+                                                    
+                                                    Image(systemName: "location")
+                                                        .font(.system(size: 10))
+                                                        .foregroundColor(.secondary)
+                                                    Text(String(format: "%.1fm", device.estimatedDistance))
+                                                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                                                        .foregroundColor(.secondary)
                                                 }
                                             }
-                                            
-                                            HStack(spacing: 6) {
-                                                // Time
-                                                Image(systemName: "clock")
-                                                    .font(.system(size: 10))
-                                                    .foregroundColor(.secondary)
-                                                Text(device.timestamp.formatted(date: .omitted, time: .shortened))
-                                                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                                                    .foregroundColor(.secondary)
-                                                
-                                                Text("•")
-                                                    .font(.system(size: 11))
-                                                    .foregroundColor(.secondary.opacity(0.5))
-                                                
-                                                // Signal strength (RSSI)
-                                                Image(systemName: "wifi")
-                                                    .font(.system(size: 10))
-                                                    .foregroundColor(colorForRssi(device.rssi))
-                                                Text("\(device.rssi) dBm")
-                                                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                                                    .foregroundColor(colorForRssi(device.rssi))
-                                                
-                                                Text("•")
-                                                    .font(.system(size: 11))
-                                                    .foregroundColor(.secondary.opacity(0.5))
-                                                
-                                                // Proximity
-                                                Image(systemName: "location")
-                                                    .font(.system(size: 10))
-                                                    .foregroundColor(.secondary)
-                                                Text(String(format: "%.1fm", estimatedDistance(for: device.rssi)))
-                                                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                                                    .foregroundColor(.secondary)
-                                            }
                                         }
+                                        .padding(.vertical, 2)
                                     }
-                                    .padding(.vertical, 2)
                                 }
                             }
-                            .onDelete(perform: deleteDevices)
                             
-                            if historicalDevices.count > 10 {
-                                NavigationLink(destination: AllResultsView()) {
-                                    Text("View All Results")
-                                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                        .foregroundColor(.blue)
+                            if !historicalDevices.isEmpty {
+                                Section(header: Text("Recent Detections").font(.subheadline).foregroundColor(.secondary)) {
+                                    ForEach(historicalDevices.prefix(10)) { device in
+                                        NavigationLink(destination: DeviceDetailView(device: device)) {
+                                            HStack(spacing: 12) {
+                                                DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
+                                                    .frame(width: 32, height: 32)
+                                                    .background(colorForType(device.type).opacity(0.1))
+                                                    .cornerRadius(8)
+                                                
+                                                VStack(alignment: .leading, spacing: 4) {
+                                                    HStack(spacing: 4) {
+                                                        Text(device.name)
+                                                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                                            .foregroundColor(.primary)
+                                                        
+                                                        if device.isStarred {
+                                                            Image(systemName: "star.fill")
+                                                                .foregroundColor(.yellow)
+                                                                .font(.system(size: 12))
+                                                        }
+                                                    }
+                                                    
+                                                    HStack(spacing: 6) {
+                                                        // Time
+                                                        Image(systemName: "clock")
+                                                            .font(.system(size: 10))
+                                                            .foregroundColor(.secondary)
+                                                        Text(device.timestamp.formatted(date: .omitted, time: .shortened))
+                                                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                                                            .foregroundColor(.secondary)
+                                                        
+                                                        Text("•")
+                                                            .font(.system(size: 11))
+                                                            .foregroundColor(.secondary.opacity(0.5))
+                                                        
+                                                        // Signal strength (RSSI)
+                                                        Image(systemName: "wifi")
+                                                            .font(.system(size: 10))
+                                                            .foregroundColor(colorForRssi(device.rssi))
+                                                        Text("\(device.rssi) dBm")
+                                                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                                                            .foregroundColor(colorForRssi(device.rssi))
+                                                        
+                                                        Text("•")
+                                                            .font(.system(size: 11))
+                                                            .foregroundColor(.secondary.opacity(0.5))
+                                                        
+                                                        // Proximity
+                                                        Image(systemName: "location")
+                                                            .font(.system(size: 10))
+                                                            .foregroundColor(.secondary)
+                                                        Text(String(format: "%.1fm", estimatedDistance(for: device.rssi)))
+                                                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                                                            .foregroundColor(.secondary)
+                                                    }
+                                                }
+                                            }
+                                            .padding(.vertical, 2)
+                                        }
+                                    }
+                                    .onDelete(perform: deleteDevices)
+                                    
+                                    if historicalDevices.count > 10 {
+                                        NavigationLink(destination: AllResultsView()) {
+                                            Text("View All Results")
+                                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                                .foregroundColor(.blue)
+                                        }
+                                    }
                                 }
                             }
                         }
