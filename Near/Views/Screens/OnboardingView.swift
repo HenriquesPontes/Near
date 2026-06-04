@@ -47,7 +47,7 @@ struct OnboardingView: View {
                     icon: "antenna.radiowaves.left.and.right",
                     color: .blue,
                     title: "Signal Detection",
-                    description: "Detects Bluetooth emissions from popular smart glasses like Ray-Ban Meta and Apple Vision Pro."
+                    description: "Detects Bluetooth emissions from popular smart glasses like Ray-Ban Meta and other smart glasses."
                 )
                 
                 FeatureRow(
