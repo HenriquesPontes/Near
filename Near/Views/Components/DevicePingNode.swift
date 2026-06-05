@@ -52,6 +52,8 @@ struct DevicePingNode: View {
             }
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("\(device.name) on radar")
+        .accessibilityHint("Double tap to select this device")
     }
 }
 

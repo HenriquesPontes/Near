@@ -79,41 +79,44 @@ struct DeviceIconView: View {
     private let customIcons = ["snapchat_icon", "Apple", "Meta", "Samsung", "Google"]
 
     var body: some View {
-        if customIcons.contains(icon) {
-            if icon == "Apple" {
-                Image(icon)
-                    .renderingMode(.template)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .foregroundColor(.primary)
-            } else if icon == "Samsung" {
-                if colorScheme == .dark {
+        Group {
+            if customIcons.contains(icon) {
+                if icon == "Apple" {
                     Image(icon)
+                        .renderingMode(.template)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .colorInvert()
+                        .foregroundColor(.primary)
+                } else if icon == "Samsung" {
+                    if colorScheme == .dark {
+                        Image(icon)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .colorInvert()
+                    } else {
+                        Image(icon)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                    }
+                } else if icon == "snapchat_icon" {
+                    Image(icon)
+                        .renderingMode(.template)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundColor(.yellow)
                 } else {
                     Image(icon)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                 }
-            } else if icon == "snapchat_icon" {
-                Image(icon)
-                    .renderingMode(.template)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .foregroundColor(.yellow)
             } else {
-                Image(icon)
+                Image(systemName: icon)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
+                    .foregroundColor(color)
             }
-        } else {
-            Image(systemName: icon)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .foregroundColor(color)
         }
+        .accessibilityHidden(true)
     }
 }
 

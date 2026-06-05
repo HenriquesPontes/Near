@@ -29,6 +29,7 @@ struct DashboardView: View {
                                 .font(.system(size: 48))
                                 .foregroundColor(.secondary.opacity(0.6))
                                 .symbolEffect(.pulse, options: .repeating)
+                                .accessibilityHidden(true)
                             Text("No devices detected yet")
                                 .font(.system(size: 16, weight: .bold, design: .rounded))
                                 .foregroundColor(.primary.opacity(0.8))
@@ -65,6 +66,7 @@ struct DashboardView: View {
                                                         Image(systemName: "wifi")
                                                             .font(.system(size: 10))
                                                             .foregroundColor(colorForRssi(device.rssi))
+                                                            .accessibilityHidden(true)
                                                         Text("\(device.rssi) dBm")
                                                             .font(.system(size: 11, weight: .medium, design: .rounded))
                                                             .foregroundColor(colorForRssi(device.rssi))
@@ -76,6 +78,7 @@ struct DashboardView: View {
                                                         Image(systemName: "location")
                                                             .font(.system(size: 10))
                                                             .foregroundColor(.secondary)
+                                                            .accessibilityHidden(true)
                                                         Text(String(format: "%.1fm", device.estimatedDistance))
                                                             .font(.system(size: 11, weight: .medium, design: .rounded))
                                                             .foregroundColor(.secondary)
@@ -106,6 +109,7 @@ struct DashboardView: View {
                                                             Image(systemName: "star.fill")
                                                                 .foregroundColor(.yellow)
                                                                 .font(.system(size: 12))
+                                                                .accessibilityLabel("Starred")
                                                         }
                                                     }
                                                     
@@ -121,6 +125,7 @@ struct DashboardView: View {
                                                         Image(systemName: "clock")
                                                             .font(.system(size: 10))
                                                             .foregroundColor(.secondary)
+                                                            .accessibilityHidden(true)
                                                         Text(device.timestamp.formatted(date: .omitted, time: .shortened))
                                                             .font(.system(size: 11, weight: .medium, design: .rounded))
                                                             .foregroundColor(.secondary)
@@ -133,6 +138,7 @@ struct DashboardView: View {
                                                         Image(systemName: "wifi")
                                                             .font(.system(size: 10))
                                                             .foregroundColor(colorForRssi(device.rssi))
+                                                            .accessibilityHidden(true)
                                                         Text("\(device.rssi) dBm")
                                                             .font(.system(size: 11, weight: .medium, design: .rounded))
                                                             .foregroundColor(colorForRssi(device.rssi))
@@ -145,6 +151,7 @@ struct DashboardView: View {
                                                         Image(systemName: "location")
                                                             .font(.system(size: 10))
                                                             .foregroundColor(.secondary)
+                                                            .accessibilityHidden(true)
                                                         Text(String(format: "%.1fm", estimatedDistance(for: device.rssi)))
                                                             .font(.system(size: 11, weight: .medium, design: .rounded))
                                                             .foregroundColor(.secondary)
@@ -415,6 +422,7 @@ struct AllResultsView: View {
                                     Image(systemName: "star.fill")
                                         .foregroundColor(.yellow)
                                         .font(.system(size: 12))
+                                        .accessibilityLabel("Starred")
                                 }
                             }
                             
@@ -430,6 +438,7 @@ struct AllResultsView: View {
                                 Image(systemName: "clock")
                                     .font(.system(size: 10))
                                     .foregroundColor(.secondary)
+                                    .accessibilityHidden(true)
                                 Text(device.timestamp.formatted(date: .omitted, time: .shortened))
                                     .font(.system(size: 11, weight: .medium, design: .rounded))
                                     .foregroundColor(.secondary)
@@ -442,6 +451,7 @@ struct AllResultsView: View {
                                 Image(systemName: "wifi")
                                     .font(.system(size: 10))
                                     .foregroundColor(colorForRssi(device.rssi))
+                                    .accessibilityHidden(true)
                                 Text("\(device.rssi) dBm")
                                     .font(.system(size: 11, weight: .medium, design: .rounded))
                                     .foregroundColor(colorForRssi(device.rssi))
@@ -454,6 +464,7 @@ struct AllResultsView: View {
                                 Image(systemName: "location")
                                     .font(.system(size: 10))
                                     .foregroundColor(.secondary)
+                                    .accessibilityHidden(true)
                                 Text(String(format: "%.1fm", estimatedDistance(for: device.rssi)))
                                     .font(.system(size: 11, weight: .medium, design: .rounded))
                                     .foregroundColor(.secondary)
