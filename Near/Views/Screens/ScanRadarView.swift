@@ -311,6 +311,12 @@ struct ScanRadarView: View {
                     .font(.system(size: 11, weight: .medium, design: .rounded))
                     .foregroundColor(.secondary)
                     .lineLimit(1)
+            } else {
+                // Invisible placeholder to keep all cards uniform height
+                Text(" ")
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundColor(.clear)
+                    .lineLimit(1)
             }
             
             Text(rssiLabel)
