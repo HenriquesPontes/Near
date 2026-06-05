@@ -78,6 +78,8 @@ struct OnboardingView: View {
             
             // Action Button
             Button {
+                // Initialize BluetoothManager to trigger native iOS permission prompts
+                _ = BluetoothManager.shared
                 withAnimation {
                     hasSeenOnboarding = true
                 }
