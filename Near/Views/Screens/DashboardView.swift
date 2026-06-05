@@ -485,48 +485,90 @@ struct AllResultsView: View {
                             Button {
                                 showStarredOnly.toggle()
                             } label: {
-                                Label("Starred Only", systemImage: showStarredOnly ? "checkmark" : "")
+                                if showStarredOnly {
+                                    Label("Starred Only", systemImage: "checkmark")
+                                } else {
+                                    Text("Starred Only")
+                                }
                             }
                         }
                         
                         Section("Device Channel (Type)") {
-                            Button("All Channels") { filterType = nil }
+                            Button { filterType = nil } label: {
+                                if filterType == nil {
+                                    Label("All Channels", systemImage: "checkmark")
+                                } else {
+                                    Text("All Channels")
+                                }
+                            }
                             ForEach(uniqueTypes, id: \.self) { type in
                                 Button {
                                     filterType = type
                                 } label: {
-                                    Label(displayNameForType(type), systemImage: filterType == type ? "checkmark" : "")
+                                    if filterType == type {
+                                        Label(displayNameForType(type), systemImage: "checkmark")
+                                    } else {
+                                        Text(displayNameForType(type))
+                                    }
                                 }
                             }
                         }
                         
                         Section("Signal Strength") {
-                            Button("All Signals") { filterSignal = nil }
+                            Button { filterSignal = nil } label: {
+                                if filterSignal == nil {
+                                    Label("All Signals", systemImage: "checkmark")
+                                } else {
+                                    Text("All Signals")
+                                }
+                            }
                             Button {
                                 filterSignal = "Excellent"
                             } label: {
-                                Label("Excellent (>-60dBm)", systemImage: filterSignal == "Excellent" ? "checkmark" : "")
+                                if filterSignal == "Excellent" {
+                                    Label("Excellent (>-60dBm)", systemImage: "checkmark")
+                                } else {
+                                    Text("Excellent (>-60dBm)")
+                                }
                             }
                             Button {
                                 filterSignal = "Good"
                             } label: {
-                                Label("Good (>-80dBm)", systemImage: filterSignal == "Good" ? "checkmark" : "")
+                                if filterSignal == "Good" {
+                                    Label("Good (>-80dBm)", systemImage: "checkmark")
+                                } else {
+                                    Text("Good (>-80dBm)")
+                                }
                             }
                             Button {
                                 filterSignal = "Weak"
                             } label: {
-                                Label("Weak (<=-80dBm)", systemImage: filterSignal == "Weak" ? "checkmark" : "")
+                                if filterSignal == "Weak" {
+                                    Label("Weak (<=-80dBm)", systemImage: "checkmark")
+                                } else {
+                                    Text("Weak (<=-80dBm)")
+                                }
                             }
                         }
                         
                         Section("Device Name") {
-                            Button("All Devices") { filterDeviceName = nil }
+                            Button { filterDeviceName = nil } label: {
+                                if filterDeviceName == nil {
+                                    Label("All Devices", systemImage: "checkmark")
+                                } else {
+                                    Text("All Devices")
+                                }
+                            }
                             // Showing up to 10 unique names to avoid an overwhelmingly large menu
                             ForEach(uniqueDeviceNames.prefix(10), id: \.self) { name in
                                 Button {
                                     filterDeviceName = name
                                 } label: {
-                                    Label(name, systemImage: filterDeviceName == name ? "checkmark" : "")
+                                    if filterDeviceName == name {
+                                        Label(name, systemImage: "checkmark")
+                                    } else {
+                                        Text(name)
+                                    }
                                 }
                             }
                         }
