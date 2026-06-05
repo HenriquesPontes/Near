@@ -35,11 +35,11 @@ struct AboutNearView: View {
                 .lineSpacing(5)
             }
             Section(header: Text("Legal")) {
-                Link("Privacy Policy", destination: URL(string: "https://henriquespontes.com/privacy")!)
+                Link("Privacy Policy", destination: URL(string: "https://github.com/HenriquesPontes/Near/blob/main/PRIVACY.md")!)
                     .foregroundColor(.blue)
-                Link("Terms of Service", destination: URL(string: "https://henriquespontes.com/terms")!)
+                Link("Terms of Service", destination: URL(string: "https://github.com/HenriquesPontes/Near/blob/main/TERMS.md")!)
                     .foregroundColor(.blue)
-                Link("End User License Agreement (EULA)", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
+                Link("End User License Agreement (EULA)", destination: URL(string: "https://github.com/HenriquesPontes/Near/blob/main/EULA.md")!)
                     .foregroundColor(.blue)
             }
             

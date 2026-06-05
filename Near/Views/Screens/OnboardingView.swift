@@ -100,7 +100,7 @@ struct OnboardingView: View {
             .padding(.bottom, 16)
             
             // Legal Disclaimer
-            Text("By continuing, you agree to our [Terms of Service](https://henriquespontes.com/terms), [Privacy Policy](https://henriquespontes.com/privacy), and [EULA](https://www.apple.com/legal/internet-services/itunes/dev/stdeula/).")
+            Text("By continuing, you agree to our [Terms of Service](https://github.com/HenriquesPontes/Near/blob/main/TERMS.md), [Privacy Policy](https://github.com/HenriquesPontes/Near/blob/main/PRIVACY.md), and [EULA](https://github.com/HenriquesPontes/Near/blob/main/EULA.md).")
                 .tint(.blue)
                 .font(.system(size: 11))
                 .foregroundColor(.secondary)
