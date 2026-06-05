@@ -158,6 +158,7 @@ struct ScanRadarView: View {
                 .frame(height: 110)
                 
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .safeAreaInset(edge: .bottom) {
                 VStack(spacing: 16) {
                     VStack(spacing: 12) {
