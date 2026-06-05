@@ -13,6 +13,7 @@
 		32154EAE93C15F98C21AA6EF /* NearWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AFE7D13441CB9B7ED2898C13 /* NearWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6579E0033DD00082509C9162 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA6586A37491B8E86641FE7 /* Supabase */; };
 		7EBB09D8145B6AE5CFCFB9D9 /* NearTests/DeviceTypeHelpersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E58DDDAA0C7A8F2A8EAB75BF /* NearTests/DeviceTypeHelpersTests.swift */; };
+		846A6EC12FD3186300562C8A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 941660B4C7809CF8D7A757CC /* Foundation.framework */; };
 		84D665602FD1742C00123C64 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 84D6655F2FD1742C00123C64 /* Auth */; };
 		84D665622FD1742C00123C64 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 84D665612FD1742C00123C64 /* Functions */; };
 		84D665642FD1742C00123C64 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 84D665632FD1742C00123C64 /* PostgREST */; };
@@ -20,7 +21,6 @@
 		84D665682FD1742C00123C64 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 84D665672FD1742C00123C64 /* Storage */; };
 		84D6656A2FD1742C00123C64 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 84D665692FD1742C00123C64 /* Supabase */; };
 		B64E5DAE44F8AF2896BAAFD9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 941660B4C7809CF8D7A757CC /* Foundation.framework */; };
-		DE8D693401FBC35254318A16 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 941660B4C7809CF8D7A757CC /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,8 +76,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DE8D693401FBC35254318A16 /* Foundation.framework in Frameworks */,
 				0420780AC69099D0BC3507AA /* Supabase in Frameworks */,
+				846A6EC12FD3186300562C8A /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -462,7 +462,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2606051632;
+				CURRENT_PROJECT_VERSION = 2606051655;
 				DEVELOPMENT_TEAM = RN6ZQ9XYA8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -474,8 +474,6 @@
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "\"NearbyGlasses uses your location to keep the app active in the background, allowing it to continuously scan for smart glasses.\"";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "\"NearbyGlasses uses your location to keep the app active in the background, allowing it to continuously scan for smart glasses.\"";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "NearbyGlasses uses location permission to help scan for nearby Bluetooth devices.";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -488,12 +486,14 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.luvlu.Near;
 				PRODUCT_NAME = Nearbyglasses;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -503,7 +503,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2606051632;
+				CURRENT_PROJECT_VERSION = 2606051655;
 				DEVELOPMENT_TEAM = RN6ZQ9XYA8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -527,12 +527,14 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.luvlu.Near;
 				PRODUCT_NAME = Nearbyglasses;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
