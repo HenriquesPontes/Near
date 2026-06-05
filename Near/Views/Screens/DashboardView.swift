@@ -342,13 +342,49 @@ struct AllResultsView: View {
     @Query(sort: \DetectedDevice.timestamp, order: .reverse) private var historicalDevices: [DetectedDevice]
     @State private var showingClearConfirmation = false
     @State private var searchText = ""
+    
     @State private var showStarredOnly = false
+    @State private var filterType: String? = nil
+    @State private var filterSignal: String? = nil
+    @State private var filterDeviceName: String? = nil
+    
+    var uniqueDeviceNames: [String] {
+        Array(Set(historicalDevices.map { $0.name })).sorted()
+    }
+    
+    var uniqueTypes: [String] {
+        Array(Set(historicalDevices.map { $0.type })).sorted()
+    }
+    
+    var isFilterActive: Bool {
+        showStarredOnly || filterType != nil || filterSignal != nil || filterDeviceName != nil
+    }
     
     var filteredDevices: [DetectedDevice] {
         var devices = historicalDevices
         
         if showStarredOnly {
             devices = devices.filter { $0.isStarred }
+        }
+        
+        if let type = filterType {
+            devices = devices.filter { $0.type == type }
+        }
+        
+        if let signal = filterSignal {
+            switch signal {
+            case "Excellent":
+                devices = devices.filter { $0.rssi > -60 }
+            case "Good":
+                devices = devices.filter { $0.rssi <= -60 && $0.rssi > -80 }
+            case "Weak":
+                devices = devices.filter { $0.rssi <= -80 }
+            default: break
+            }
+        }
+        
+        if let name = filterDeviceName {
+            devices = devices.filter { $0.name == name }
         }
         
         if !searchText.isEmpty {
@@ -445,18 +481,68 @@ struct AllResultsView: View {
                         }
                     }
                     Menu {
-                        Button {
-                            showStarredOnly = false
-                        } label: {
-                            Label("All Detections", systemImage: showStarredOnly ? "" : "checkmark")
+                        Section("Status") {
+                            Button {
+                                showStarredOnly.toggle()
+                            } label: {
+                                Label("Starred Only", systemImage: showStarredOnly ? "checkmark" : "")
+                            }
                         }
-                        Button {
-                            showStarredOnly = true
-                        } label: {
-                            Label("Starred Only", systemImage: showStarredOnly ? "checkmark" : "")
+                        
+                        Section("Device Channel (Type)") {
+                            Button("All Channels") { filterType = nil }
+                            ForEach(uniqueTypes, id: \.self) { type in
+                                Button {
+                                    filterType = type
+                                } label: {
+                                    Label(displayNameForType(type), systemImage: filterType == type ? "checkmark" : "")
+                                }
+                            }
+                        }
+                        
+                        Section("Signal Strength") {
+                            Button("All Signals") { filterSignal = nil }
+                            Button {
+                                filterSignal = "Excellent"
+                            } label: {
+                                Label("Excellent (>-60dBm)", systemImage: filterSignal == "Excellent" ? "checkmark" : "")
+                            }
+                            Button {
+                                filterSignal = "Good"
+                            } label: {
+                                Label("Good (>-80dBm)", systemImage: filterSignal == "Good" ? "checkmark" : "")
+                            }
+                            Button {
+                                filterSignal = "Weak"
+                            } label: {
+                                Label("Weak (<=-80dBm)", systemImage: filterSignal == "Weak" ? "checkmark" : "")
+                            }
+                        }
+                        
+                        Section("Device Name") {
+                            Button("All Devices") { filterDeviceName = nil }
+                            // Showing up to 10 unique names to avoid an overwhelmingly large menu
+                            ForEach(uniqueDeviceNames.prefix(10), id: \.self) { name in
+                                Button {
+                                    filterDeviceName = name
+                                } label: {
+                                    Label(name, systemImage: filterDeviceName == name ? "checkmark" : "")
+                                }
+                            }
+                        }
+                        
+                        if isFilterActive {
+                            Section {
+                                Button("Clear All Filters", role: .destructive) {
+                                    showStarredOnly = false
+                                    filterType = nil
+                                    filterSignal = nil
+                                    filterDeviceName = nil
+                                }
+                            }
                         }
                     } label: {
-                        Image(systemName: showStarredOnly ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+                        Image(systemName: isFilterActive ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
                     }
                 }
             }
