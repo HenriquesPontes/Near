@@ -753,14 +753,13 @@ extension BluetoothManager: UNUserNotificationCenterDelegate {
     // Developer tool to test notifications
     func simulateAllNotifications() {
         let types = [
-            ("rayban_meta", "Meta Glasses (Simulated)"),
-            ("vision_pro", "Apple Vision Pro (Simulated)"),
-            ("snap_spectacles", "Spectacles (Simulated)"),
-            ("google_glass", "Google Glass (Simulated)"),
-            ("samsung_glasses", "Samsung Smartglasses (Simulated)"),
-            ("oho_sunshine", "OhO Camera Glasses (Simulated)"),
-            ("ivue_glasses", "iVue Camera Glasses (Simulated)"),
-            ("brilliant_labs", "Brilliant Labs Glasses (Simulated)"),
+            ("rayban_meta", "Meta AI Glasses"),
+            ("vision_pro", "Apple Vision Pro"),
+            ("snap_spectacles", "Snapchat Spectacles Smartglasses"),
+            ("google_glass", "Google Glass"),
+            ("samsung_glasses", "Samsung Smartglasses"),
+            ("oho_sunshine", "OhO Camera Glasses"),
+            ("brilliant_labs", "Brilliant Labs Glasses"),
             ("unknown", "Unknown Device"),
         ]
 

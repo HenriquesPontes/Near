@@ -341,14 +341,32 @@ struct AllResultsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \DetectedDevice.timestamp, order: .reverse) private var historicalDevices: [DetectedDevice]
     @State private var showingClearConfirmation = false
+    @State private var searchText = ""
+    @State private var showStarredOnly = false
+    
+    var filteredDevices: [DetectedDevice] {
+        var devices = historicalDevices
+        
+        if showStarredOnly {
+            devices = devices.filter { $0.isStarred }
+        }
+        
+        if !searchText.isEmpty {
+            devices = devices.filter {
+                $0.name.localizedCaseInsensitiveContains(searchText) ||
+                displayNameForType($0.type).localizedCaseInsensitiveContains(searchText)
+            }
+        }
+        
+        return devices
+    }
     
     var body: some View {
         List {
-            ForEach(historicalDevices) { device in
+            ForEach(filteredDevices) { device in
                 NavigationLink(destination: DeviceDetailView(device: device)) {
                     HStack(spacing: 12) {
                         DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
-                            .frame(width: 20, height: 20)
                             .frame(width: 32, height: 32)
                         
                         VStack(alignment: .leading, spacing: 4) {
@@ -362,6 +380,13 @@ struct AllResultsView: View {
                                         .foregroundColor(.yellow)
                                         .font(.system(size: 12))
                                 }
+                            }
+                            
+                            let typeName = displayNameForType(device.type)
+                            if !device.name.contains(typeName) {
+                                Text(typeName)
+                                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                                    .foregroundColor(.secondary)
                             }
                             
                             HStack(spacing: 6) {
@@ -405,6 +430,7 @@ struct AllResultsView: View {
             .onDelete(perform: deleteDevices)
         }
         .listStyle(.insetGrouped)
+        .searchable(text: $searchText, prompt: "Search detections")
         .navigationTitle("All Detections")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -418,7 +444,20 @@ struct AllResultsView: View {
                                 .foregroundColor(.red)
                         }
                     }
-                    EditButton()
+                    Menu {
+                        Button {
+                            showStarredOnly = false
+                        } label: {
+                            Label("All Detections", systemImage: showStarredOnly ? "" : "checkmark")
+                        }
+                        Button {
+                            showStarredOnly = true
+                        } label: {
+                            Label("Starred Only", systemImage: showStarredOnly ? "checkmark" : "")
+                        }
+                    } label: {
+                        Image(systemName: showStarredOnly ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+                    }
                 }
             }
         }
@@ -442,7 +481,8 @@ struct AllResultsView: View {
     private func deleteDevices(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-                modelContext.delete(historicalDevices[index])
+                let device = filteredDevices[index]
+                modelContext.delete(device)
             }
             try? modelContext.save()
         }
