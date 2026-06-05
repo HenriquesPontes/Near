@@ -29,7 +29,7 @@ struct DashboardView: View {
                                 .font(.system(size: 48))
                                 .foregroundColor(.secondary.opacity(0.6))
                                 .symbolEffect(.pulse, options: .repeating)
-                            Text("No smart glasses detected yet")
+                            Text("No devices detected yet")
                                 .font(.system(size: 16, weight: .bold, design: .rounded))
                                 .foregroundColor(.primary.opacity(0.8))
                             Text("Tap Start Scanning below to scan for nearby devices.")
