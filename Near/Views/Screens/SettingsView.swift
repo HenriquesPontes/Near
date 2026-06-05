@@ -334,7 +334,7 @@ struct ScanRangeSettingsView: View {
                             .font(.system(size: 16, weight: .medium, design: .rounded))
                             .foregroundColor(.primary)
                         Spacer()
-                        Text("\(Int(btManager.notificationCooldown / 1000))s")
+                        Text("\(Int(btManager.notificationCooldown / 60000)) min")
                             .font(.system(size: 15, design: .rounded))
                             .foregroundColor(.secondary)
                     }
@@ -713,12 +713,12 @@ struct CooldownSettingsView: View {
                     Text("Cooldown interval:")
                         .font(.system(size: 15, design: .rounded))
                     Spacer()
-                    Text("\(Int(btManager.notificationCooldown)) ms (\(Int(btManager.notificationCooldown / 1000)) s)")
+                    Text("\(Int(btManager.notificationCooldown / 60000)) min")
                         .font(.system(size: 15, weight: .bold, design: .rounded))
                         .foregroundColor(.blue)
                 }
                 
-                Slider(value: $btManager.notificationCooldown, in: 2000...60000, step: 1000)
+                Slider(value: $btManager.notificationCooldown, in: 300000...3600000, step: 60000)
                     .accentColor(.blue)
             }
             

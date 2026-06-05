@@ -122,7 +122,7 @@ struct ScanRadarView: View {
                                 .font(.system(size: 12, weight: .bold, design: .rounded))
                                 .foregroundColor(.green)
                         }
-                        Text("\(btManager.detectedDevices.count) smart wearable emissions in range")
+                        Text("\(btManager.detectedDevices.count) devices emissions in range")
                             .font(.system(size: 14, weight: .medium, design: .rounded))
                             .foregroundColor(.secondary)
                     } else {
@@ -134,7 +134,7 @@ struct ScanRadarView: View {
                                 .font(.system(size: 12, weight: .bold, design: .rounded))
                                 .foregroundColor(.red)
                         }
-                        Text("Tap Play to resume privacy detection scan")
+                        Text("Tap to resume the scanning")
                             .font(.system(size: 14, weight: .medium, design: .rounded))
                             .foregroundColor(.secondary)
                     }
@@ -178,13 +178,13 @@ struct ScanRadarView: View {
                     }
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 32)
+                .padding(.top, 48)
                 .padding(.bottom, 16)
                 .background(
                     LinearGradient(
                         stops: [
                             .init(color: .clear, location: 0.0),
-                            .init(color: DesignSystem.backgroundColor, location: 0.3),
+                            .init(color: DesignSystem.backgroundColor, location: 0.7),
                             .init(color: DesignSystem.backgroundColor, location: 1.0)
                         ],
                         startPoint: .top,

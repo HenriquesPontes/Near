@@ -70,7 +70,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         }
     }
     @AppStorage("appAppearance") var appAppearance: String = "system"
-    @AppStorage("notificationCooldown") var notificationCooldown: Double = 10000.0 {
+    @AppStorage("notificationCooldown") var notificationCooldown: Double = 300000.0 {
         willSet {
             objectWillChange.send()
         }
@@ -227,19 +227,20 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     #if os(iOS)
         @objc private func handleDidEnterBackground() {
             if continueScanInBackground && isScanning {
-                // Send background notification reminder
-                let content = UNMutableNotificationContent()
-                content.title = String(localized: "Radar Mode Active")
-                content.body = String(localized: "Radar Mode scans for smart wearable signals in the background, allowing the app to send alerts when in your pocket.")
-                let request = UNNotificationRequest(identifier: "RadarModeBackground", content: content, trigger: nil)
-                UNUserNotificationCenter.current().add(request)
-                
                 // Start location updates to keep the app executing in the background (like a foreground service)
                 locationManager?.startUpdatingLocation()
                 
-                // Note: We deliberately do NOT stop the generic scan here. By keeping the app 
-                // alive via location tracking, the existing scanForPeripherals(withServices: nil) 
-                // might continue functioning depending on iOS enforcement behavior.
+                // Restart scan with explicit services to allow iOS background scanning to work
+                centralManager?.stopScan()
+                let backgroundServices = [
+                    CBUUID(string: "FD60"),  // Meta
+                    CBUUID(string: "180F"),  // Battery Service
+                    CBUUID(string: "180A"),  // Device Information
+                    CBUUID(string: "FEAA"),  // Eddystone
+                ]
+                centralManager?.scanForPeripherals(
+                    withServices: backgroundServices,
+                    options: nil) // Note: AllowDuplicatesKey is IGNORED in the background by iOS.
             }
         }
 
@@ -508,13 +509,14 @@ extension BluetoothManager: CBCentralManagerDelegate {
                 #if os(iOS)
                     if UIApplication.shared.applicationState == .background {
                         let backgroundServices = [
+                            CBUUID(string: "FD60"),  // Meta
                             CBUUID(string: "180F"),  // Battery Service
                             CBUUID(string: "180A"),  // Device Information
                             CBUUID(string: "FEAA"),  // Eddystone
                         ]
                         centralManager?.scanForPeripherals(
                             withServices: backgroundServices,
-                            options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
+                            options: nil)
                         return
                     }
                 #endif
