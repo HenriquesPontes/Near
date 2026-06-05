@@ -74,8 +74,9 @@ struct OnboardingView: View {
 
             // Disclaimer
             Text(
-                "NearbyGlasses uses Bluetooth to estimate proximity. It requires permission to scan for devices. False positives are possible."
+                "NearbyGlasses uses Bluetooth to estimate proximity. It requires permission to scan for devices. False positives are possible.\n\nBy continuing, you agree to our [Terms of Service](https://henriquespontes.com/terms), [Privacy Policy](https://henriquespontes.com/privacy), and [EULA](https://www.apple.com/legal/internet-services/itunes/dev/stdeula/)."
             )
+            .tint(.blue)
             .font(.system(size: 12))
             .foregroundColor(.secondary)
             .multilineTextAlignment(.center)

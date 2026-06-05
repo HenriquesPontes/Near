@@ -34,6 +34,22 @@ struct AboutNearView: View {
                 .foregroundColor(.red)
                 .lineSpacing(5)
             }
+            Section(header: Text("Legal")) {
+                Link("Privacy Policy", destination: URL(string: "https://henriquespontes.com/privacy")!)
+                    .foregroundColor(.blue)
+                Link("Terms of Service", destination: URL(string: "https://henriquespontes.com/terms")!)
+                    .foregroundColor(.blue)
+                Link("End User License Agreement (EULA)", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
+                    .foregroundColor(.blue)
+            }
+            
+            Section {
+                Text("Copyright © 2026 Henriques Pontes. All rights reserved.")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .listRowBackground(Color.clear)
+            }
         }
         .listStyle(.insetGrouped)
         .navigationTitle("About NearbyGlasses")
