@@ -218,7 +218,6 @@ struct DashboardView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 12)
                     .padding(.bottom, 16)
-                    .background(DesignSystem.backgroundColor)
                 }
             }
             .navigationTitle("Nearby")
