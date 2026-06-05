@@ -186,21 +186,6 @@ struct DashboardView: View {
                 .safeAreaInset(edge: .bottom) {
                     VStack(spacing: 16) {
                         // Radar Status Bar
-                        if btManager.continueScanInBackground {
-                            HStack(spacing: 8) {
-                                Circle()
-                                    .fill(Color.green)
-                                    .frame(width: 8, height: 8)
-                                    .shadow(color: Color.green.opacity(0.5), radius: 3)
-                                
-                                Text("Privacy Awareness Active")
-                                    .font(.system(size: 15, weight: .bold, design: .rounded))
-                                    .foregroundColor(.primary)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.vertical, 4)
-                        }
-                        
                         // Buttons
                         VStack(spacing: 12) {
                             // SCAN Button (Blue)
@@ -216,13 +201,13 @@ struct DashboardView: View {
                         }
                     }
                     .padding(.horizontal, 20)
-                    .padding(.top, 32)
+                    .padding(.top, 48)
                     .padding(.bottom, 16)
                     .background(
                         LinearGradient(
                             stops: [
                                 .init(color: .clear, location: 0.0),
-                                .init(color: DesignSystem.backgroundColor, location: 0.3),
+                                .init(color: DesignSystem.backgroundColor, location: 0.7),
                                 .init(color: DesignSystem.backgroundColor, location: 1.0)
                             ],
                             startPoint: .top,

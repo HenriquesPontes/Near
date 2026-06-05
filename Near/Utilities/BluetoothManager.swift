@@ -61,8 +61,11 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             if continueScanInBackground {
                 if !isScanning {
                     startScanning()
+                } else {
+                    locationManager?.startUpdatingLocation()
                 }
             } else {
+                locationManager?.stopUpdatingLocation()
                 if isScanning {
                     stopScanning()
                 }
@@ -146,6 +149,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     #endif
     private var lastNotifiedTimes: [String: Date] = [:]
     private var cleanupTimer: Timer?
+    private var backgroundScanTimer: Timer?
     private var companyIdentifiers: [String: String] = [:]
 
     private func loadCompanyIdentifiers() {
@@ -198,6 +202,8 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         if continueScanInBackground {
             isScanning = true
             startCleanupTimer()
+            // Ensure location manager starts on launch to keep background scanning alive
+            locationManager?.startUpdatingLocation()
         }
     }
 
@@ -224,11 +230,15 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         locationAuthorizationStatus = status
     }
 
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        // Required to receive location updates and keep the app fully awake in the background.
+        // We don't need to do anything with the locations.
+    }
+
     #if os(iOS)
         @objc private func handleDidEnterBackground() {
             if continueScanInBackground && isScanning {
-                // Start location updates to keep the app executing in the background (like a foreground service)
-                locationManager?.startUpdatingLocation()
+                // Location updates are already running, which keeps the app executing in the background.
                 
                 // Restart scan with explicit services to allow iOS background scanning to work
                 centralManager?.stopScan()
@@ -241,20 +251,48 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
                 centralManager?.scanForPeripherals(
                     withServices: backgroundServices,
                     options: nil) // Note: AllowDuplicatesKey is IGNORED in the background by iOS.
+                    
+                // Start a timer to periodically restart the scan. This bypasses the CoreBluetooth 
+                // limitation where duplicates are ignored in the background, allowing us to get 
+                // updated RSSI values and trigger notifications when devices get closer.
+                startBackgroundScanRestarter()
             }
         }
 
         @objc private func handleWillEnterForeground() {
             if continueScanInBackground && isScanning {
-                // Stop location updates since we are back in the foreground
-                locationManager?.stopUpdatingLocation()
+                stopBackgroundScanRestarter()
                 
-                // Restore full generic scanning in foreground just in case it was paused
+                // Restore full generic scanning in foreground
                 centralManager?.stopScan()
                 centralManager?.scanForPeripherals(
                     withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey: true]
                 )
             }
+        }
+        
+        private func startBackgroundScanRestarter() {
+            backgroundScanTimer?.invalidate()
+            // Restart scan every 10 seconds to fetch new RSSI values
+            backgroundScanTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { [weak self] _ in
+                guard let self = self, self.isScanning, self.continueScanInBackground else { return }
+                
+                self.centralManager?.stopScan()
+                let backgroundServices = [
+                    CBUUID(string: "FD60"),
+                    CBUUID(string: "180F"),
+                    CBUUID(string: "180A"),
+                    CBUUID(string: "FEAA"),
+                ]
+                self.centralManager?.scanForPeripherals(
+                    withServices: backgroundServices,
+                    options: nil)
+            }
+        }
+        
+        private func stopBackgroundScanRestarter() {
+            backgroundScanTimer?.invalidate()
+            backgroundScanTimer = nil
         }
     #endif
 
@@ -263,14 +301,13 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         guard !isScanning else { return }
         isScanning = true
         startCleanupTimer()
+        
+        if continueScanInBackground {
+            // Start location tracking to keep the background scanning alive
+            locationManager?.startUpdatingLocation()
+        }
 
         if centralManager?.state == .poweredOn {
-            #if os(iOS)
-                if UIApplication.shared.applicationState == .background {
-                    // Start location tracking to keep the background scanning alive
-                    locationManager?.startUpdatingLocation()
-                }
-            #endif
             centralManager?.scanForPeripherals(
                 withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
         }
@@ -280,6 +317,9 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         guard isScanning else { return }
         isScanning = false
         stopCleanupTimer()
+        #if os(iOS)
+        stopBackgroundScanRestarter()
+        #endif
         centralManager?.stopScan()
         locationManager?.stopUpdatingLocation()
         DispatchQueue.main.async {
