@@ -164,8 +164,6 @@ struct ScanRadarView: View {
                     }
                 } label: {
                     HStack(spacing: 10) {
-                        Image(systemName: btManager.isScanning ? "pause.fill" : "play.fill")
-                            .font(.system(size: 16, weight: .bold))
                         Text(btManager.isScanning ? "Stop Scanning" : "Resume Scanning")
                             .font(.system(size: 16, weight: .bold, design: .rounded))
                     }
