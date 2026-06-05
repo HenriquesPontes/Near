@@ -612,7 +612,7 @@ extension BluetoothManager: CBCentralManagerDelegate {
             (discoveredCompanyID == 0x058E || discoveredCompanyID == 0x01AB
                 || discoveredCompanyID == 0x0D53)
         let isExplicitRayBan =
-            lowerName.contains("ray-ban") || lowerName.contains("rb-meta")
+            lowerName.contains("ray-ban") || lowerName.contains("rb-meta") || lowerName.contains("rb meta")
             || lowerName.contains("rayban") || discoveredCompanyID == 0x01AB
         let isExplicitOakley = lowerName.contains("oakley")
         let isExplicitAria = lowerName.contains("aria")
@@ -686,8 +686,6 @@ extension BluetoothManager: CBCentralManagerDelegate {
             }
         }
 
-        print("🔍 DETECTED DEVICE -> Name: '\(name)', Type: '\(detectedType)', CompanyID: '\(String(describing: discoveredCompanyID))', Manufacturer: '\(manufacturerName ?? "nil")'")
-        
         // Check if type is enabled in Settings
         guard enabledAlertTypes.contains(detectedType) else { return }
 
