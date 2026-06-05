@@ -9,10 +9,14 @@
 		<string>fetch</string>
 		<string>processing</string>
 		<string>remote-notification</string>
-		<string>push-to-talk</string>
 		<string>nearby-interaction</string>
 		<string>bluetooth-peripheral</string>
 		<string>external-accessory</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.luvlu.Near.refresh</string>
+		<string>com.luvlu.Near.processing</string>
 	</array>
 </dict>
 </plist>
