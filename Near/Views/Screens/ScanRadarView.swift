@@ -157,24 +157,29 @@ struct ScanRadarView: View {
                 }
                 .frame(height: 110)
                 
-                // PLAY / PAUSE BUTTON (Red styled at bottom)
-                Button {
-                    withAnimation {
-                        toggleScanningWithLocationCheck()
+            }
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: 16) {
+                    VStack(spacing: 12) {
+                        Button {
+                            withAnimation {
+                                toggleScanningWithLocationCheck()
+                            }
+                        } label: {
+                            Text(btManager.isScanning ? "Stop Scanning" : "Resume Scanning")
+                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 52)
+                                .background(btManager.isScanning ? DesignSystem.activeRed : DesignSystem.primaryBlue)
+                                .cornerRadius(26)
+                        }
                     }
-                } label: {
-                    HStack(spacing: 10) {
-                        Text(btManager.isScanning ? "Stop Scanning" : "Resume Scanning")
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                    }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 54)
-                    .background(btManager.isScanning ? DesignSystem.activeRed : DesignSystem.primaryBlue)
-                    .cornerRadius(27)
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 24)
+                .padding(.horizontal, 20)
+                .padding(.top, 12)
+                .padding(.bottom, 16)
+                .background(DesignSystem.backgroundColor)
             }
         }
         .navigationTitle("Scan")
