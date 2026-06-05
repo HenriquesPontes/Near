@@ -305,6 +305,14 @@ struct ScanRadarView: View {
                 .foregroundColor(.primary)
                 .lineLimit(1)
             
+            let typeName = displayNameForType(device.type)
+            if !device.name.contains(typeName) {
+                Text(typeName)
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+            }
+            
             Text(rssiLabel)
                 .font(.system(size: 11))
                 .foregroundColor(.secondary)

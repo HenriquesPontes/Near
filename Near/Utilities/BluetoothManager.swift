@@ -239,7 +239,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         @objc private func handleDidEnterBackground() {
             if continueScanInBackground && isScanning {
                 // Location updates are already running, which keeps the app executing in the background.
-                
+
                 // Restart scan with explicit services to allow iOS background scanning to work
                 centralManager?.stopScan()
                 let backgroundServices = [
@@ -250,10 +250,10 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
                 ]
                 centralManager?.scanForPeripherals(
                     withServices: backgroundServices,
-                    options: nil) // Note: AllowDuplicatesKey is IGNORED in the background by iOS.
-                    
-                // Start a timer to periodically restart the scan. This bypasses the CoreBluetooth 
-                // limitation where duplicates are ignored in the background, allowing us to get 
+                    options: nil)  // Note: AllowDuplicatesKey is IGNORED in the background by iOS.
+
+                // Start a timer to periodically restart the scan. This bypasses the CoreBluetooth
+                // limitation where duplicates are ignored in the background, allowing us to get
                 // updated RSSI values and trigger notifications when devices get closer.
                 startBackgroundScanRestarter()
             }
@@ -262,7 +262,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         @objc private func handleWillEnterForeground() {
             if continueScanInBackground && isScanning {
                 stopBackgroundScanRestarter()
-                
+
                 // Restore full generic scanning in foreground
                 centralManager?.stopScan()
                 centralManager?.scanForPeripherals(
@@ -270,13 +270,16 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
                 )
             }
         }
-        
+
         private func startBackgroundScanRestarter() {
             backgroundScanTimer?.invalidate()
             // Restart scan every 10 seconds to fetch new RSSI values
-            backgroundScanTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { [weak self] _ in
-                guard let self = self, self.isScanning, self.continueScanInBackground else { return }
-                
+            backgroundScanTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) {
+                [weak self] _ in
+                guard let self = self, self.isScanning, self.continueScanInBackground else {
+                    return
+                }
+
                 self.centralManager?.stopScan()
                 let backgroundServices = [
                     CBUUID(string: "FD60"),
@@ -289,7 +292,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
                     options: nil)
             }
         }
-        
+
         private func stopBackgroundScanRestarter() {
             backgroundScanTimer?.invalidate()
             backgroundScanTimer = nil
@@ -301,7 +304,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         guard !isScanning else { return }
         isScanning = true
         startCleanupTimer()
-        
+
         if continueScanInBackground {
             // Start location tracking to keep the background scanning alive
             locationManager?.startUpdatingLocation()
@@ -318,7 +321,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         isScanning = false
         stopCleanupTimer()
         #if os(iOS)
-        stopBackgroundScanRestarter()
+            stopBackgroundScanRestarter()
         #endif
         centralManager?.stopScan()
         locationManager?.stopUpdatingLocation()
@@ -531,7 +534,7 @@ class BluetoothManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         let now = Date()
         // Devices should remain active for longer than the notification cooldown (e.g., 60 seconds)
         // because BLE advertisements might be sparse when connected.
-        let expirationSeconds: TimeInterval = 60.0 
+        let expirationSeconds: TimeInterval = 60.0
         let filtered = detectedDevices.filter {
             now.timeIntervalSince($0.lastSeen) <= expirationSeconds
         }
@@ -590,12 +593,13 @@ extension BluetoothManager: CBCentralManagerDelegate {
         {
             discoveredCompanyID = UInt16(manufacturerData[0]) | (UInt16(manufacturerData[1]) << 8)
         }
-        
+
         var hasMetaServiceUUID = false
         if let serviceUUIDs = advertisementData[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID] {
             hasMetaServiceUUID = serviceUUIDs.contains(CBUUID(string: "FD60"))
         }
-        if let serviceData = advertisementData[CBAdvertisementDataServiceDataKey] as? [CBUUID: Any] {
+        if let serviceData = advertisementData[CBAdvertisementDataServiceDataKey] as? [CBUUID: Any]
+        {
             if serviceData.keys.contains(CBUUID(string: "FD60")) {
                 hasMetaServiceUUID = true
             }
@@ -608,11 +612,13 @@ extension BluetoothManager: CBCentralManagerDelegate {
         }
 
         // 1. Categorize by Name or Company ID FIRST
-        let isMetaCompany = hasMetaServiceUUID || 
-            (discoveredCompanyID == 0x058E || discoveredCompanyID == 0x01AB
+        let isMetaCompany =
+            hasMetaServiceUUID
+            || (discoveredCompanyID == 0x058E || discoveredCompanyID == 0x01AB
                 || discoveredCompanyID == 0x0D53)
         let isExplicitRayBan =
-            lowerName.contains("ray-ban") || lowerName.contains("rb-meta") || lowerName.contains("rb meta")
+            lowerName.contains("ray-ban") || lowerName.contains("rb-meta")
+            || lowerName.contains("rb meta")
             || lowerName.contains("rayban") || discoveredCompanyID == 0x01AB
         let isExplicitOakley = lowerName.contains("oakley")
         let isExplicitAria = lowerName.contains("aria")
@@ -668,7 +674,10 @@ extension BluetoothManager: CBCentralManagerDelegate {
             detectedType = "oho_sunshine"
         } else if lowerName.contains("ivue") {
             detectedType = "ivue_glasses"
-        } else if lowerName.contains("brilliant") && (lowerName.contains("labs") || lowerName.contains("frame") || lowerName.contains("halo")) {
+        } else if lowerName.contains("brilliant")
+            && (lowerName.contains("labs") || lowerName.contains("frame")
+                || lowerName.contains("halo"))
+        {
             detectedType = "brilliant_labs"
         } else {
             detectedType = "unknown"
@@ -740,7 +749,7 @@ extension BluetoothManager: CBCentralManagerDelegate {
 
 // MARK: - UNUserNotificationCenterDelegate
 extension BluetoothManager: UNUserNotificationCenterDelegate {
-    
+
     // Developer tool to test notifications
     func simulateAllNotifications() {
         let types = [
@@ -752,9 +761,9 @@ extension BluetoothManager: UNUserNotificationCenterDelegate {
             ("oho_sunshine", "OhO Camera Glasses (Simulated)"),
             ("ivue_glasses", "iVue Camera Glasses (Simulated)"),
             ("brilliant_labs", "Brilliant Labs Glasses (Simulated)"),
-            ("unknown", "Unknown Device (Simulated)")
+            ("unknown", "Unknown Device"),
         ]
-        
+
         for (index, info) in types.enumerated() {
             let device = BluetoothDevice(
                 deviceId: UUID().uuidString,
@@ -769,7 +778,7 @@ extension BluetoothManager: UNUserNotificationCenterDelegate {
             // Stagger notifications slightly
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 1.0) {
                 self.sendPrivacyAlert(for: device)
-                
+
                 // Add to current session dashboard
                 if !self.detectedDevices.contains(where: { $0.deviceId == device.deviceId }) {
                     self.detectedDevices.append(device)
@@ -778,7 +787,7 @@ extension BluetoothManager: UNUserNotificationCenterDelegate {
             }
         }
     }
-    
+
     func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification,

@@ -54,9 +54,17 @@ struct DeviceDetailView: View {
                                 .font(.system(size: 24, weight: .bold, design: .rounded))
                                 .foregroundColor(.primary)
                             
+                            let typeName = displayNameForType(device.type)
+                            if !device.name.contains(typeName) {
+                                Text(typeName)
+                                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                                    .foregroundColor(.secondary)
+                            }
+                            
                             Text("ID: \(device.deviceId)")
                                 .font(.system(size: 12, design: .monospaced))
                                 .foregroundColor(.secondary)
+                                .padding(.top, 2)
                         }
                     }
                     .frame(maxWidth: .infinity)
