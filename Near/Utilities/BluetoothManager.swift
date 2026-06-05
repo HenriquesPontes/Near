@@ -686,6 +686,8 @@ extension BluetoothManager: CBCentralManagerDelegate {
             }
         }
 
+        print("🔍 DETECTED DEVICE -> Name: '\(name)', Type: '\(detectedType)', CompanyID: '\(String(describing: discoveredCompanyID))', Manufacturer: '\(manufacturerName ?? "nil")'")
+        
         // Check if type is enabled in Settings
         guard enabledAlertTypes.contains(detectedType) else { return }
 
