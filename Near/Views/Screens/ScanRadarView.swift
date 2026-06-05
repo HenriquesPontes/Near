@@ -172,7 +172,6 @@ struct ScanRadarView: View {
                     .frame(height: 54)
                     .background(btManager.isScanning ? DesignSystem.activeRed : DesignSystem.primaryBlue)
                     .cornerRadius(27)
-                    .shadow(color: (btManager.isScanning ? DesignSystem.activeRed : DesignSystem.primaryBlue).opacity(0.33), radius: 10, y: 5)
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 24)
