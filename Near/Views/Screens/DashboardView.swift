@@ -213,21 +213,6 @@ struct DashboardView: View {
                                     .background(DesignSystem.primaryBlue)
                                     .cornerRadius(26)
                             }
-                            
-                            // Setting Button (Light Gray / Dynamic Secondary Grouped Background)
-                            NavigationLink(destination: SettingsView()) {
-                                Text("Settings")
-                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                    .foregroundColor(.primary)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 52)
-                                    .background(DesignSystem.itemBackground)
-                                    .cornerRadius(26)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 26)
-                                            .stroke(DesignSystem.borderStroke, lineWidth: 1)
-                                    )
-                            }
                         }
                     }
                     .padding(.horizontal, 20)
@@ -239,6 +224,14 @@ struct DashboardView: View {
             .navigationTitle("Nearby")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                // Top Left Settings Button
+                ToolbarItem(placement: .navigationBarLeading) {
+                    NavigationLink(destination: SettingsView()) {
+                        Image(systemName: "gearshape")
+                            .foregroundColor(.primary)
+                    }
+                }
+                
                 // Top Right Radar Toggle Button
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
