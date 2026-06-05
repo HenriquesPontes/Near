@@ -74,14 +74,13 @@ struct OnboardingView: View {
 
             // Disclaimer
             Text(
-                "NearbyGlasses uses Bluetooth to estimate proximity. It requires permission to scan for devices. False positives are possible.\n\nBy continuing, you agree to our [Terms of Service](https://henriquespontes.com/terms), [Privacy Policy](https://henriquespontes.com/privacy), and [EULA](https://www.apple.com/legal/internet-services/itunes/dev/stdeula/)."
+                "NearbyGlasses uses Bluetooth to estimate proximity. It requires permission to scan for devices. False positives are possible."
             )
-            .tint(.blue)
             .font(.system(size: 12))
             .foregroundColor(.secondary)
             .multilineTextAlignment(.center)
             .padding(.horizontal, 40)
-            .padding(.bottom, 20)
+            .padding(.bottom, 24)
 
             // Action Button
             Button {
@@ -98,7 +97,16 @@ struct OnboardingView: View {
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .padding(.horizontal, 24)
-            .padding(.bottom, 40)
+            .padding(.bottom, 16)
+            
+            // Legal Disclaimer
+            Text("By continuing, you agree to our [Terms of Service](https://henriquespontes.com/terms), [Privacy Policy](https://henriquespontes.com/privacy), and [EULA](https://www.apple.com/legal/internet-services/itunes/dev/stdeula/).")
+                .tint(.blue)
+                .font(.system(size: 11))
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+                .padding(.bottom, 32)
         }
         .background(Color(.systemGroupedBackground))
     }
