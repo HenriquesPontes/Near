@@ -216,8 +216,19 @@ struct DashboardView: View {
                         }
                     }
                     .padding(.horizontal, 20)
-                    .padding(.top, 12)
+                    .padding(.top, 32)
                     .padding(.bottom, 16)
+                    .background(
+                        LinearGradient(
+                            stops: [
+                                .init(color: .clear, location: 0.0),
+                                .init(color: DesignSystem.backgroundColor, location: 0.3),
+                                .init(color: DesignSystem.backgroundColor, location: 1.0)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
                 }
             }
             .navigationTitle("Nearby")
