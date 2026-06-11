@@ -20,7 +20,7 @@ struct LogExporter {
         for device in devices {
             let timestamp = formatter.string(from: device.timestamp)
             let name = escapeCSVField(device.name)
-            let type = displayNameForType(device.type)
+            let type = displayNameForType(device.type, manufacturer: device.manufacturer)
             let rssi = "\(device.rssi)"
             let threat = device.threatLevel
             let deviceId = escapeCSVField(device.deviceId)

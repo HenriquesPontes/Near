@@ -48,7 +48,10 @@ func foregroundColorForType(_ type: String) -> Color {
 }
 
 /// Returns a human-readable display name for a device type string.
-func displayNameForType(_ type: String) -> String {
+func displayNameForType(_ type: String, manufacturer: String? = nil) -> String {
+    if type == "unknown", let mfg = manufacturer, !mfg.isEmpty {
+        return mfg
+    }
     switch type {
     case "rayban_meta": return String(localized: "Ray-Ban Meta glasses")
     case "oakley_meta": return String(localized: "Oakley Meta glasses")

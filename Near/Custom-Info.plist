@@ -2,21 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.luvlu.Near.refresh</string>
+		<string>com.luvlu.Near.processing</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
-		<string>bluetooth-central</string>
 		<string>location</string>
 		<string>fetch</string>
 		<string>processing</string>
 		<string>remote-notification</string>
 		<string>nearby-interaction</string>
-		<string>bluetooth-peripheral</string>
-		<string>external-accessory</string>
-	</array>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>com.luvlu.Near.refresh</string>
-		<string>com.luvlu.Near.processing</string>
 	</array>
 </dict>
 </plist>

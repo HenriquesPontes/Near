@@ -43,7 +43,18 @@ struct DashboardView: View {
                     } else {
                         List {
                             if !btManager.detectedDevices.isEmpty {
-                                Section(header: Text("Currently Nearby").font(.subheadline).foregroundColor(.secondary)) {
+                                Section(header: 
+                                    HStack(spacing: 6) {
+                                        Text("Currently Nearby")
+                                        if btManager.isScanning {
+                                            ProgressView()
+                                                .controlSize(.mini)
+                                                .id(btManager.isScanning)
+                                        }
+                                    }
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                ) {
                                     ForEach(btManager.detectedDevices) { device in
                                         NavigationLink(value: device) {
                                             HStack(spacing: 12) {
@@ -55,12 +66,12 @@ struct DashboardView: View {
                                                         .font(.system(size: 16, weight: .semibold, design: .rounded))
                                                         .foregroundColor(.primary)
                                                     
-                                                    let typeName = displayNameForType(device.type)
-                                                    if !device.name.contains(typeName) {
-                                                        Text(typeName)
-                                                            .font(.system(size: 13, weight: .medium, design: .rounded))
-                                                            .foregroundColor(.secondary)
-                                                    }
+                                                    let typeName = displayNameForType(device.type, manufacturer: device.manufacturer)
+                                                    let mfgName = device.manufacturer ?? "Unknown Manufacturer"
+                                                    let subtitle = (typeName == mfgName) ? typeName : (device.name.contains(typeName) ? mfgName : "\(typeName) • \(mfgName)")
+                                                    Text(subtitle)
+                                                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                                                        .foregroundColor(.secondary)
                                                     
                                                     HStack(spacing: 6) {
                                                         Image(systemName: "wifi")
@@ -113,12 +124,12 @@ struct DashboardView: View {
                                                         }
                                                     }
                                                     
-                                                    let typeName = displayNameForType(device.type)
-                                                    if !device.name.contains(typeName) {
-                                                        Text(typeName)
-                                                            .font(.system(size: 13, weight: .medium, design: .rounded))
-                                                            .foregroundColor(.secondary)
-                                                    }
+                                                    let typeName = displayNameForType(device.type, manufacturer: device.manufacturer)
+                                                    let mfgName = device.manufacturer ?? "Unknown Manufacturer"
+                                                    let subtitle = (typeName == mfgName) ? typeName : (device.name.contains(typeName) ? mfgName : "\(typeName) • \(mfgName)")
+                                                    Text(subtitle)
+                                                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                                                        .foregroundColor(.secondary)
                                                     
                                                     HStack(spacing: 6) {
                                                         // Time
@@ -152,7 +163,7 @@ struct DashboardView: View {
                                                             .font(.system(size: 10))
                                                             .foregroundColor(.secondary)
                                                             .accessibilityHidden(true)
-                                                        Text(String(format: "%.1fm", estimatedDistance(for: device.rssi)))
+                                                        Text(String(format: "%.1fm", Nearbyglasses.estimatedDistance(for: device.rssi)))
                                                             .font(.system(size: 11, weight: .medium, design: .rounded))
                                                             .foregroundColor(.secondary)
                                                     }
@@ -174,6 +185,12 @@ struct DashboardView: View {
                             }
                         }
                         .listStyle(.insetGrouped)
+                        .refreshable {
+                            btManager.detectedDevices.removeAll()
+                            if !btManager.isScanning {
+                                btManager.startScanning()
+                            }
+                        }
                         .navigationDestination(for: BluetoothDevice.self) { device in
                             let historyDevice = historicalDevices.first(where: { $0.deviceId == device.deviceId }) ?? DetectedDevice(
                                 deviceId: device.deviceId,
@@ -238,11 +255,7 @@ struct DashboardView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         if !btManager.continueScanInBackground {
-                            if btManager.locationAuthorizationStatus == .notDetermined {
-                                btManager.requestLocationPermission()
-                            } else if btManager.locationAuthorizationStatus != .authorizedAlways {
-                                showLocationSettingsAlert = true
-                            } else if !hasAcceptedRadarModeWarning {
+                            if !hasAcceptedRadarModeWarning {
                                 showRadarWarning = true
                             } else {
                                 withAnimation(.spring(response: 0.35, dampingFraction: 0.6, blendDuration: 0)) {
@@ -397,7 +410,7 @@ struct AllResultsView: View {
         if !searchText.isEmpty {
             devices = devices.filter {
                 $0.name.localizedCaseInsensitiveContains(searchText) ||
-                displayNameForType($0.type).localizedCaseInsensitiveContains(searchText)
+                displayNameForType($0.type, manufacturer: $0.manufacturer).localizedCaseInsensitiveContains(searchText)
             }
         }
         
@@ -426,12 +439,12 @@ struct AllResultsView: View {
                                 }
                             }
                             
-                            let typeName = displayNameForType(device.type)
-                            if !device.name.contains(typeName) {
-                                Text(typeName)
-                                    .font(.system(size: 13, weight: .medium, design: .rounded))
-                                    .foregroundColor(.secondary)
-                            }
+                            let typeName = displayNameForType(device.type, manufacturer: device.manufacturer)
+                            let mfgName = device.manufacturer ?? "Unknown Manufacturer"
+                            let subtitle = (typeName == mfgName) ? typeName : (device.name.contains(typeName) ? mfgName : "\(typeName) • \(mfgName)")
+                            Text(subtitle)
+                                .font(.system(size: 13, weight: .medium, design: .rounded))
+                                .foregroundColor(.secondary)
                             
                             HStack(spacing: 6) {
                                 // Time
@@ -465,7 +478,7 @@ struct AllResultsView: View {
                                     .font(.system(size: 10))
                                     .foregroundColor(.secondary)
                                     .accessibilityHidden(true)
-                                Text(String(format: "%.1fm", estimatedDistance(for: device.rssi)))
+                                Text(String(format: "%.1fm", Nearbyglasses.estimatedDistance(for: device.rssi)))
                                     .font(.system(size: 11, weight: .medium, design: .rounded))
                                     .foregroundColor(.secondary)
                             }

@@ -251,12 +251,7 @@ struct ScanRangeSettingsView: View {
             get: { btManager.continueScanInBackground },
             set: { newValue in
                 if newValue {
-                    if btManager.locationAuthorizationStatus == .notDetermined {
-                        btManager.requestLocationPermission()
-                        btManager.continueScanInBackground = false // wait for permission
-                    } else if btManager.locationAuthorizationStatus != .authorizedAlways {
-                        showLocationSettingsAlert = true
-                    } else if !hasAcceptedRadarModeWarning {
+                    if !hasAcceptedRadarModeWarning {
                         showRadarWarning = true
                     } else {
                         btManager.continueScanInBackground = newValue
@@ -275,7 +270,7 @@ struct ScanRangeSettingsView: View {
                 header: Text("Radar Mode"),
                 footer: Group {
                     #if os(iOS)
-                    if btManager.backgroundRefreshStatus == .denied {
+                    if UIApplication.shared.backgroundRefreshStatus == .denied {
                         Button(action: {
                             if let url = URL(string: UIApplication.openSettingsURLString) {
                                 UIApplication.shared.open(url)
@@ -290,7 +285,7 @@ struct ScanRangeSettingsView: View {
                                     .multilineTextAlignment(.leading)
                             }
                         }
-                    } else if btManager.backgroundRefreshStatus == .restricted {
+                    } else if UIApplication.shared.backgroundRefreshStatus == .restricted {
                         HStack(spacing: 8) {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .foregroundColor(.orange)

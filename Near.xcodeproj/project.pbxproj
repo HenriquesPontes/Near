@@ -461,8 +461,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Near/Near.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2606060045;
+				CURRENT_PROJECT_VERSION = 2606110643;
 				DEVELOPMENT_TEAM = RN6ZQ9XYA8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -474,6 +475,7 @@
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "\"NearbyGlasses uses your location to keep the app active in the background, allowing it to continuously scan for smart glasses.\"";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "\"NearbyGlasses uses your location to keep the app active in the background, allowing it to continuously scan for smart glasses.\"";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "NearbyGlasses uses location permission to help scan for nearby Bluetooth devices.";
+				INFOPLIST_KEY_UIBackgroundModes = "location bluetooth-central";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -502,8 +504,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Near/Near.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2606060045;
+				CURRENT_PROJECT_VERSION = 2606110643;
 				DEVELOPMENT_TEAM = RN6ZQ9XYA8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -515,6 +518,7 @@
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "\"NearbyGlasses uses your location to keep the app active in the background, allowing it to continuously scan for smart glasses.\"";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "\"NearbyGlasses uses your location to keep the app active in the background, allowing it to continuously scan for smart glasses.\"";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "NearbyGlasses uses location permission to help scan for nearby Bluetooth devices.";
+				INFOPLIST_KEY_UIBackgroundModes = "location bluetooth-central";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

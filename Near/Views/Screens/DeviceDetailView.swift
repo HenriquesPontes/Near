@@ -54,12 +54,12 @@ struct DeviceDetailView: View {
                                 .font(.system(size: 24, weight: .bold, design: .rounded))
                                 .foregroundColor(.primary)
                             
-                            let typeName = displayNameForType(device.type)
-                            if !device.name.contains(typeName) {
-                                Text(typeName)
-                                    .font(.system(size: 14, weight: .medium, design: .rounded))
-                                    .foregroundColor(.secondary)
-                            }
+                            let typeName = displayNameForType(device.type, manufacturer: device.manufacturer)
+                            let mfgName = device.manufacturer ?? "Unknown Manufacturer"
+                            let subtitle = (typeName == mfgName) ? typeName : (device.name.contains(typeName) ? mfgName : "\(typeName) • \(mfgName)")
+                            Text(subtitle)
+                                .font(.system(size: 14, weight: .medium, design: .rounded))
+                                .foregroundColor(.secondary)
                             
                             Text("ID: \(device.deviceId)")
                                 .font(.system(size: 12, design: .monospaced))
@@ -76,27 +76,23 @@ struct DeviceDetailView: View {
                 }
                 
                 // DEVICE INFO
-                if device.manufacturer != nil || device.companyID != nil {
-                    Section(header: Text("Device Info")) {
-                        if let manufacturer = device.manufacturer {
-                            HStack {
-                                Text("Manufacturer")
-                                    .font(.system(size: 15, weight: .medium, design: .rounded))
-                                Spacer()
-                                Text(manufacturer)
-                                    .font(.system(size: 15, design: .rounded))
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        if let companyID = device.companyID {
-                            HStack {
-                                Text("Company Identifier")
-                                    .font(.system(size: 15, weight: .medium, design: .rounded))
-                                Spacer()
-                                Text(String(format: "0x%04X", companyID))
-                                    .font(.system(size: 15, design: .monospaced))
-                                    .foregroundColor(.secondary)
-                            }
+                Section(header: Text("Device Info")) {
+                    HStack {
+                        Text("Manufacturer")
+                            .font(.system(size: 15, weight: .medium, design: .rounded))
+                        Spacer()
+                        Text(device.manufacturer ?? "Unknown Manufacturer")
+                            .font(.system(size: 15, design: .rounded))
+                            .foregroundColor(.secondary)
+                    }
+                    if let companyID = device.companyID {
+                        HStack {
+                            Text("Company Identifier")
+                                .font(.system(size: 15, weight: .medium, design: .rounded))
+                            Spacer()
+                            Text(String(format: "0x%04X", companyID))
+                                .font(.system(size: 15, design: .monospaced))
+                                .foregroundColor(.secondary)
                         }
                     }
                 }
@@ -218,7 +214,7 @@ struct DeviceDetailView: View {
                 Section {
                     Button(role: .destructive) {
                         // Add to ignoredDevices dictionary in BluetoothManager
-                        let displayName = "\(displayNameForType(device.type)) (\(device.name))"
+                        let displayName = "\(displayNameForType(device.type, manufacturer: device.manufacturer)) (\(device.name))"
                         btManager.ignoreDevice(id: device.deviceId, name: displayName)
                         
                         // Delete from SwiftData database

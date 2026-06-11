@@ -208,35 +208,10 @@ struct ScanRadarView: View {
         .onAppear {
             handleScanOnAppear()
         }
-        .onChange(of: btManager.locationAuthorizationStatus) { newStatus in
-            if newStatus == .authorizedWhenInUse || newStatus == .authorizedAlways {
-                if !btManager.isScanning {
-                    btManager.startScanning()
-                }
-            }
-        }
         .onDisappear {
             if !btManager.continueScanInBackground {
                 btManager.stopScanning()
             }
-        }
-        .alert("Location Access Required", isPresented: $showLocationPermissionPrompt) {
-            Button("Allow Location") {
-                btManager.requestLocationPermission()
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("Nearby scanning uses location and Bluetooth to detect nearby devices. Please allow location access so scanning can start.")
-        }
-        .alert("Location Access Denied", isPresented: $showLocationSettingsPrompt) {
-            Button("Open Settings") {
-                if let url = URL(string: UIApplication.openSettingsURLString) {
-                    openURL(url)
-                }
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("Location permission is denied. Open Settings and grant location access to use the scan feature.")
         }
         .navigationDestination(item: $selectedDevice) { device in
             // Map the transient BluetoothDevice to a temporary DetectedDevice for the details view
@@ -257,29 +232,15 @@ struct ScanRadarView: View {
     }
     
     private func handleScanOnAppear() {
-        switch btManager.locationAuthorizationStatus {
-        case .authorizedWhenInUse, .authorizedAlways:
-            btManager.startScanning()
-        case .denied, .restricted:
-            showLocationSettingsPrompt = true
-        default:
-            showLocationPermissionPrompt = true
-        }
+        btManager.startScanning()
     }
     
     private func toggleScanningWithLocationCheck() {
         if btManager.isScanning {
             btManager.continueScanInBackground = false
             btManager.stopScanning()
-            return
-        }
-        switch btManager.locationAuthorizationStatus {
-        case .authorizedWhenInUse, .authorizedAlways:
+        } else {
             btManager.startScanning()
-        case .denied, .restricted:
-            showLocationSettingsPrompt = true
-        default:
-            showLocationPermissionPrompt = true
         }
     }
     
@@ -305,19 +266,14 @@ struct ScanRadarView: View {
                 .foregroundColor(.primary)
                 .lineLimit(1)
             
-            let typeName = displayNameForType(device.type)
-            if !device.name.contains(typeName) {
-                Text(typeName)
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundColor(.secondary)
-                    .lineLimit(1)
-            } else {
-                // Invisible placeholder to keep all cards uniform height
-                Text(" ")
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundColor(.clear)
-                    .lineLimit(1)
-            }
+            let typeName = displayNameForType(device.type, manufacturer: device.manufacturer)
+            let mfgName = device.manufacturer ?? "Unknown Manufacturer"
+            let subtitle = (typeName == mfgName) ? typeName : (device.name.contains(typeName) ? mfgName : "\(typeName) • \(mfgName)")
+            
+            Text(subtitle)
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundColor(.secondary)
+                .lineLimit(1)
             
             Text(rssiLabel)
                 .font(.system(size: 11))
