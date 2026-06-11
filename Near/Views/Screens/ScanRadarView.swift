@@ -119,11 +119,11 @@ struct ScanRadarView: View {
                                 .frame(width: 8, height: 8)
                                 .shadow(color: .green, radius: 4)
                             Text("SCANNING ACTIVE")
-                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(.green)
                         }
                         Text("\(btManager.detectedDevices.count) devices emissions in range")
-                            .font(.system(size: 14, weight: .medium, design: .rounded))
+                            .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.secondary)
                     } else {
                         HStack(spacing: 8) {
@@ -131,11 +131,11 @@ struct ScanRadarView: View {
                                 .fill(Color.red)
                                 .frame(width: 8, height: 8)
                             Text("SCANNING PAUSED")
-                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(.red)
                         }
                         Text("Tap to resume the scanning")
-                            .font(.system(size: 14, weight: .medium, design: .rounded))
+                            .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.secondary)
                     }
                 }
@@ -161,18 +161,38 @@ struct ScanRadarView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .safeAreaInset(edge: .bottom) {
                 VStack(spacing: 16) {
-                    VStack(spacing: 12) {
+                    HStack(spacing: 12) {
+                        // Pause / Resume Button
                         Button {
                             withAnimation {
                                 toggleScanningWithLocationCheck()
                             }
                         } label: {
-                            Text(btManager.isScanning ? "Stop Scanning" : "Resume Scanning")
-                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                            Text(btManager.isScanning ? "Pause Scan" : "Resume Scan")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(btManager.isScanning ? DesignSystem.primaryBlue : .white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 52)
+                                .background(btManager.isScanning ? Color.clear : DesignSystem.primaryBlue)
+                                .cornerRadius(26)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 26)
+                                        .stroke(DesignSystem.primaryBlue, lineWidth: btManager.isScanning ? 2 : 0)
+                                )
+                        }
+                        
+                        // Stop & Show Results Button
+                        Button {
+                            btManager.continueScanInBackground = false
+                            btManager.stopScanning()
+                            dismiss()
+                        } label: {
+                            Text("Stop")
+                                .font(.system(size: 16, weight: .bold))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 52)
-                                .background(btManager.isScanning ? DesignSystem.activeRed : DesignSystem.primaryBlue)
+                                .background(DesignSystem.activeRed)
                                 .cornerRadius(26)
                         }
                     }
@@ -200,7 +220,11 @@ struct ScanRadarView: View {
                 NavigationLink {
                     DeviceFiltersSettingsView()
                 } label: {
-                    Image(systemName: "slider.horizontal.3")
+                    Image("Slider_03")
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 24, height: 24)
                         .foregroundColor(.primary)
                 }
             }
@@ -257,12 +281,12 @@ struct ScanRadarView: View {
                 Spacer()
                 
                 Text(distanceLabel)
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .font(.system(size: 11, weight: .bold))
                     .foregroundColor(DesignSystem.primaryBlue)
             }
             
             Text(device.name)
-                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .font(.system(size: 14, weight: .bold))
                 .foregroundColor(.primary)
                 .lineLimit(1)
             
@@ -271,7 +295,7 @@ struct ScanRadarView: View {
             let subtitle = (typeName == mfgName) ? typeName : (device.name.contains(typeName) ? mfgName : "\(typeName) • \(mfgName)")
             
             Text(subtitle)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .font(.system(size: 11, weight: .medium))
                 .foregroundColor(.secondary)
                 .lineLimit(1)
             

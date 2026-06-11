@@ -19,7 +19,7 @@ struct DeviceTrackerView: View {
     // Audio and haptics
     @State private var enableHaptics = true
     
-    private var distanceText: String {
+    private var distanceText: LocalizedStringKey {
         if smoother.smoothedRSSI == -100.0 { return "Searching..." }
         
         let rssi = smoother.smoothedRSSI
@@ -30,7 +30,7 @@ struct DeviceTrackerView: View {
         return "Very Far"
     }
     
-    private var instructionalText: String {
+    private var instructionalText: LocalizedStringKey {
         if smoother.smoothedRSSI == -100.0 { return "Move around to establish a connection." }
         
         let rssi = smoother.smoothedRSSI
@@ -60,7 +60,7 @@ struct DeviceTrackerView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.black.ignoresSafeArea()
+                DesignSystem.backgroundColor.ignoresSafeArea()
                 
                 VStack {
                     Spacer()
@@ -71,14 +71,14 @@ struct DeviceTrackerView: View {
                         .padding(.bottom, 20)
                     
                     Text(distanceText)
-                        .font(.system(size: 48, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
+                        .font(.system(size: 48, weight: .bold))
+                        .foregroundColor(.primary)
                         .minimumScaleFactor(0.5)
                         .lineLimit(1)
                     
                     Text(instructionalText)
                         .font(.system(size: 16))
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 32)
                         .padding(.top, 8)
@@ -111,15 +111,16 @@ struct DeviceTrackerView: View {
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { enableHaptics.toggle() }) {
-                        Image(systemName: enableHaptics ? "iphone.radiowaves.left.and.right" : "iphone.slash")
+                        Image(enableHaptics ? "Mobile_Button" : "Mobile")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
                             .foregroundColor(enableHaptics ? .green : .gray)
                     }
                 }
             }
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.black, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .preferredColorScheme(.dark)
         }
         .onAppear {
             startTracking()
@@ -127,7 +128,7 @@ struct DeviceTrackerView: View {
         .onDisappear {
             stopTracking()
         }
-        .onChange(of: ringCount) { _ in
+        .onChange(of: ringCount) { _, _ in
             triggerHaptic(style: .heavy)
         }
     }

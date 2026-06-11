@@ -59,6 +59,7 @@ class BluetoothManager: NSObject, ObservableObject {
     @AppStorage("notificationCooldown") var notificationCooldown: Double = 300000.0 {
         willSet { objectWillChange.send() }
     }
+    @AppStorage("scanTimeout") var scanTimeout: Double = 300.0
 
     var enabledAlertTypes: Set<String> {
         get {
@@ -95,6 +96,8 @@ class BluetoothManager: NSObject, ObservableObject {
         var currentIgnored = ignoredDevices
         currentIgnored[id] = name
         ignoredDevices = currentIgnored
+        
+        internalDevices.removeValue(forKey: id)
         DispatchQueue.main.async {
             self.detectedDevices.removeAll(where: { $0.deviceId == id })
         }
@@ -108,7 +111,10 @@ class BluetoothManager: NSObject, ObservableObject {
 
     private var centralManager: CBCentralManager?
     private var lastNotifiedTimes: [String: Date] = [:]
-    private var cleanupTimer: Timer?
+    private var lastGlobalNotificationTime: Date? = nil
+    private var updateTimer: Timer?
+    private var scanTimeoutTimer: Timer?
+    private var internalDevices: [String: BluetoothDevice] = [:]
     private var companyIdentifiers: [String: String] = [:]
 
     private func loadCompanyIdentifiers() {
@@ -134,49 +140,75 @@ class BluetoothManager: NSObject, ObservableObject {
 
         if autoStartScanning || continueScanInBackground {
             isScanning = true
-            startCleanupTimer()
+            startUpdateTimer()
         }
     }
 
     deinit {
-        cleanupTimer?.invalidate()
+        updateTimer?.invalidate()
     }
 
     func startScanning() {
         guard !isScanning else { return }
         isScanning = true
-        startCleanupTimer()
+        startUpdateTimer()
         if centralManager?.state == .poweredOn {
             centralManager?.scanForPeripherals(withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.scanTimeoutTimer?.invalidate()
+            
+            let timeout = self?.scanTimeout ?? 300.0
+            if timeout > 0 {
+                self?.scanTimeoutTimer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
+                    self?.continueScanInBackground = false
+                    self?.stopScanning()
+                }
+            }
         }
     }
 
     func stopScanning() {
         guard isScanning else { return }
         isScanning = false
-        stopCleanupTimer()
+        stopUpdateTimer()
+        scanTimeoutTimer?.invalidate()
+        scanTimeoutTimer = nil
         centralManager?.stopScan()
         DispatchQueue.main.async {
+            self.internalDevices.removeAll()
             self.detectedDevices = []
         }
     }
 
-    private func checkAndTriggerAlert(for device: BluetoothDevice) {
+    private func checkAndTriggerAlert(for device: BluetoothDevice, isNew: Bool) {
         guard alertOnNewDevices else { return }
         guard device.rssi >= rssiThreshold else { return }
         guard enabledAlertTypes.isEmpty || enabledAlertTypes.contains(device.type) else { return }
 
         let now = Date()
         let cooldownSeconds = notificationCooldown / 1000.0
+        
+        // 1. Per-device cooldown
         if let lastNotified = lastNotifiedTimes[device.deviceId],
            now.timeIntervalSince(lastNotified) < cooldownSeconds {
             return
         }
+        
+        // 2. Global cooldown (60 seconds) to prevent notification spam from many devices at once.
+        // We bypass the global cooldown for High threat devices.
+        if device.threatLevel != "High" {
+            if let lastGlobal = lastGlobalNotificationTime,
+               now.timeIntervalSince(lastGlobal) < 60.0 {
+                return
+            }
+        }
 
         lastNotifiedTimes[device.deviceId] = now
+        lastGlobalNotificationTime = now
         
-        let isNew = !self.detectedDevices.contains(where: { $0.deviceId == device.deviceId })
-        let deviceCount = self.detectedDevices.count + (isNew ? 1 : 0)
+        let deviceCount = self.internalDevices.count
         
         NotificationManager.shared.sendDeviceDetectedNotification(device: device, deviceCount: deviceCount)
         saveToSwiftDataHistory(device: device)
@@ -186,32 +218,37 @@ class BluetoothManager: NSObject, ObservableObject {
         NotificationCenter.default.post(name: NSNotification.Name("NewDeviceDetectedHistory"), object: device)
     }
 
-    func startCleanupTimer() {
+    func startUpdateTimer() {
         DispatchQueue.main.async { [weak self] in
-            self?.cleanupTimer?.invalidate()
-            self?.cleanupTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-                self?.cleanupExpiredDevices()
+            self?.updateTimer?.invalidate()
+            self?.updateTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+                self?.updateUIAndCleanup()
             }
         }
     }
 
-    func stopCleanupTimer() {
+    func stopUpdateTimer() {
         DispatchQueue.main.async { [weak self] in
-            self?.cleanupTimer?.invalidate()
-            self?.cleanupTimer = nil
+            self?.updateTimer?.invalidate()
+            self?.updateTimer = nil
         }
     }
 
-    private func cleanupExpiredDevices() {
+    private func updateUIAndCleanup() {
         let now = Date()
         let expirationSeconds: TimeInterval = 60.0
-        let filtered = detectedDevices.filter { now.timeIntervalSince($0.lastSeen) <= expirationSeconds }
-        if filtered.count != detectedDevices.count {
-            self.detectedDevices = filtered
+        
+        // Remove expired devices
+        let keysToRemove = internalDevices.filter { now.timeIntervalSince($0.value.lastSeen) > expirationSeconds }.map { $0.key }
+        for key in keysToRemove {
+            internalDevices.removeValue(forKey: key)
         }
+        
+        // Convert to array and update UI
+        let updatedArray = Array(internalDevices.values).sorted(by: { $0.rssi > $1.rssi })
+        self.detectedDevices = updatedArray
     }
 
-    // Developer tool to test notifications
     func simulateAllNotifications() {
         let device = BluetoothDevice(
             deviceId: UUID().uuidString,
@@ -222,13 +259,11 @@ class BluetoothManager: NSObject, ObservableObject {
             isSimulated: true
         )
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            let isNew = !self.detectedDevices.contains(where: { $0.deviceId == device.deviceId })
-            let deviceCount = self.detectedDevices.count + (isNew ? 1 : 0)
+            self.internalDevices[device.deviceId] = device
+            let deviceCount = self.internalDevices.count
             NotificationManager.shared.sendDeviceDetectedNotification(device: device, deviceCount: deviceCount)
-            if !self.detectedDevices.contains(where: { $0.deviceId == device.deviceId }) {
-                self.detectedDevices.append(device)
-            }
             self.saveToSwiftDataHistory(device: device)
+            self.updateUIAndCleanup()
         }
     }
 }
@@ -248,6 +283,7 @@ extension BluetoothManager: CBCentralManagerDelegate {
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {
         let deviceId = peripheral.identifier.uuidString
         guard !ignoredDevices.keys.contains(deviceId) else { return }
+        if TrustedDeviceManager.shared.isTrusted(id: deviceId) { return }
 
         let advName = advertisementData[CBAdvertisementDataLocalNameKey] as? String
         let name = advName ?? peripheral.name ?? "Unknown Device"
@@ -304,23 +340,15 @@ extension BluetoothManager: CBCentralManagerDelegate {
             manufacturer: manufacturerName
         )
 
-        var updatedDevices = detectedDevices
-        if let index = updatedDevices.firstIndex(where: { $0.deviceId == deviceId }) {
-            var dev = updatedDevices[index]
-            dev.rssi = RSSI.intValue
-            dev.lastSeen = Date()
-            if dev.manufacturer == nil { dev.manufacturer = manufacturerName }
-            if dev.companyID == nil && discoveredCompanyID != nil { dev.companyID = Int(discoveredCompanyID!) }
-            if dev.name == "Unknown Device" || dev.name.isEmpty { dev.name = deviceName }
-            updatedDevices[index] = dev
-            checkAndTriggerAlert(for: dev)
-        } else {
-            updatedDevices.append(bluetoothDevice)
-            checkAndTriggerAlert(for: bluetoothDevice)
-        }
-
-        DispatchQueue.main.async {
-            self.detectedDevices = updatedDevices
-        }
+        let isNew = internalDevices[deviceId] == nil
+        var dev = internalDevices[deviceId] ?? bluetoothDevice
+        dev.rssi = RSSI.intValue
+        dev.lastSeen = Date()
+        if dev.manufacturer == nil { dev.manufacturer = manufacturerName }
+        if dev.companyID == nil && discoveredCompanyID != nil { dev.companyID = Int(discoveredCompanyID!) }
+        if dev.name == "Unknown Device" || dev.name.isEmpty { dev.name = deviceName }
+        
+        internalDevices[deviceId] = dev
+        checkAndTriggerAlert(for: dev, isNew: isNew)
     }
 }

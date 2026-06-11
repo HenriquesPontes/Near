@@ -7,33 +7,81 @@
 
 import Foundation
 
-/// Generates a CSV string from an array of DetectedDevice records
-/// for exporting the detection log history.
-struct LogExporter {
+class PersistentLogger {
+    static let shared = PersistentLogger()
     
-    static func generateCSV(from devices: [DetectedDevice]) -> String {
-        var csv = "Timestamp,Device Name,Device Type,RSSI (dBm),Threat Level,Device ID,Starred\n"
+    private let fileURL: URL
+    private let queue = DispatchQueue(label: "com.near.persistentlogger")
+    
+    private init() {
+        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        fileURL = docs.appendingPathComponent("NearPersistentLog.csv")
         
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        
-        for device in devices {
-            let timestamp = formatter.string(from: device.timestamp)
-            let name = escapeCSVField(device.name)
+        if !FileManager.default.fileExists(atPath: fileURL.path) {
+            let header = "Timestamp,Log Type,Device Name,Device Type,RSSI (dBm),Threat Level,Device ID,Starred,Activity Message\n"
+            try? header.write(to: fileURL, atomically: true, encoding: .utf8)
+        }
+    }
+    
+    func logDetection(_ device: DetectedDevice) {
+        queue.async { [weak self] in
+            guard let self = self else { return }
+            let formatter = ISO8601DateFormatter()
+            formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let ts = formatter.string(from: device.timestamp)
+            
+            let name = self.escapeCSVField(device.name)
             let type = displayNameForType(device.type, manufacturer: device.manufacturer)
             let rssi = "\(device.rssi)"
             let threat = device.threatLevel
-            let deviceId = escapeCSVField(device.deviceId)
+            let deviceId = self.escapeCSVField(device.deviceId)
             let starred = device.isStarred ? "Yes" : "No"
             
-            csv += "\(timestamp),\(name),\(type),\(rssi),\(threat),\(deviceId),\(starred)\n"
+            let line = "\(ts),Detection,\(name),\(type),\(rssi),\(threat),\(deviceId),\(starred),\n"
+            self.append(line)
         }
-        
-        return csv
     }
     
-    /// Escapes a CSV field value — wraps in quotes if it contains commas, quotes, or newlines.
-    private static func escapeCSVField(_ field: String) -> String {
+    func logActivity(_ message: String) {
+        queue.async { [weak self] in
+            guard let self = self else { return }
+            let formatter = ISO8601DateFormatter()
+            formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let ts = formatter.string(from: Date())
+            let msg = self.escapeCSVField(message)
+            
+            let line = "\(ts),Activity,,,,,,,\(msg)\n"
+            self.append(line)
+        }
+    }
+    
+    private func append(_ string: String) {
+        if let data = string.data(using: .utf8) {
+            if let handle = try? FileHandle(forWritingTo: fileURL) {
+                handle.seekToEndOfFile()
+                handle.write(data)
+                handle.closeFile()
+            } else {
+                try? data.write(to: fileURL)
+            }
+        }
+    }
+    
+    func exportCSV() -> URL? {
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("near_log_\(Date().timeIntervalSince1970).csv")
+        do {
+            if FileManager.default.fileExists(atPath: tempURL.path) {
+                try FileManager.default.removeItem(at: tempURL)
+            }
+            try FileManager.default.copyItem(at: fileURL, to: tempURL)
+            return tempURL
+        } catch {
+            print("Failed to copy persistent log for export: \(error.localizedDescription)")
+            return nil
+        }
+    }
+    
+    private func escapeCSVField(_ field: String) -> String {
         if field.contains(",") || field.contains("\"") || field.contains("\n") {
             let escaped = field.replacingOccurrences(of: "\"", with: "\"\"")
             return "\"\(escaped)\""

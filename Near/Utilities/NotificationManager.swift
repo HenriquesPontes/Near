@@ -34,19 +34,41 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         }
         
         content.title = "\(baseTitle) ⚠️"
-        content.body = "\(deviceCount) \(String(localized: "device(s) nearby:")) \(device.name)"
+        content.body = "\(String(localized: "Detected:")) \(device.name)"
         content.sound = .default
         content.badge = NSNumber(value: deviceCount)
         
         // Add custom data
         content.userInfo = ["deviceName": device.name, "deviceCount": deviceCount]
         
+        content.threadIdentifier = "near_device_detection"
+        
         if #available(iOS 15.0, *) {
             content.interruptionLevel = .active
         }
         
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1.0, repeats: false)
-        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+        let request = UNNotificationRequest(identifier: device.deviceId, content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error scheduling notification: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func scheduleNotification(title: String, body: String, identifier: String) {
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = .default
+        
+        if #available(iOS 15.0, *) {
+            content.interruptionLevel = .timeSensitive
+        }
+        
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1.0, repeats: false)
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
         
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
@@ -61,7 +83,7 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
-        // Present visual native iOS notification banner and play sound even in foreground
-        completionHandler([.banner, .list, .sound, .badge])
+        // Only show in notification center list and update badge, avoid banners/sound while actively using the app
+        completionHandler([.list, .badge])
     }
 }

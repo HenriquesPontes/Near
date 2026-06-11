@@ -21,8 +21,10 @@ final class DetectedDevice {
     var isSimulated: Bool
     var companyID: Int?
     var manufacturer: String?
+    var latitude: Double?
+    var longitude: Double?
     
-    init(id: UUID = UUID(), deviceId: String, name: String, type: String, timestamp: Date = Date(), rssi: Int = -80, isStarred: Bool = false, threatLevel: String = "Medium", isSimulated: Bool = false, companyID: Int? = nil, manufacturer: String? = nil) {
+    init(id: UUID = UUID(), deviceId: String, name: String, type: String, timestamp: Date = Date(), rssi: Int = -80, isStarred: Bool = false, threatLevel: String = "Medium", isSimulated: Bool = false, companyID: Int? = nil, manufacturer: String? = nil, latitude: Double? = nil, longitude: Double? = nil) {
         self.id = id
         self.deviceId = deviceId
         self.name = name
@@ -34,5 +36,7 @@ final class DetectedDevice {
         self.isSimulated = isSimulated
         self.companyID = companyID
         self.manufacturer = manufacturer
+        self.latitude = latitude
+        self.longitude = longitude
     }
 }

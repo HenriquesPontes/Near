@@ -1,143 +1,272 @@
-//
-//  OnboardingView.swift
-//  Near
-//
-//  Created by Admin on 6/4/26.
-//
-
 import SwiftUI
+import UserNotifications
+
+enum OnboardingStep: Int, Hashable {
+    case features = 1
+}
 
 struct OnboardingView: View {
     @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
+    @State private var path = NavigationPath()
+    @State private var iconPositions: [IconPosition] = []
+
+    let backgroundIcons = [
+        "Wifi_High", "Camera", "Desktop", "Shield_Warning", "Help",
+        "Terminal", "Qr_Code", "Devices", "Bell_Notification", "Phone",
+        "Shield_Check", "Info", "Data", "Code", "Mobile", "Tablet",
+    ]
+
+    let iconColors: [Color] = [.blue, .purple, .orange, .red, .green, .cyan, .pink, .indigo]
 
     var body: some View {
+        NavigationStack(path: $path) {
+            ZStack {
+                Color(UIColor.systemBackground).ignoresSafeArea()
+                welcomeStep
+            }
+            .navigationDestination(for: OnboardingStep.self) { step in
+                ZStack {
+                    Color(UIColor.systemBackground).ignoresSafeArea()
+                    switch step {
+                    case .features:
+                        featuresStep
+                    }
+                }
+                // Custom back button in toolbar to match health app
+                .navigationBarBackButtonHidden(true)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button {
+                            path.removeLast()
+                        } label: {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.primary)
+                                .frame(width: 36, height: 36)
+                                .background(Color(UIColor.secondarySystemBackground))
+                                .clipShape(Circle())
+                        }
+                    }
+                }
+            }
+        }
+        .onAppear {
+            if iconPositions.isEmpty {
+                generatePositions()
+            }
+        }
+    }
+
+    // MARK: - Welcome Step
+    private var welcomeStep: some View {
         VStack(spacing: 0) {
             Spacer()
 
-            // Header Icon
+            // Icon cluster + Logo
             ZStack {
-                Circle()
-                    .fill(Color.primary)
-                    .frame(width: 100, height: 100)
+                GeometryReader { geometry in
+                    ZStack {
+                        ForEach(iconPositions) { pos in
+                            Image(pos.icon)
+                                .renderingMode(.template)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 28, height: 28)
+                                .scaleEffect(pos.scale)
+                                .rotationEffect(.degrees(pos.rotation))
+                                .position(
+                                    x: pos.x * geometry.size.width, y: pos.y * geometry.size.height
+                                )
+                                .opacity(pos.opacity)
+                                .foregroundColor(pos.color)
+                        }
+                    }
+                }
+                .frame(height: 300)
 
-                Image(systemName: "eyeglasses")
-                    .font(.system(size: 40))
-                    .foregroundColor(Color(UIColor.systemBackground))
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(Color(UIColor.systemBackground))
+                    .frame(width: 104, height: 104)
+                    .shadow(color: Color.black.opacity(0.08), radius: 20, x: 0, y: 10)
+
+                Image("AppLogo")
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundColor(Color.primary)
+                    .frame(width: 60, height: 60)
             }
-            .padding(.bottom, 30)
-            .accessibilityHidden(true)
+            .padding(.bottom, 40)
 
-            // Title
-            Text("Welcome to Nearby")
-                .font(.system(size: 32, weight: .bold, design: .rounded))
-                .foregroundColor(.primary)
-                .multilineTextAlignment(.center)
-                .padding(.bottom, 12)
-                .accessibilityAddTraits(.isHeader)
+            // Text Content
+            VStack(spacing: 12) {
+                Text("Welcome to Near")
+                    .font(.system(size: 32, weight: .bold))
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.center)
 
-            // Subtitle
-            Text("Your personal awareness tool for smart glasses and camera-equipped wearables.")
-                .font(.system(size: 16))
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
-                .padding(.bottom, 48)
+                Text("This app brings your awareness and privacy tools together in one place.")
+                    .font(.system(size: 17, weight: .regular))
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
 
-            // Features list
-            VStack(alignment: .leading, spacing: 24) {
-                FeatureRow(
-                    icon: "antenna.radiowaves.left.and.right",
-                    color: .blue,
-                    title: "Signal Detection",
-                    description:
-                        "Detects Bluetooth emissions from popular smart glasses like Ray-Ban Meta and other smart glasses."
-                )
-
-                FeatureRow(
-                    icon: "bell.badge.fill",
-                    color: .red,
-                    title: "Alerts & Notifications",
-                    description: "Get notified when potential surveillance devices are nearby."
-                )
-
-                FeatureRow(
-                    icon: "lock.shield.fill",
-                    color: .green,
-                    title: "Privacy First",
-                    description:
-                        "NearbyGlasses doesn't collect your data. Everything happens entirely on your device."
-                )
             }
-            .padding(.horizontal, 32)
 
             Spacer()
 
-            // Disclaimer
-            Text(
-                "NearbyGlasses uses Bluetooth to estimate proximity. It requires permission to scan for devices. False positives are possible."
-            )
-            .font(.system(size: 12))
-            .foregroundColor(.secondary)
-            .multilineTextAlignment(.center)
-            .padding(.horizontal, 40)
-            .padding(.bottom, 24)
-
-            // Action Button
+            // Continue Button
             Button {
-                // Initialize BluetoothManager to trigger native iOS permission prompts
-                _ = BluetoothManager.shared
-                withAnimation {
-                    hasSeenOnboarding = true
-                }
+                path.append(OnboardingStep.features)
             } label: {
-                Text("Grant Permission")
-                    .font(.headline)
+                Text("Continue")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundColor(Color(UIColor.systemBackground))
                     .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Color.primary)
+                    .clipShape(Capsule())
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
             .padding(.horizontal, 24)
-            .padding(.bottom, 16)
-            
-            // Legal Disclaimer
-            Text("By continuing, you agree to our [Terms of Service](https://github.com/HenriquesPontes/Near/blob/main/TERMS.md), [Privacy Policy](https://github.com/HenriquesPontes/Near/blob/main/PRIVACY.md), and [EULA](https://github.com/HenriquesPontes/Near/blob/main/EULA.md).")
+            .padding(.bottom, 32)
+        }
+    }
+
+    // MARK: - Features & Permissions Step
+    private var featuresStep: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 32) {
+                    Text("Features & Notifications")
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(.primary)
+                        .padding(.top, 16)
+                        .padding(.horizontal, 24)
+
+                    VStack(alignment: .leading, spacing: 32) {
+                        FeatureRow(
+                            icon: "Wifi_High", title: "Signal Detection",
+                            subtitle:
+                                "Detects Bluetooth emissions from popular smart glasses like Ray-Ban Meta and other smart glasses.",
+                            iconColor: .blue)
+                        FeatureRow(
+                            icon: "Bell_Notification", title: "Alerts & Notifications",
+                            subtitle:
+                                "Get notified when potential surveillance devices are nearby.",
+                            iconColor: .orange)
+                        FeatureRow(
+                            icon: "Shield_Check", title: "Privacy First",
+                            subtitle:
+                                "NearbyGlasses doesn't collect your data. Everything happens entirely on your device.",
+                            iconColor: .green)
+                    }
+                    .padding(.horizontal, 24)
+                }
+                .padding(.bottom, 40)
+            }
+
+            VStack(spacing: 16) {
+                Text(
+                    "By continuing, you agree to our [Terms of Service](https://github.com/HenriquesPontes/Near/blob/main/TERMS.md) and [Privacy Policy](https://github.com/HenriquesPontes/Near/blob/main/PRIVACY.md)."
+                )
                 .tint(.blue)
-                .font(.system(size: 11))
+                .font(.system(size: 12))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
-                .padding(.bottom, 32)
+
+                Button {
+                    UNUserNotificationCenter.current().requestAuthorization(options: [
+                        .alert, .sound, .badge,
+                    ]) { _, _ in
+                        DispatchQueue.main.async {
+                            withAnimation {
+                                hasSeenOnboarding = true
+                            }
+                        }
+                    }
+                } label: {
+                    Text("Continue")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(Color(UIColor.systemBackground))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Color.primary)
+                        .clipShape(Capsule())
+                }
+                .padding(.horizontal, 24)
+            }
+            .padding(.bottom, 32)
         }
-        .background(Color(.systemGroupedBackground))
     }
+
+    // MARK: - Helpers
+    private func generatePositions() {
+        var newPositions: [IconPosition] = []
+        let count = 12
+        for i in 0..<count {
+            let angle = (Double(i) / Double(count)) * 2 * .pi
+            let radius = CGFloat.random(in: 80...130)
+
+            let xOffset = (cos(angle) * radius) / 350.0
+            let yOffset = (sin(angle) * radius) / 300.0
+
+            let icon = backgroundIcons.randomElement() ?? "Wifi_High"
+            let color = iconColors.randomElement() ?? .blue
+            let scale = CGFloat.random(in: 0.8...1.2)
+            let rotation = Double.random(in: -45...45)
+
+            newPositions.append(
+                IconPosition(
+                    icon: icon,
+                    color: color,
+                    x: 0.5 + xOffset,
+                    y: 0.5 + yOffset,
+                    scale: scale,
+                    rotation: rotation,
+                    opacity: 1.0
+                ))
+        }
+        iconPositions = newPositions
+    }
+}
+
+struct IconPosition: Identifiable {
+    let id = UUID()
+    let icon: String
+    let color: Color
+    let x: CGFloat
+    let y: CGFloat
+    let scale: CGFloat
+    let rotation: Double
+    let opacity: Double
 }
 
 struct FeatureRow: View {
     let icon: String
-    let color: Color
     let title: LocalizedStringKey
-    let description: LocalizedStringKey
+    let subtitle: LocalizedStringKey
+    var iconColor: Color = .blue
 
     var body: some View {
-        HStack(spacing: 16) {
-            Image(systemName: icon)
-                .font(.system(size: 24))
-                .foregroundColor(color)
-                .frame(width: 32)
-                .accessibilityHidden(true)
+        HStack(alignment: .top, spacing: 16) {
+            Image(icon)
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 32, height: 32)
+                .foregroundColor(iconColor)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(.primary)
-
-                Text(description)
-                    .font(.system(size: 14))
+                Text(subtitle)
+                    .font(.system(size: 15, weight: .regular))
                     .foregroundColor(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .lineSpacing(2)
             }
         }
-        .accessibilityElement(children: .combine)
     }
 }
 

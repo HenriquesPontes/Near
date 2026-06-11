@@ -15,6 +15,7 @@ struct SettingsView: View {
     @Query(sort: \DetectedDevice.timestamp, order: .reverse) private var historicalDevices: [DetectedDevice]
     @AppStorage("selectedLanguage") var selectedLanguage: String = Bundle.main.preferredLocalizations.first ?? "en"
     @AppStorage("isDeveloperModeEnabled") private var isDeveloperModeEnabled = false
+    @AppStorage("enableThreatMapBeta") private var enableThreatMapBeta = false
     @State private var versionTapCount = 0
     
     private var appVersion: String {
@@ -31,12 +32,15 @@ struct SettingsView: View {
             Section(header: Text("General")) {
                 // Notifications Row
                 HStack(spacing: 16) {
-                    Image(systemName: "bell.fill")
+                    Image("Bell")
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
                         .foregroundColor(.blue)
                         .font(.system(size: 18))
                         .frame(width: 24, height: 24)
                     Text("Notifications")
-                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                        .font(.system(size: 16, weight: .medium))
                     Spacer()
                     Toggle("", isOn: $btManager.alertOnNewDevices)
                         .toggleStyle(SwitchToggleStyle(tint: .green))
@@ -45,12 +49,15 @@ struct SettingsView: View {
                 
                 // Appearance Row
                 HStack(spacing: 16) {
-                    Image(systemName: "paintpalette.fill")
+                    Image("Swatches_Palette")
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
                         .foregroundColor(.blue)
                         .font(.system(size: 18))
                         .frame(width: 24, height: 24)
                     Text("Appearance")
-                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                        .font(.system(size: 16, weight: .medium))
                     Spacer()
                     Picker("", selection: $btManager.appAppearance) {
                         Text("System").tag("system")
@@ -63,12 +70,15 @@ struct SettingsView: View {
                 
                 // Language Row
                 HStack(spacing: 16) {
-                    Image(systemName: "globe")
+                    Image("Globe")
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
                         .foregroundColor(.blue)
                         .font(.system(size: 18))
                         .frame(width: 24, height: 24)
                     Text("Language")
-                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                        .font(.system(size: 16, weight: .medium))
                     Spacer()
                     Picker("", selection: $selectedLanguage) {
                         Text("English").tag("en")
@@ -81,31 +91,21 @@ struct SettingsView: View {
                     .pickerStyle(.menu)
                     .labelsHidden()
                 }
-                // History Row
-                NavigationLink {
-                    AllResultsView()
-                } label: {
-                    HStack(spacing: 16) {
-                        Image(systemName: "clock.fill")
-                            .foregroundColor(.blue)
-                            .font(.system(size: 18))
-                            .frame(width: 24, height: 24)
-                        Text("History")
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
-                    }
-                }
-                
+
                 // Privacy Row
                 NavigationLink {
                     PrivacySettingsView(historicalDevices: historicalDevices)
                 } label: {
                     HStack(spacing: 16) {
-                        Image(systemName: "hand.raised.fill")
+                        Image("Stop_Sign")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
                             .foregroundColor(.blue)
                             .font(.system(size: 18))
                             .frame(width: 24, height: 24)
                         Text("Privacy")
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .font(.system(size: 16, weight: .medium))
                     }
                 }
             }
@@ -117,12 +117,15 @@ struct SettingsView: View {
                     ScanRangeSettingsView()
                 } label: {
                     HStack(spacing: 16) {
-                        Image(systemName: "scope")
+                        Image("Search_Magnifying_Glass")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
                             .foregroundColor(.blue)
                             .font(.system(size: 18))
                             .frame(width: 24, height: 24)
                         Text("Scan Preference")
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .font(.system(size: 16, weight: .medium))
                     }
                 }
                 
@@ -131,12 +134,32 @@ struct SettingsView: View {
                     DeviceFiltersSettingsView()
                 } label: {
                     HStack(spacing: 16) {
-                        Image(systemName: "slider.horizontal.3")
+                        Image("Slider_03")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
                             .foregroundColor(.blue)
                             .font(.system(size: 18))
                             .frame(width: 24, height: 24)
                         Text("Device Channel")
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .font(.system(size: 16, weight: .medium))
+                    }
+                }
+                
+                // Trusted Devices Row
+                NavigationLink {
+                    TrustedDevicesSettingsView()
+                } label: {
+                    HStack(spacing: 16) {
+                        Image(systemName: "checkmark.shield")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundColor(.green)
+                            .font(.system(size: 18))
+                            .frame(width: 24, height: 24)
+                        Text("Trusted Devices")
+                            .font(.system(size: 16, weight: .medium))
                     }
                 }
             }
@@ -145,15 +168,18 @@ struct SettingsView: View {
             Section(header: Text("About")) {
                 // Version Row
                 HStack(spacing: 16) {
-                    Image(systemName: "number")
+                    Image("Text")
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
                         .foregroundColor(.blue)
                         .font(.system(size: 18))
                         .frame(width: 24, height: 24)
                     Text("Version")
-                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                        .font(.system(size: 16, weight: .medium))
                     Spacer()
                     Text("\(appVersion) (\(appBuild))")
-                        .font(.system(size: 15, design: .rounded))
+                        .font(.system(size: 15))
                         .foregroundColor(.secondary)
                 }
                 .contentShape(Rectangle())
@@ -174,12 +200,15 @@ struct SettingsView: View {
                     AboutNearView()
                 } label: {
                     HStack(spacing: 16) {
-                        Image(systemName: "info.circle.fill")
+                        Image("Info")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
                             .foregroundColor(.blue)
                             .font(.system(size: 18))
                             .frame(width: 24, height: 24)
-                        Text("About NearbyGlasses")
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                        Text("About Near")
+                            .font(.system(size: 16, weight: .medium))
                     }
                 }
                 
@@ -188,12 +217,15 @@ struct SettingsView: View {
                     LicensesSettingsView()
                 } label: {
                     HStack(spacing: 16) {
-                        Image(systemName: "doc.text.fill")
+                        Image("File_Document")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
                             .foregroundColor(.blue)
                             .font(.system(size: 18))
                             .frame(width: 24, height: 24)
                         Text("Licences")
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .font(.system(size: 16, weight: .medium))
                     }
                 }
             } // Close About section
@@ -202,24 +234,43 @@ struct SettingsView: View {
                 // SECTION 4: DEVELOPER
                 Section(header: Text("Developer")) {
                     HStack(spacing: 16) {
-                        Image(systemName: "ladybug.fill")
+                        Image("Warning")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
                             .foregroundColor(.blue)
                             .font(.system(size: 18))
                             .frame(width: 24, height: 24)
                         Toggle("Developer Mode", isOn: $isDeveloperModeEnabled.animation())
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .font(.system(size: 16, weight: .medium))
+                            .tint(.blue)
+                    }
+                    
+                    HStack(spacing: 16) {
+                        Image(systemName: "map.fill")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                            .frame(width: 24, height: 24)
+                        Toggle("Threat Map (Beta)", isOn: $enableThreatMapBeta.animation())
+                            .font(.system(size: 16, weight: .medium))
                             .tint(.blue)
                     }
                     Button(action: {
                         btManager.simulateAllNotifications()
                     }) {
                         HStack(spacing: 16) {
-                            Image(systemName: "bell.badge.fill")
+                            Image("Bell_Notification")
+                                .renderingMode(.template)
+                                .resizable()
+                                .scaledToFit()
                                 .foregroundColor(.blue)
                                 .font(.system(size: 18))
                                 .frame(width: 24, height: 24)
                             Text("Simulate Detections (Test Notifications)")
-                                .font(.system(size: 16, weight: .medium, design: .rounded))
+                                .font(.system(size: 16, weight: .medium))
                                 .foregroundColor(.primary)
                         }
                     }
@@ -227,6 +278,8 @@ struct SettingsView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(DesignSystem.backgroundColor)
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -238,10 +291,49 @@ struct SettingsView: View {
 
 // MARK: - Sub-Screens
 
+struct TrustedDevicesSettingsView: View {
+    @ObservedObject var trustedManager = TrustedDeviceManager.shared
+    
+    var body: some View {
+        List {
+            Section(header: Text("Trusted Devices"), footer: Text("These devices will be ignored and won't trigger any alerts.")) {
+                if trustedManager.trustedDevices.isEmpty {
+                    Text("No trusted devices")
+                        .foregroundColor(.secondary)
+                } else {
+                    ForEach(trustedManager.trustedDevices) { device in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(device.name)
+                                    .font(.system(size: 15, weight: .semibold))
+                                Text("ID: \(device.deviceId)")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
+                    .onDelete { indexSet in
+                        for index in indexSet {
+                            let device = trustedManager.trustedDevices[index]
+                            trustedManager.untrustDevice(id: device.deviceId)
+                        }
+                    }
+                }
+            }
+        }
+        .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(DesignSystem.backgroundColor)
+        .navigationTitle("Trusted Devices")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
 struct ScanRangeSettingsView: View {
     @ObservedObject var btManager = BluetoothManager.shared
     @Environment(\.dismiss) private var dismiss
     @State private var showCooldownSheet = false
+    @State private var showTimeoutSheet = false
     @AppStorage("hasAcceptedRadarModeWarning") private var hasAcceptedRadarModeWarning = false
     @State private var showRadarWarning = false
     @State private var showLocationSettingsAlert = false
@@ -277,20 +369,26 @@ struct ScanRangeSettingsView: View {
                             }
                         }) {
                             HStack(spacing: 8) {
-                                Image(systemName: "exclamationmark.triangle.fill")
+                                Image("Warning")
+                                    .renderingMode(.template)
+                                    .resizable()
+                                    .scaledToFit()
                                     .foregroundColor(.orange)
                                 Text("Background App Refresh is disabled. Radar Mode cannot run in the background. Tap to open Settings.")
-                                    .font(.system(size: 13, design: .rounded))
+                                    .font(.system(size: 13))
                                     .foregroundColor(.orange)
                                     .multilineTextAlignment(.leading)
                             }
                         }
                     } else if UIApplication.shared.backgroundRefreshStatus == .restricted {
                         HStack(spacing: 8) {
-                            Image(systemName: "exclamationmark.triangle.fill")
+                            Image("Warning")
+                                .renderingMode(.template)
+                                .resizable()
+                                .scaledToFit()
                                 .foregroundColor(.orange)
                             Text("Background App Refresh is restricted on this device. Radar Mode cannot run in the background.")
-                                .font(.system(size: 13, design: .rounded))
+                                .font(.system(size: 13))
                                 .foregroundColor(.orange)
                                 .multilineTextAlignment(.leading)
                         }
@@ -303,12 +401,15 @@ struct ScanRangeSettingsView: View {
                 }
             ) {
                 HStack(spacing: 16) {
-                    Image(systemName: "antenna.radiowaves.left.and.right")
+                    Image("Wifi_High")
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
                         .foregroundColor(.blue)
                         .font(.system(size: 18))
                         .frame(width: 24, height: 24)
                     Text("Radar Mode")
-                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                        .font(.system(size: 16, weight: .medium))
                     Spacer()
                     Toggle("", isOn: radarModeBinding)
                         .toggleStyle(SwitchToggleStyle(tint: .green))
@@ -321,27 +422,68 @@ struct ScanRangeSettingsView: View {
                     showCooldownSheet = true
                 } label: {
                     HStack(spacing: 16) {
-                        Image(systemName: "timer")
+                        Image("Timer")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
                             .foregroundColor(.blue)
                             .font(.system(size: 18))
                             .frame(width: 24, height: 24)
                         Text("Notification Cooldown")
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .font(.system(size: 16, weight: .medium))
                             .foregroundColor(.primary)
                         Spacer()
                         Text("\(Int(btManager.notificationCooldown / 60000)) min")
-                            .font(.system(size: 15, design: .rounded))
+                            .font(.system(size: 15))
                             .foregroundColor(.secondary)
+                    }
+                }
+            }
+            
+            // Scan Timeout
+            Section(header: Text("Scan Timeout")) {
+                Button {
+                    showTimeoutSheet = true
+                } label: {
+                    HStack(spacing: 16) {
+                        Image("Timer")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                            .frame(width: 24, height: 24)
+                        Text("Auto-Stop Scan")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.primary)
+                        Spacer()
+                        if btManager.scanTimeout == 0 {
+                            Text("Never")
+                                .font(.system(size: 15))
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("\(Int(btManager.scanTimeout / 60)) min")
+                                .font(.system(size: 15))
+                                .foregroundColor(.secondary)
+                        }
                     }
                 }
             }
         }
         .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(DesignSystem.backgroundColor)
         .navigationTitle("Scan Preference")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showCooldownSheet) {
             NavigationStack {
                 CooldownSettingsView()
+            }
+            .presentationDetents([.height(300), .medium])
+        }
+        .sheet(isPresented: $showTimeoutSheet) {
+            NavigationStack {
+                TimeoutSettingsView()
             }
             .presentationDetents([.height(300), .medium])
         }
@@ -393,16 +535,19 @@ struct DeviceFiltersSettingsView: View {
                     showSensitivitySheet = true
                 } label: {
                     HStack(spacing: 16) {
-                        Image(systemName: "slider.horizontal.3")
+                        Image("Slider_03")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
                             .foregroundColor(.blue)
                             .font(.system(size: 18))
                             .frame(width: 24, height: 24)
                         Text("Detection Sensitivity")
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .font(.system(size: 16, weight: .medium))
                             .foregroundColor(.primary)
                         Spacer()
                         Text(sensitivityLabel)
-                            .font(.system(size: 15, design: .rounded))
+                            .font(.system(size: 15))
                             .foregroundColor(.secondary)
                     }
                 }
@@ -469,17 +614,22 @@ struct DeviceFiltersSettingsView: View {
             Section(header: Text("Ignored Devices")) {
                 if btManager.ignoredDevices.isEmpty {
                     Text("No ignored devices")
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(.secondary)
                 } else {
                     let keys = Array(btManager.ignoredDevices.keys).sorted()
                     ForEach(keys, id: \.self) { id in
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text(btManager.ignoredDevices[id] ?? "Unknown Device")
-                                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                if let deviceName = btManager.ignoredDevices[id] {
+                                    Text(deviceName)
+                                        .font(.system(size: 16, weight: .semibold))
+                                } else {
+                                    Text("Unknown Device")
+                                        .font(.system(size: 16, weight: .semibold))
+                                }
                                 Text("ID: \(id)")
-                                    .font(.system(size: 11, design: .monospaced))
+                                    .font(.system(size: 11))
                                     .foregroundColor(.secondary)
                             }
                             Spacer()
@@ -489,7 +639,7 @@ struct DeviceFiltersSettingsView: View {
                                 }
                             } label: {
                                 Text("Restore")
-                                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                                    .font(.system(size: 13, weight: .bold))
                                     .foregroundColor(.blue)
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 6)
@@ -502,6 +652,8 @@ struct DeviceFiltersSettingsView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(DesignSystem.backgroundColor)
         .navigationTitle("Device Channel")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showSensitivitySheet) {
@@ -544,9 +696,9 @@ struct SettingsFilterToggleRow: View {
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .font(.system(size: 16, weight: .semibold))
                 Text(description)
-                    .font(.system(size: 12, design: .rounded))
+                    .font(.system(size: 12))
                     .foregroundColor(.secondary)
             }
             
@@ -578,11 +730,31 @@ struct PrivacySettingsView: View {
                 } label: {
                     HStack {
                         Text("Export CSV Detection Log")
-                            .font(.system(size: 15, weight: .semibold, design: .rounded))
+                            .font(.system(size: 15, weight: .semibold))
                             .foregroundColor(.primary)
                         Spacer()
-                        Image(systemName: "square.and.arrow.up")
-                            .font(.system(size: 15))
+                        Image("Share_iOS_Export")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .foregroundColor(.blue)
+                    }
+                }
+                
+                Button {
+                    exportPDFLog()
+                } label: {
+                    HStack {
+                        Text("Export PDF Security Audit")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(.primary)
+                        Spacer()
+                        Image("File_Document")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
                             .foregroundColor(.blue)
                     }
                 }
@@ -591,21 +763,24 @@ struct PrivacySettingsView: View {
             // Privacy disclosures
             Section(header: Text("Privacy Disclosures")) {
                 VStack(alignment: .leading, spacing: 14) {
-                    HStack {
-                        Image(systemName: "exclamationmark.shield.fill")
+                    HStack(spacing: 8) {
+                        Image("Shield_Warning")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
                             .foregroundColor(.red)
-                            .font(.title2)
                         Text("Understanding Smart Wear Risks")
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .font(.system(size: 16, weight: .bold))
                     }
                     
                     Text("Most smart glasses utilize a front-facing white LED indicator that turns solid or flashes when recording is active. However, these LEDs can be obstructed or modified.")
-                        .font(.system(size: 13, weight: .regular, design: .rounded))
+                        .font(.system(size: 13, weight: .regular))
                         .foregroundColor(.secondary)
                         .lineSpacing(4)
                     
                     Text("The NearbyGlasses app continuously parses Bluetooth Low Energy advertisements. Ray-Ban Meta glasses emit periodic BLE pulses to negotiate data transfers, letting us detect them even if recording is not actively running.")
-                        .font(.system(size: 13, weight: .regular, design: .rounded))
+                        .font(.system(size: 13, weight: .regular))
                         .foregroundColor(.secondary)
                         .lineSpacing(4)
                 }
@@ -613,6 +788,8 @@ struct PrivacySettingsView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(DesignSystem.backgroundColor)
         .navigationTitle("Privacy")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showShareSheet) {
@@ -623,14 +800,20 @@ struct PrivacySettingsView: View {
     }
     
     private func exportCSVLog() {
-        let csv = LogExporter.generateCSV(from: historicalDevices)
-        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("near_log_\(Date().timeIntervalSince1970).csv")
-        do {
-            try csv.write(to: tempURL, atomically: true, encoding: .utf8)
-            shareURL = tempURL
+        if let url = PersistentLogger.shared.exportCSV() {
+            shareURL = url
             showShareSheet = true
-        } catch {
-            print("Failed to export CSV: \(error.localizedDescription)")
+        } else {
+            print("Failed to export CSV")
+        }
+    }
+    
+    private func exportPDFLog() {
+        if let url = PDFExporter.shared.exportPDF(devices: historicalDevices) {
+            shareURL = url
+            showShareSheet = true
+        } else {
+            print("Failed to export PDF")
         }
     }
 }
@@ -685,12 +868,14 @@ TO THE EXTENT NOT PROHIBITED BY LAW, IN NO EVENT SHALL LICENSOR BE LIABLE FOR PE
 8. Governing Law
 This License will be governed by and construed in accordance with the laws of the jurisdiction in which the Licensor resides, excluding its conflict of law principles. Any dispute arising out of or in connection with this License shall be subject to the exclusive jurisdiction of the courts located in that jurisdiction.
 """))
-                .font(.system(size: 13, design: .rounded))
+                .font(.system(size: 13))
                 .foregroundColor(.secondary)
                 .lineSpacing(5)
             }
         }
         .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(DesignSystem.backgroundColor)
         .navigationTitle("Licences")
         .navigationBarTitleDisplayMode(.inline)
 
@@ -706,10 +891,10 @@ struct CooldownSettingsView: View {
             Section(header: Text("Notification Cooldown")) {
                 HStack {
                     Text("Cooldown interval:")
-                        .font(.system(size: 15, design: .rounded))
+                        .font(.system(size: 15))
                     Spacer()
                     Text("\(Int(btManager.notificationCooldown / 60000)) min")
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .font(.system(size: 15, weight: .bold))
                         .foregroundColor(.blue)
                 }
                 
@@ -722,7 +907,46 @@ struct CooldownSettingsView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(DesignSystem.backgroundColor)
         .navigationTitle("Notification Cooldown")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+struct TimeoutSettingsView: View {
+    @ObservedObject var btManager = BluetoothManager.shared
+    
+    var body: some View {
+        List {
+            Section(header: Text("Auto-Stop Scan")) {
+                HStack {
+                    Text("Timeout interval:")
+                        .font(.system(size: 15))
+                    Spacer()
+                    if btManager.scanTimeout == 0 {
+                        Text("Never")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(.blue)
+                    } else {
+                        Text("\(Int(btManager.scanTimeout / 60)) min")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(.blue)
+                    }
+                }
+                
+                Slider(value: $btManager.scanTimeout, in: 0...3600, step: 60)
+                    .accentColor(.blue)
+            }
+            
+            Section(footer: Text("Automatically stops scanning after a certain duration to save battery life. Set to 'Never' (0 min) to scan continuously without stopping.")) {
+                EmptyView()
+            }
+        }
+        .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(DesignSystem.backgroundColor)
+        .navigationTitle("Scan Timeout")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -749,10 +973,10 @@ struct SensitivitySettingsView: View {
             ) {
                 HStack {
                     Text("Current sensitivity:")
-                        .font(.system(size: 15, design: .rounded))
+                        .font(.system(size: 15))
                     Spacer()
                     Text(sensitivityLabel)
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .font(.system(size: 15, weight: .bold))
                         .foregroundColor(.blue)
                 }
                 
@@ -764,6 +988,8 @@ struct SensitivitySettingsView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(DesignSystem.backgroundColor)
         .navigationTitle("Sensitivity")
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -15,6 +15,7 @@ struct DashboardView: View {
     @ObservedObject var btManager = BluetoothManager.shared
     
     @AppStorage("hasAcceptedRadarModeWarning") private var hasAcceptedRadarModeWarning = false
+    @AppStorage("enableThreatMapBeta") private var enableThreatMapBeta = false
     @State private var showRadarWarning = false
     @State private var showLocationSettingsAlert = false
     
@@ -25,13 +26,16 @@ struct DashboardView: View {
                     if historicalDevices.isEmpty && btManager.detectedDevices.isEmpty {
                         VStack(spacing: 12) {
                             Spacer()
-                            Image(systemName: "shield.slash")
-                                .font(.system(size: 48))
+                            Image("Shield_Warning")
+                                .renderingMode(.template)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 48, height: 48)
                                 .foregroundColor(.secondary.opacity(0.6))
                                 .symbolEffect(.pulse, options: .repeating)
                                 .accessibilityHidden(true)
                             Text("No devices detected yet")
-                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                                .font(.system(size: 16, weight: .bold))
                                 .foregroundColor(.primary.opacity(0.8))
                             Text("Tap Start Scanning below to scan for nearby devices.")
                                 .font(.system(size: 13))
@@ -52,124 +56,54 @@ struct DashboardView: View {
                                                 .id(btManager.isScanning)
                                         }
                                     }
-                                    .font(.subheadline)
+                                    .font(.system(size: 15))
                                     .foregroundColor(.secondary)
                                 ) {
                                     ForEach(btManager.detectedDevices) { device in
                                         NavigationLink(value: device) {
-                                            HStack(spacing: 12) {
-                                                DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
-                                                    .frame(width: 32, height: 32)
-                                                
-                                                VStack(alignment: .leading, spacing: 4) {
-                                                    Text(device.name)
-                                                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                                        .foregroundColor(.primary)
-                                                    
-                                                    let typeName = displayNameForType(device.type, manufacturer: device.manufacturer)
-                                                    let mfgName = device.manufacturer ?? "Unknown Manufacturer"
-                                                    let subtitle = (typeName == mfgName) ? typeName : (device.name.contains(typeName) ? mfgName : "\(typeName) • \(mfgName)")
-                                                    Text(subtitle)
-                                                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                                                        .foregroundColor(.secondary)
-                                                    
-                                                    HStack(spacing: 6) {
-                                                        Image(systemName: "wifi")
-                                                            .font(.system(size: 10))
-                                                            .foregroundColor(colorForRssi(device.rssi))
-                                                            .accessibilityHidden(true)
-                                                        Text("\(device.rssi) dBm")
-                                                            .font(.system(size: 11, weight: .medium, design: .rounded))
-                                                            .foregroundColor(colorForRssi(device.rssi))
-                                                        
-                                                        Text("•")
-                                                            .font(.system(size: 11))
-                                                            .foregroundColor(.secondary.opacity(0.5))
-                                                        
-                                                        Image(systemName: "location")
-                                                            .font(.system(size: 10))
-                                                            .foregroundColor(.secondary)
-                                                            .accessibilityHidden(true)
-                                                        Text(String(format: "%.1fm", device.estimatedDistance))
-                                                            .font(.system(size: 11, weight: .medium, design: .rounded))
-                                                            .foregroundColor(.secondary)
-                                                    }
-                                                }
+                                                                                        DeviceRowView(
+                                                name: device.name,
+                                                type: device.type,
+                                                manufacturer: device.manufacturer,
+                                                rssi: device.rssi,
+                                                isStarred: false,
+                                                timestamp: nil,
+                                                estimatedDistance: device.estimatedDistance
+                                            )
+                                        }
+                                        .swipeActions(edge: .leading) {
+                                            Button {
+                                                TrustedDeviceManager.shared.trustDevice(id: device.deviceId, name: device.name)
+                                            } label: {
+                                                Label("Trust", systemImage: "checkmark.shield")
                                             }
-                                            .padding(.vertical, 2)
+                                            .tint(.green)
                                         }
                                     }
                                 }
                             }
                             
                             if !historicalDevices.isEmpty {
-                                Section(header: Text("Recent Detections").font(.subheadline).foregroundColor(.secondary)) {
+                                Section(header: Text("Recent Detections").font(.system(size: 15)).foregroundColor(.secondary)) {
                                     ForEach(historicalDevices.prefix(10)) { device in
                                         NavigationLink(destination: DeviceDetailView(device: device)) {
-                                            HStack(spacing: 12) {
-                                                DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
-                                                    .frame(width: 32, height: 32)
-                                                
-                                                VStack(alignment: .leading, spacing: 4) {
-                                                    HStack(spacing: 4) {
-                                                        Text(device.name)
-                                                            .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                                            .foregroundColor(.primary)
-                                                        
-                                                        if device.isStarred {
-                                                            Image(systemName: "star.fill")
-                                                                .foregroundColor(.yellow)
-                                                                .font(.system(size: 12))
-                                                                .accessibilityLabel("Starred")
-                                                        }
-                                                    }
-                                                    
-                                                    let typeName = displayNameForType(device.type, manufacturer: device.manufacturer)
-                                                    let mfgName = device.manufacturer ?? "Unknown Manufacturer"
-                                                    let subtitle = (typeName == mfgName) ? typeName : (device.name.contains(typeName) ? mfgName : "\(typeName) • \(mfgName)")
-                                                    Text(subtitle)
-                                                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                                                        .foregroundColor(.secondary)
-                                                    
-                                                    HStack(spacing: 6) {
-                                                        // Time
-                                                        Image(systemName: "clock")
-                                                            .font(.system(size: 10))
-                                                            .foregroundColor(.secondary)
-                                                            .accessibilityHidden(true)
-                                                        Text(device.timestamp.formatted(date: .omitted, time: .shortened))
-                                                            .font(.system(size: 11, weight: .medium, design: .rounded))
-                                                            .foregroundColor(.secondary)
-                                                        
-                                                        Text("•")
-                                                            .font(.system(size: 11))
-                                                            .foregroundColor(.secondary.opacity(0.5))
-                                                        
-                                                        // Signal strength (RSSI)
-                                                        Image(systemName: "wifi")
-                                                            .font(.system(size: 10))
-                                                            .foregroundColor(colorForRssi(device.rssi))
-                                                            .accessibilityHidden(true)
-                                                        Text("\(device.rssi) dBm")
-                                                            .font(.system(size: 11, weight: .medium, design: .rounded))
-                                                            .foregroundColor(colorForRssi(device.rssi))
-                                                        
-                                                        Text("•")
-                                                            .font(.system(size: 11))
-                                                            .foregroundColor(.secondary.opacity(0.5))
-                                                        
-                                                        // Proximity
-                                                        Image(systemName: "location")
-                                                            .font(.system(size: 10))
-                                                            .foregroundColor(.secondary)
-                                                            .accessibilityHidden(true)
-                                                        Text(String(format: "%.1fm", Nearbyglasses.estimatedDistance(for: device.rssi)))
-                                                            .font(.system(size: 11, weight: .medium, design: .rounded))
-                                                            .foregroundColor(.secondary)
-                                                    }
-                                                }
+                                            DeviceRowView(
+                                                name: device.name,
+                                                type: device.type,
+                                                manufacturer: device.manufacturer,
+                                                rssi: device.rssi,
+                                                isStarred: device.isStarred,
+                                                timestamp: device.timestamp,
+                                                estimatedDistance: Nearbyglasses.estimatedDistance(for: device.rssi)
+                                            )
+                                        }
+                                        .swipeActions(edge: .leading) {
+                                            Button {
+                                                TrustedDeviceManager.shared.trustDevice(id: device.deviceId, name: device.name)
+                                            } label: {
+                                                Label("Trust", systemImage: "checkmark.shield")
                                             }
-                                            .padding(.vertical, 2)
+                                            .tint(.green)
                                         }
                                     }
                                     .onDelete(perform: deleteDevices)
@@ -177,7 +111,7 @@ struct DashboardView: View {
                                     if historicalDevices.count > 10 {
                                         NavigationLink(destination: AllResultsView()) {
                                             Text("View All Results")
-                                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                                .font(.system(size: 17, weight: .bold))
                                                 .foregroundColor(.blue)
                                         }
                                     }
@@ -185,6 +119,8 @@ struct DashboardView: View {
                             }
                         }
                         .listStyle(.insetGrouped)
+                        .scrollContentBackground(.hidden)
+                        .background(Color.clear)
                         .refreshable {
                             btManager.detectedDevices.removeAll()
                             if !btManager.isScanning {
@@ -212,15 +148,45 @@ struct DashboardView: View {
                         // Radar Status Bar
                         // Buttons
                         VStack(spacing: 12) {
-                            // SCAN Button (Blue)
-                            NavigationLink(destination: ScanRadarView()) {
-                                Text("Start Scanning")
-                                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 52)
-                                    .background(DesignSystem.primaryBlue)
-                                    .cornerRadius(26)
+                            HStack(spacing: 12) {
+                                // SCAN Button (Blue)
+                                NavigationLink(destination: ScanRadarView()) {
+                                    Text("Start Scanning")
+                                        .font(.system(size: 16, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 52)
+                                        .background(DesignSystem.primaryBlue)
+                                        .cornerRadius(26)
+                                }
+                                
+                                // HISTORY Button
+                                NavigationLink(destination: AllResultsView()) {
+                                    Image("Clock")
+                                        .renderingMode(.template)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 20, height: 20)
+                                        .foregroundColor(.white)
+                                        .frame(width: 52, height: 52)
+                                        .background(DesignSystem.primaryBlue)
+                                        .cornerRadius(26)
+                                }
+                                
+                                // MAP Button
+                                if enableThreatMapBeta {
+                                    NavigationLink(destination: ThreatMapView()) {
+                                        Image(systemName: "map.fill")
+                                            .renderingMode(.template)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 20, height: 20)
+                                            .foregroundColor(.white)
+                                            .frame(width: 52, height: 52)
+                                            .background(DesignSystem.primaryBlue)
+                                            .cornerRadius(26)
+                                    }
+                                }
                             }
                         }
                     }
@@ -243,16 +209,8 @@ struct DashboardView: View {
             .navigationTitle("Nearby")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                // Top Left Settings Button
-                ToolbarItem(placement: .navigationBarLeading) {
-                    NavigationLink(destination: SettingsView()) {
-                        Image(systemName: "gearshape")
-                            .foregroundColor(.primary)
-                    }
-                }
-                
-                // Top Right Radar Toggle Button
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    // Radar Toggle Button
                     Button {
                         if !btManager.continueScanInBackground {
                             if !hasAcceptedRadarModeWarning {
@@ -268,9 +226,20 @@ struct DashboardView: View {
                             }
                         }
                     } label: {
-                        Image(systemName: btManager.continueScanInBackground ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash")
-                            .foregroundColor(btManager.continueScanInBackground ? .green : .gray)
-                            .font(.system(size: 17))
+                        Image(btManager.continueScanInBackground ? "Wifi_High" : "Wifi_Off")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 17, height: 17)
+                    }
+                    
+                    // Settings Button
+                    NavigationLink(destination: SettingsView()) {
+                        Image("Settings")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
                     }
                 }
             }
@@ -326,9 +295,35 @@ struct DashboardView: View {
                 if first.companyID == nil {
                     first.companyID = device.companyID
                 }
+                if let loc = LocationManager.shared.currentLocation {
+                    first.latitude = loc.latitude
+                    first.longitude = loc.longitude
+                }
                 try? modelContext.save()
             }
             return
+        }
+        
+        // Stalker Detection Logic
+        if let currentLoc = LocationManager.shared.currentLocation, 
+           !TrustedDeviceManager.shared.isTrusted(id: device.deviceId) {
+            let allDetectionsDescriptor = FetchDescriptor<DetectedDevice>(
+                predicate: #Predicate { $0.deviceId == deviceId }
+            )
+            if let allPrevious = try? modelContext.fetch(allDetectionsDescriptor) {
+                for previous in allPrevious {
+                    if let prevLat = previous.latitude, let prevLon = previous.longitude {
+                        let prevCLLoc = CLLocation(latitude: prevLat, longitude: prevLon)
+                        let currCLLoc = CLLocation(latitude: currentLoc.latitude, longitude: currentLoc.longitude)
+                        let distance = currCLLoc.distance(from: prevCLLoc)
+                        // If detected > 500 meters away from a previous detection, and it's not a trusted device
+                        if distance > 500 {
+                            NotificationManager.shared.scheduleNotification(title: "Possible Tracking Detected", body: "An unknown device (\(device.name)) is following you. It was detected at multiple distant locations.", identifier: "stalker_\(device.deviceId)")
+                            break
+                        }
+                    }
+                }
+            }
         }
         
         let newLog = DetectedDevice(
@@ -340,14 +335,18 @@ struct DashboardView: View {
             threatLevel: device.threatLevel,
             isSimulated: device.isSimulated,
             companyID: device.companyID,
-            manufacturer: device.manufacturer
+            manufacturer: device.manufacturer,
+            latitude: LocationManager.shared.currentLocation?.latitude,
+            longitude: LocationManager.shared.currentLocation?.longitude
         )
         
         modelContext.insert(newLog)
         try? modelContext.save()
+        PersistentLogger.shared.logDetection(newLog)
     }
     
     private func deleteDevices(offsets: IndexSet) {
+        PersistentLogger.shared.logActivity("User deleted \(offsets.count) history record(s) manually.")
         withAnimation {
             for index in offsets {
                 modelContext.delete(historicalDevices[index])
@@ -362,7 +361,8 @@ struct AllResultsView: View {
     @Query(sort: \DetectedDevice.timestamp, order: .reverse) private var historicalDevices: [DetectedDevice]
     @State private var showingClearConfirmation = false
     @State private var searchText = ""
-    
+    @State private var showingSettings = false
+    @State private var currentThreatLevel: String = "Low"
     @State private var showStarredOnly = false
     @State private var filterType: String? = nil
     @State private var filterSignal: String? = nil
@@ -421,75 +421,39 @@ struct AllResultsView: View {
         List {
             ForEach(filteredDevices) { device in
                 NavigationLink(destination: DeviceDetailView(device: device)) {
-                    HStack(spacing: 12) {
-                        DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
-                            .frame(width: 32, height: 32)
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack(spacing: 4) {
-                                Text(device.name)
-                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                    .foregroundColor(.primary)
-                                
-                                if device.isStarred {
-                                    Image(systemName: "star.fill")
-                                        .foregroundColor(.yellow)
-                                        .font(.system(size: 12))
-                                        .accessibilityLabel("Starred")
-                                }
-                            }
-                            
-                            let typeName = displayNameForType(device.type, manufacturer: device.manufacturer)
-                            let mfgName = device.manufacturer ?? "Unknown Manufacturer"
-                            let subtitle = (typeName == mfgName) ? typeName : (device.name.contains(typeName) ? mfgName : "\(typeName) • \(mfgName)")
-                            Text(subtitle)
-                                .font(.system(size: 13, weight: .medium, design: .rounded))
-                                .foregroundColor(.secondary)
-                            
-                            HStack(spacing: 6) {
-                                // Time
-                                Image(systemName: "clock")
-                                    .font(.system(size: 10))
-                                    .foregroundColor(.secondary)
-                                    .accessibilityHidden(true)
-                                Text(device.timestamp.formatted(date: .omitted, time: .shortened))
-                                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                                    .foregroundColor(.secondary)
-                                
-                                Text("•")
-                                    .font(.system(size: 11))
-                                    .foregroundColor(.secondary.opacity(0.5))
-                                
-                                // Signal strength (RSSI)
-                                Image(systemName: "wifi")
-                                    .font(.system(size: 10))
-                                    .foregroundColor(colorForRssi(device.rssi))
-                                    .accessibilityHidden(true)
-                                Text("\(device.rssi) dBm")
-                                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                                    .foregroundColor(colorForRssi(device.rssi))
-                                
-                                Text("•")
-                                    .font(.system(size: 11))
-                                    .foregroundColor(.secondary.opacity(0.5))
-                                
-                                // Proximity
-                                Image(systemName: "location")
-                                    .font(.system(size: 10))
-                                    .foregroundColor(.secondary)
-                                    .accessibilityHidden(true)
-                                Text(String(format: "%.1fm", Nearbyglasses.estimatedDistance(for: device.rssi)))
-                                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                                    .foregroundColor(.secondary)
-                            }
-                        }
+                    DeviceRowView(
+                        name: device.name,
+                        type: device.type,
+                        manufacturer: device.manufacturer,
+                        rssi: device.rssi,
+                        isStarred: device.isStarred,
+                        timestamp: device.timestamp,
+                        estimatedDistance: Nearbyglasses.estimatedDistance(for: device.rssi)
+                    )
+                }
+                .swipeActions(edge: .leading) {
+                    Button {
+                        TrustedDeviceManager.shared.trustDevice(id: device.deviceId, name: device.name)
+                    } label: {
+                        Label("Trust", systemImage: "checkmark.shield")
                     }
-                    .padding(.vertical, 2)
+                    .tint(.green)
                 }
             }
             .onDelete(perform: deleteDevices)
         }
+        .overlay {
+            if filteredDevices.isEmpty {
+                ContentUnavailableView(
+                    "No Detections",
+                    systemImage: "magnifyingglass",
+                    description: searchText.isEmpty ? Text("No devices have been detected yet.") : Text("No devices found for \"\(searchText)\".")
+                )
+            }
+        }
         .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(DesignSystem.backgroundColor)
         .searchable(text: $searchText, prompt: "Search detections")
         .navigationTitle("All Detections")
         .navigationBarTitleDisplayMode(.inline)
@@ -608,7 +572,11 @@ struct AllResultsView: View {
                             }
                         }
                     } label: {
-                        Image(systemName: isFilterActive ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+                        Image(isFilterActive ? "Filter" : "Filter_Off")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
                     }
                 }
             }
@@ -622,6 +590,7 @@ struct AllResultsView: View {
     }
     
     private func clearAll() {
+        PersistentLogger.shared.logActivity("User cleared all history.")
         withAnimation {
             for device in historicalDevices {
                 modelContext.delete(device)
@@ -631,6 +600,7 @@ struct AllResultsView: View {
     }
     
     private func deleteDevices(offsets: IndexSet) {
+        PersistentLogger.shared.logActivity("User deleted \(offsets.count) history record(s) manually.")
         withAnimation {
             for index in offsets {
                 let device = filteredDevices[index]

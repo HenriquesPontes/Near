@@ -51,20 +51,20 @@ struct DeviceDetailView: View {
                         
                         VStack(spacing: 4) {
                             Text(device.name)
-                                .font(.system(size: 24, weight: .bold, design: .rounded))
+                                .font(.system(size: 32, weight: .bold))
                                 .foregroundColor(.primary)
                             
                             let typeName = displayNameForType(device.type, manufacturer: device.manufacturer)
                             let mfgName = device.manufacturer ?? "Unknown Manufacturer"
                             let subtitle = (typeName == mfgName) ? typeName : (device.name.contains(typeName) ? mfgName : "\(typeName) • \(mfgName)")
                             Text(subtitle)
-                                .font(.system(size: 14, weight: .medium, design: .rounded))
+                                .font(.system(size: 16, weight: .medium))
                                 .foregroundColor(.secondary)
                             
                             Text("ID: \(device.deviceId)")
-                                .font(.system(size: 12, design: .monospaced))
-                                .foregroundColor(.secondary)
-                                .padding(.top, 2)
+                                .font(.system(size: 12))
+                                .foregroundColor(.secondary.opacity(0.4))
+                                .padding(.top, 4)
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -76,36 +76,36 @@ struct DeviceDetailView: View {
                 }
                 
                 // DEVICE INFO
-                Section(header: Text("Device Info")) {
+                Section(header: Text("Device Info").font(.system(size: 14, weight: .bold))) {
                     HStack {
                         Text("Manufacturer")
-                            .font(.system(size: 15, weight: .medium, design: .rounded))
+                            .font(.system(size: 15, weight: .medium))
                         Spacer()
                         Text(device.manufacturer ?? "Unknown Manufacturer")
-                            .font(.system(size: 15, design: .rounded))
+                            .font(.system(size: 15))
                             .foregroundColor(.secondary)
                     }
                     if let companyID = device.companyID {
                         HStack {
                             Text("Company Identifier")
-                                .font(.system(size: 15, weight: .medium, design: .rounded))
+                                .font(.system(size: 15, weight: .medium))
                             Spacer()
                             Text(String(format: "0x%04X", companyID))
-                                .font(.system(size: 15, design: .monospaced))
+                                .font(.system(size: 15))
                                 .foregroundColor(.secondary)
                         }
                     }
                 }
                 
                 // 2. SIGNAL TREND (LINE CHART)
-                Section(header: Text("Signal Strength")) {
+                Section(header: Text("Signal Strength").font(.system(size: 14, weight: .bold))) {
                     HStack {
                         Label("Signal strength over time", systemImage: "chart.line.uptrend.xyaxis")
-                            .font(.system(size: 14, weight: .bold, design: .rounded))
+                            .font(.system(size: 14, weight: .bold))
                             .foregroundColor(.primary)
                         Spacer()
                         Text("\(currentRssi) dBm")
-                            .font(.system(size: 13, weight: .bold, design: .monospaced))
+                            .font(.system(size: 13, weight: .bold))
                             .foregroundColor(proximityStatus.color)
                     }
                     
@@ -131,7 +131,7 @@ struct DeviceDetailView: View {
                 }
                 
                 // 3. HOT & COLD PROXIMITY FINDER
-                Section(header: Text("PROXIMITY RADAR")) {
+                Section(header: Text("PROXIMITY RADAR").font(.system(size: 14, weight: .bold))) {
                     ZStack {
                         // Background Radar Rings
                         Circle()
@@ -162,11 +162,11 @@ struct DeviceDetailView: View {
                     
                     VStack(alignment: .leading, spacing: 6) {
                         Text(proximityStatus.text)
-                            .font(.system(size: 15, weight: .black, design: .rounded))
+                            .font(.system(size: 15, weight: .black))
                             .foregroundColor(proximityStatus.color)
                         
                         Text("Estimated distance: ~\(String(format: "%.1f", estimatedDistance(for: currentRssi))) meters")
-                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(.primary)
                         
                         Text(proximityStatus.description)
@@ -182,7 +182,11 @@ struct DeviceDetailView: View {
                             showTrackerView = true
                         } label: {
                             HStack {
-                                Image(systemName: "location.viewfinder")
+                                Image("Map_Pin")
+                                    .renderingMode(.template)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 14, height: 14)
                                 Text("Trace Device")
                                     .fontWeight(.bold)
                             }
@@ -225,15 +229,21 @@ struct DeviceDetailView: View {
                     } label: {
                         HStack {
                             Spacer()
-                            Image(systemName: "eye.slash.fill")
+                            Image("Hide")
+                                .renderingMode(.template)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 16)
                             Text("Ignore Device (Add to Whitelist)")
-                                .font(.system(size: 15, weight: .bold, design: .rounded))
+                                .font(.system(size: 15, weight: .bold))
                             Spacer()
                         }
                     }
                 }
             }
             .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
+            .background(DesignSystem.backgroundColor)
         .navigationTitle("Device Details")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -242,7 +252,12 @@ struct DeviceDetailView: View {
                     device.isStarred.toggle()
                     try? modelContext.save()
                 } label: {
-                    Image(systemName: device.isStarred ? "star.fill" : "star")
+                    Image("Star")
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 20, height: 20)
+                        .opacity(device.isStarred ? 1.0 : 0.5)
                         .foregroundColor(device.isStarred ? .yellow : .gray)
                         .contentTransition(.identity)
                 }
@@ -366,14 +381,18 @@ struct DeviceDetailView: View {
     
     private func riskRow(title: LocalizedStringKey, desc: LocalizedStringKey, danger: Bool) -> some View {
         HStack(alignment: .top, spacing: 14) {
-            Image(systemName: danger ? "exclamationmark.triangle.fill" : "checkmark.shield.fill")
+            Image(danger ? "Warning" : "Shield_Check")
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 32, height: 32)
                 .foregroundColor(danger ? .red : .green)
                 .font(.system(size: 16))
                 .padding(.top, 2)
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.primary)
                 Text(desc)
                     .font(.system(size: 12))

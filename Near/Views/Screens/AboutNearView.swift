@@ -15,7 +15,7 @@ struct AboutNearView: View {
                         """
                     )
                 )
-                .font(.system(size: 13, design: .rounded))
+                .font(.system(size: 13))
                 .foregroundColor(.secondary)
                 .lineSpacing(5)
             }
@@ -30,7 +30,7 @@ struct AboutNearView: View {
                         """
                     )
                 )
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(.system(size: 13, weight: .semibold))
                 .foregroundColor(.red)
                 .lineSpacing(5)
             }
@@ -45,13 +45,15 @@ struct AboutNearView: View {
             
             Section {
                 Text("Copyright © 2026 Henriques Pontes. All rights reserved.")
-                    .font(.footnote)
+                    .font(.system(size: 13))
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .listRowBackground(Color.clear)
             }
         }
         .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(DesignSystem.backgroundColor)
         .navigationTitle("About NearbyGlasses")
         .navigationBarTitleDisplayMode(.inline)
     }
