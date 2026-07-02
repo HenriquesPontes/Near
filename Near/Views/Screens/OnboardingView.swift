@@ -351,9 +351,10 @@ struct PhoneNotificationMockupView: View {
     var body: some View {
         ZStack {
             // Mock Phone Frame
-            RoundedRectangle(cornerRadius: 40)
-                .stroke(Color.primary.opacity(0.08), lineWidth: 8)
-                .frame(width: 320, height: 260)
+            Image("iPhone 16 Pro")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 320, height: 280, alignment: .top)
                 // Mask with gradient to fade out bottom edge
                 .mask(
                     LinearGradient(
