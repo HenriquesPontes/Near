@@ -47,12 +47,26 @@ struct StatusHeaderCard: View {
             .frame(maxWidth: .infinity, minHeight: 150, maxHeight: 150, alignment: .topLeading)
             .padding(.horizontal, 16)
             .padding(.top, 16)
-            .padding(.bottom, 32)
+            .padding(.bottom, 24)
             .background(
-                DesignSystem.cardBackground
-                    .padding(.top, -1000)
-                    .ignoresSafeArea()
-                    .clipShape(.rect(topLeadingRadius: 0, bottomLeadingRadius: 28, bottomTrailingRadius: 28, topTrailingRadius: 0, style: .continuous))
+                ZStack {
+                    // Stretches card background color upwards behind navigation and status bars
+                    DesignSystem.cardBackground
+                        .padding(.top, -1000)
+                        .ignoresSafeArea()
+                    
+                    // Fades the bottom padding area into the background color
+                    LinearGradient(
+                        stops: [
+                            .init(color: DesignSystem.cardBackground, location: 0.0),
+                            .init(color: DesignSystem.cardBackground, location: 0.7),
+                            .init(color: DesignSystem.backgroundColor, location: 1.0)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                }
+                .ignoresSafeArea()
             )
         }
         .buttonStyle(PlainButtonStyle())
