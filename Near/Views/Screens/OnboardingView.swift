@@ -339,16 +339,141 @@ struct OnboardingPingNode: View {
     }
 }
 
+struct StylizedMapView: View {
+    @State private var travelProgress: CGFloat = 0.0
+    @State private var ringScale: CGFloat = 1.0
+    @State private var ringOpacity: Double = 0.8
+    
+    // Path points for A to B route
+    let p0 = CGPoint(x: 60, y: 180)
+    let p1 = CGPoint(x: 120, y: 200)
+    let p2 = CGPoint(x: 160, y: 120)
+    let p3 = CGPoint(x: 240, y: 130)
+    
+    var body: some View {
+        ZStack {
+            // Dark Map Background
+            Color(red: 0.07, green: 0.07, blue: 0.07)
+            
+            // Map grid roads (simulated thin street lines)
+            GeometryReader { geo in
+                Path { path in
+                    // Vertical streets
+                    for x in stride(from: CGFloat(-20), to: geo.size.width + 40, by: 45) {
+                        path.move(to: CGPoint(x: x, y: -20))
+                        path.addLine(to: CGPoint(x: x + geo.size.height * 0.25, y: geo.size.height + 20))
+                    }
+                    // Horizontal/diagonal streets
+                    for y in stride(from: CGFloat(-20), to: geo.size.height + 40, by: 50) {
+                        path.move(to: CGPoint(x: -20, y: y))
+                        path.addLine(to: CGPoint(x: geo.size.width + 20, y: y + geo.size.width * 0.08))
+                    }
+                }
+                .stroke(Color(red: 0.16, green: 0.16, blue: 0.16), lineWidth: 1.5)
+            }
+            
+            // Route Path Line from Point A to B
+            Path { path in
+                path.move(to: p0)
+                path.addCurve(to: p3, control1: p1, control2: p2)
+            }
+            .stroke(
+                LinearGradient(
+                    colors: [Color.orange.opacity(0.4), Color.red],
+                    startPoint: .bottomLeading,
+                    endPoint: .topTrailing
+                ),
+                style: StrokeStyle(lineWidth: 4, lineCap: .round)
+            )
+            
+            // Point A (Start)
+            Circle()
+                .fill(Color.orange)
+                .frame(width: 8, height: 8)
+                .position(p0)
+            
+            // Point B (End Target)
+            ZStack {
+                // Pulsating Halo
+                Circle()
+                    .stroke(Color.red, lineWidth: 2)
+                    .frame(width: 24, height: 24)
+                    .scaleEffect(ringScale)
+                    .opacity(ringOpacity)
+                
+                Circle()
+                    .fill(Color.red.opacity(0.2))
+                    .frame(width: 24, height: 24)
+                
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 10, height: 10)
+            }
+            .position(p3)
+            
+            // Traveling Dot (Dot moving from A to B)
+            Circle()
+                .fill(Color.white)
+                .frame(width: 6, height: 6)
+                .shadow(color: .white, radius: 2)
+                .position(bezierPoint(t: travelProgress, p0: p0, p1: p1, p2: p2, p3: p3))
+            
+            // Floating Label "Device nearby • 1m" near Point B
+            HStack(spacing: 4) {
+                Circle()
+                    .fill(Color.red)
+                    .frame(width: 6, height: 6)
+                Text("Device nearby • 1m")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(.white)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(Color.black.opacity(0.75))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(Color.red.opacity(0.3), lineWidth: 1)
+                    )
+            )
+            .position(x: p3.x, y: p3.y + 24)
+        }
+        .onAppear {
+            withAnimation(Animation.linear(duration: 3.5).repeatForever(autoreverses: false)) {
+                travelProgress = 1.0
+            }
+            
+            withAnimation(Animation.easeOut(duration: 1.5).repeatForever(autoreverses: false)) {
+                ringScale = 2.0
+                ringOpacity = 0.0
+            }
+        }
+    }
+    
+    private func bezierPoint(t: CGFloat, p0: CGPoint, p1: CGPoint, p2: CGPoint, p3: CGPoint) -> CGPoint {
+        let u = 1.0 - t
+        let tt = t * t
+        let uu = u * u
+        let uuu = uu * u
+        let ttt = tt * t
+        
+        var p = CGPoint.zero
+        p.x = uuu * p0.x + 3 * uu * t * p1.x + 3 * u * tt * p2.x + ttt * p3.x
+        p.y = uuu * p0.y + 3 * uu * t * p1.y + 3 * u * tt * p2.y + ttt * p3.y
+        return p
+    }
+}
+
 struct NotificationPreviewCard: View {
     var body: some View {
-        VStack(spacing: 12) {
-            // Lock screen time representation
-            Text("09:41")
-                .font(.system(size: 54, weight: .light))
-                .foregroundColor(Color.primary.opacity(0.6))
-                .padding(.top, 24)
+        ZStack(alignment: .top) {
+            // Stylized Map
+            StylizedMapView()
+                .frame(height: 240)
+                .clipShape(RoundedRectangle(cornerRadius: 24))
             
-            // Notification Banner representation
+            // Floating Notification Banner overlaying the map at the top
             HStack(spacing: 12) {
                 // App Icon / Bell Icon
                 ZStack {
@@ -377,25 +502,12 @@ struct NotificationPreviewCard: View {
             .background(
                 RoundedRectangle(cornerRadius: 18)
                     .fill(Color(UIColor.secondarySystemGroupedBackground))
-                    .shadow(color: Color.black.opacity(0.08), radius: 10, x: 0, y: 4)
+                    .shadow(color: Color.black.opacity(0.12), radius: 10, x: 0, y: 4)
             )
-            .padding(.horizontal, 20)
-            .padding(.bottom, 24)
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
         }
-        .frame(maxWidth: .infinity)
-        .background(
-            RoundedRectangle(cornerRadius: 24)
-                .fill(
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            Color(UIColor.secondarySystemBackground).opacity(0.5),
-                            Color(UIColor.systemBackground)
-                        ]),
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-        )
+        .frame(height: 240)
         .padding(.horizontal, 24)
     }
 }
