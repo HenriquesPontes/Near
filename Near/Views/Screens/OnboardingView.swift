@@ -10,6 +10,7 @@ struct OnboardingView: View {
     @State private var path = NavigationPath()
     @State private var iconPositions: [IconPosition] = []
     @State private var isAnimating: Bool = false
+    @State private var showingSettingsAlert: Bool = false
 
     let backgroundIcons = [
         "Wifi_High", "Camera", "Desktop", "Shield_Warning", "Help",
@@ -41,6 +42,23 @@ struct OnboardingView: View {
                 generatePositions()
             }
             isAnimating = true
+        }
+        .alert("Notifications Disabled", isPresented: $showingSettingsAlert) {
+            Button("Cancel", role: .cancel) {
+                withAnimation {
+                    hasSeenOnboarding = true
+                }
+            }
+            Button("Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+                withAnimation {
+                    hasSeenOnboarding = true
+                }
+            }
+        } message: {
+            Text("Please enable notifications in System Settings to receive alerts when tracking devices are detected near you.")
         }
     }
 
@@ -127,12 +145,23 @@ struct OnboardingView: View {
 
             // Action Button
             Button {
-                UNUserNotificationCenter.current().requestAuthorization(options: [
-                    .alert, .sound, .badge,
-                ]) { _, _ in
+                let center = UNUserNotificationCenter.current()
+                center.getNotificationSettings { settings in
                     DispatchQueue.main.async {
-                        withAnimation {
-                            hasSeenOnboarding = true
+                        if settings.authorizationStatus == .denied {
+                            showingSettingsAlert = true
+                        } else if settings.authorizationStatus == .notDetermined {
+                            center.requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in
+                                DispatchQueue.main.async {
+                                    withAnimation {
+                                        hasSeenOnboarding = true
+                                    }
+                                }
+                            }
+                        } else {
+                            withAnimation {
+                                hasSeenOnboarding = true
+                            }
                         }
                     }
                 }
