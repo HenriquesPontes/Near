@@ -31,7 +31,6 @@ struct DashboardView: View {
                     } else {
                         currentlyNearbySection
                         recentlyScannedSection
-                        clearHistorySection
                     }
                 }
                 .listStyle(.grouped)
@@ -440,28 +439,6 @@ struct DashboardView: View {
                     .listRowSeparator(.hidden)
                 }
                 .onDelete(perform: deleteDevices)
-            }
-        }
-    }
-    
-    @ViewBuilder
-    private var clearHistorySection: some View {
-        if !historicalDevices.isEmpty {
-            let totalRows = 1
-            Section {
-                Button(action: {
-                    showingClearConfirmation = true
-                }) {
-                    Text("Clear Search History")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.blue)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .listRowInsets(EdgeInsets(top: 12, leading: 28, bottom: 12, trailing: 28))
-                .listRowBackground(
-                    GroupedRowBackground(index: totalRows - 1, count: totalRows)
-                )
-                .listRowSeparator(.hidden)
             }
         }
     }
