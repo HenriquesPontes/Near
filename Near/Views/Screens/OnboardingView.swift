@@ -57,7 +57,6 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - Welcome Step
     private var welcomeStep: some View {
         VStack(spacing: 0) {
             Spacer()
@@ -65,7 +64,8 @@ struct OnboardingView: View {
             // Radar Animation
             OnboardingRadarView()
                 .frame(height: 300)
-                .padding(.bottom, 40)
+
+            Spacer()
 
             // Text Content
             VStack(spacing: 16) {
@@ -86,8 +86,7 @@ struct OnboardingView: View {
                     .padding(.horizontal, 32)
                     .lineSpacing(4)
             }
-
-            Spacer()
+            .padding(.bottom, 32)
 
             // Next Button
             Button {
