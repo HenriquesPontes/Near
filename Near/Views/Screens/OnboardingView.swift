@@ -111,7 +111,8 @@ struct OnboardingView: View {
 
             // Notification Preview Card
             NotificationPreviewCard()
-                .padding(.bottom, 24)
+
+            Spacer()
 
             // Text Content
             VStack(spacing: 16) {
@@ -127,8 +128,7 @@ struct OnboardingView: View {
                     .padding(.horizontal, 32)
                     .lineSpacing(4)
             }
-
-            Spacer()
+            .padding(.bottom, 32)
 
             // Action Buttons
             VStack(spacing: 8) {
