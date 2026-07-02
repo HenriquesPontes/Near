@@ -8,16 +8,6 @@ enum OnboardingStep: Int, Hashable {
 struct OnboardingView: View {
     @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
     @State private var path = NavigationPath()
-    @State private var iconPositions: [IconPosition] = []
-    @State private var isAnimating: Bool = false
-
-    let backgroundIcons = [
-        "Wifi_High", "Camera", "Desktop", "Shield_Warning", "Help",
-        "Terminal", "Qr_Code", "Devices", "Bell_Notification", "Phone",
-        "Shield_Check", "Info", "Data", "Code", "Mobile", "Tablet",
-    ]
-
-    let iconColors: [Color] = [.blue, .purple, .orange, .red, .green, .cyan, .pink, .indigo]
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -49,67 +39,88 @@ struct OnboardingView: View {
                 }
             }
         }
-        .onAppear {
-            if iconPositions.isEmpty {
-                generatePositions()
-            }
-            isAnimating = true
-        }
     }
 
     // MARK: - Welcome Step
     private var welcomeStep: some View {
         VStack(spacing: 0) {
-            Spacer()
-
-            // Icon cluster + Logo
-            ZStack {
-                GeometryReader { geometry in
-                    ZStack {
-                        ForEach(iconPositions) { pos in
-                            Image(pos.icon)
-                                .renderingMode(.template)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 28, height: 28)
-                                .scaleEffect(pos.scale)
-                                .rotationEffect(.degrees(pos.rotation))
-                                .position(
-                                    x: pos.x * geometry.size.width, y: pos.y * geometry.size.height
-                                )
-                                .offset(y: isAnimating ? -pos.yOffset : pos.yOffset)
-                                .opacity(pos.opacity)
-                                .foregroundColor(pos.color)
-                                .animation(
-                                    Animation.easeInOut(duration: pos.duration)
-                                        .repeatForever(autoreverses: true)
-                                        .delay(pos.delay),
-                                    value: isAnimating
-                                )
-                        }
+            // Diagonal masonry collage of smart devices
+            ZStack(alignment: .bottom) {
+                HStack(spacing: 16) {
+                    // Column 1
+                    VStack(spacing: 16) {
+                        Image("welcome_laptop")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 160, height: 200)
+                            .cornerRadius(28)
+                            .clipped()
+                        
+                        Image("welcome_speaker")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 160, height: 200)
+                            .cornerRadius(28)
+                            .clipped()
                     }
+                    
+                    // Column 2 (Offset to create a staggered masonry effect)
+                    VStack(spacing: 16) {
+                        Image("welcome_smartwatch")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 160, height: 200)
+                            .cornerRadius(28)
+                            .clipped()
+                        
+                        Image("welcome_glasses")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 160, height: 200)
+                            .cornerRadius(28)
+                            .clipped()
+                    }
+                    .offset(y: 40)
                 }
-                .frame(height: 300)
+                .rotationEffect(.degrees(-15))
+                .scaleEffect(1.1)
+                .frame(maxWidth: .infinity, maxHeight: 380)
+                .offset(y: -40)
+                
+                // Soft fade gradient transition into the background
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color(UIColor.systemBackground).opacity(0.0),
+                        Color(UIColor.systemBackground).opacity(0.8),
+                        Color(UIColor.systemBackground).opacity(1.0)
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: 180)
             }
-            .padding(.bottom, 40)
-
+            .frame(height: 380)
+            .clipped()
+            
+            Spacer()
+            
             // Text Content
             VStack(spacing: 12) {
                 Text("Welcome to Near")
-                    .font(.system(size: 32, weight: .bold))
+                    .font(.system(size: 34, weight: .bold))
                     .foregroundColor(.primary)
                     .multilineTextAlignment(.center)
-
+                
                 Text("This app brings your awareness and privacy tools together in one place.")
                     .font(.system(size: 17, weight: .regular))
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
-
             }
-
+            .padding(.top, 16)
+            
             Spacer()
-
+            
             // Continue Button
             Button {
                 path.append(OnboardingStep.features)
@@ -195,53 +206,6 @@ struct OnboardingView: View {
             .padding(.bottom, 32)
         }
     }
-
-    // MARK: - Helpers
-    private func generatePositions() {
-        var newPositions: [IconPosition] = []
-        let count = 12
-        for i in 0..<count {
-            let angle = (Double(i) / Double(count)) * 2 * .pi
-            let radius = CGFloat.random(in: 80...130)
-
-            let xOffset = (cos(angle) * radius) / 350.0
-            let yOffset = (sin(angle) * radius) / 300.0
-
-            let icon = backgroundIcons.randomElement() ?? "Wifi_High"
-            let color = iconColors.randomElement() ?? .blue
-            let scale = CGFloat.random(in: 0.8...1.2)
-            let rotation = Double.random(in: -45...45)
-
-            newPositions.append(
-                IconPosition(
-                    icon: icon,
-                    color: color,
-                    x: 0.5 + xOffset,
-                    y: 0.5 + yOffset,
-                    scale: scale,
-                    rotation: rotation,
-                    opacity: 1.0,
-                    duration: Double.random(in: 2...4),
-                    delay: Double.random(in: 0...2),
-                    yOffset: CGFloat.random(in: 10...25)
-                ))
-        }
-        iconPositions = newPositions
-    }
-}
-
-struct IconPosition: Identifiable {
-    let id = UUID()
-    let icon: String
-    let color: Color
-    let x: CGFloat
-    let y: CGFloat
-    let scale: CGFloat
-    let rotation: Double
-    let opacity: Double
-    let duration: Double
-    let delay: Double
-    let yOffset: CGFloat
 }
 
 struct FeatureRow: View {
