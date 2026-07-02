@@ -96,9 +96,8 @@ struct OnboardingView: View {
         VStack(spacing: 0) {
             Spacer()
 
-            // Notification Radar Graphic
-            NotificationRadarGraphicView()
-                .frame(height: 300)
+            // Notification Preview Card
+            NotificationPreviewCard()
 
             Spacer()
 
@@ -332,141 +331,94 @@ struct OnboardingPingNode: View {
     }
 }
 
-struct NotificationRadarGraphicView: View {
-    @State private var pulseScale: CGFloat = 1.0
-    @State private var sweepAngle: Double = 0.0
-
+struct NotificationPreviewCard: View {
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                // Background gradient: Deep navy/dark indigo matching the scan view background
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(red: 10/255, green: 17/255, blue: 40/255),
-                        Color(red: 26/255, green: 43/255, blue: 76/255)
-                    ]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
+        ZStack {
+            // Background Gradient
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color(red: 0.08, green: 0.1, blue: 0.25),   // Midnight Blue
+                    Color(red: 0.15, green: 0.08, blue: 0.3)    // Deep Indigo
+                ]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            
+            // Glowing Orbs
+            Circle()
+                .fill(Color.blue.opacity(0.3))
+                .frame(width: 150, height: 150)
+                .blur(radius: 40)
+                .offset(x: -80, y: -40)
+            
+            Circle()
+                .fill(Color.purple.opacity(0.3))
+                .frame(width: 180, height: 180)
+                .blur(radius: 55)
+                .offset(x: 80, y: 40)
+            
+            VStack(spacing: 0) {
+                // Time
+                Text("09:41")
+                    .font(.system(size: 58, weight: .thin))
+                    .foregroundColor(.white)
+                    .padding(.top, 24)
                 
-                // Concentric radar rings matching the dashboard sweep style
-                ForEach(1...4, id: \.self) { index in
-                    Circle()
-                        .stroke(Color.white.opacity(0.07), lineWidth: 1)
-                        .frame(width: CGFloat(index) * 60, height: CGFloat(index) * 60)
-                }
+                // Date
+                Text("Thursday, July 2")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.white.opacity(0.7))
+                    .padding(.top, 4)
                 
-                // Crosshairs
-                Rectangle()
-                    .fill(Color.white.opacity(0.04))
-                    .frame(width: 1, height: 260)
-                Rectangle()
-                    .fill(Color.white.opacity(0.04))
-                    .frame(width: 260, height: 1)
+                Spacer()
                 
-                // Active Radar Sweep animation
-                Circle()
-                    .fill(
-                        AngularGradient(
-                            gradient: Gradient(colors: [
-                                Color.blue.opacity(0.25),
-                                Color.blue.opacity(0.0)
-                            ]),
-                            center: .center,
-                            startAngle: .degrees(0),
-                            endAngle: .degrees(90)
-                        )
-                    )
-                    .frame(width: 240, height: 240)
-                    .rotationEffect(.degrees(sweepAngle))
-                
-                // Simulated device ping indicators with glowing alert rings
-                // Green Ping (Safe)
-                ZStack {
-                    Circle()
-                        .fill(Color.green.opacity(0.15 * pulseScale))
-                        .frame(width: 24, height: 24)
-                    Circle()
-                        .fill(Color.green)
-                        .frame(width: 6, height: 6)
-                }
-                .position(x: geometry.size.width * 0.35, y: geometry.size.height * 0.32)
-                
-                // Purple Ping (Wearable)
-                ZStack {
-                    Circle()
-                        .fill(Color.purple.opacity(0.15 * pulseScale))
-                        .frame(width: 28, height: 28)
-                    Circle()
-                        .fill(Color.purple)
-                        .frame(width: 7, height: 7)
-                }
-                .position(x: geometry.size.width * 0.72, y: geometry.size.height * 0.42)
-                
-                // Red Ping (Alert/Glasses)
-                ZStack {
-                    Circle()
-                        .fill(Color.red.opacity(0.2 * pulseScale))
-                        .frame(width: 36, height: 36)
-                    Circle()
-                        .fill(Color.red)
-                        .frame(width: 9, height: 9)
-                        .shadow(color: .red, radius: 4)
-                }
-                .position(x: geometry.size.width * 0.52, y: geometry.size.height * 0.65)
-                
-                // Floating mockup notification banner at the bottom
-                VStack {
-                    Spacer()
-                    
-                    HStack(spacing: 12) {
-                        ZStack {
-                            Circle()
-                                .fill(Color.red)
-                                .frame(width: 36, height: 36)
-                                .shadow(color: .red.opacity(0.3), radius: 4, x: 0, y: 2)
-                            Image(systemName: "bell.fill")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.white)
-                        }
+                // Glassmorphic Banner
+                HStack(spacing: 12) {
+                    // App logo / radar representation
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.blue)
+                            .frame(width: 38, height: 38)
                         
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text("Nearby Alert")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.primary)
-                            Text("Smart glasses detected nearby.")
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        Spacer()
-                        
-                        Text("now")
-                            .font(.system(size: 11, weight: .regular))
-                            .foregroundColor(.secondary)
+                        Image(systemName: "sensor.tag.radiowaves.forward")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.white)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color(UIColor.secondarySystemGroupedBackground))
-                            .shadow(color: Color.black.opacity(0.12), radius: 10, x: 0, y: 5)
-                    )
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 16)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack {
+                            Text("Nearby Alert")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(.white)
+                            Spacer()
+                            Text("now")
+                                .font(.system(size: 11))
+                                .foregroundColor(.white.opacity(0.6))
+                        }
+                        
+                        Text("Smart glasses detected nearby.")
+                            .font(.system(size: 13))
+                            .foregroundColor(.white.opacity(0.85))
+                    }
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 18)
+                        .fill(Color.white.opacity(0.08))
+                        .background(.ultraThinMaterial)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 18)
+                                .stroke(Color.white.opacity(0.12), lineWidth: 0.5)
+                        )
+                )
+                .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 4)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 24)
             }
         }
-        .frame(height: 300)
-        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .frame(height: 240)
+        .clipShape(RoundedRectangle(cornerRadius: 28))
         .padding(.horizontal, 24)
-        .onAppear {
-            withAnimation(.linear(duration: 4.5).repeatForever(autoreverses: false)) {
-                sweepAngle = 360
-            }
-            withAnimation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true)) {
-                pulseScale = 1.5
-            }
-        }
     }
 }
