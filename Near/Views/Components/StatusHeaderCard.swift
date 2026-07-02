@@ -47,11 +47,12 @@ struct StatusHeaderCard: View {
             .frame(maxWidth: .infinity, minHeight: 150, maxHeight: 150, alignment: .topLeading)
             .padding(.horizontal, 16)
             .padding(.top, 16)
-            .padding(.bottom, 24)
+            .padding(.bottom, 32)
             .background(
                 DesignSystem.cardBackground
                     .padding(.top, -1000)
                     .ignoresSafeArea()
+                    .clipShape(.rect(topLeadingRadius: 0, bottomLeadingRadius: 28, bottomTrailingRadius: 28, topTrailingRadius: 0, style: .continuous))
             )
         }
         .buttonStyle(PlainButtonStyle())
