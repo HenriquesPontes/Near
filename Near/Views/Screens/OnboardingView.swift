@@ -105,40 +105,33 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - Features & Permissions Step
     private var featuresStep: some View {
         VStack(spacing: 0) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 32) {
-                    Text("Features & Notifications")
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.primary)
-                        .padding(.top, 16)
-                        .padding(.horizontal, 24)
+            Spacer()
 
-                    VStack(alignment: .leading, spacing: 32) {
-                        FeatureRow(
-                            icon: "Wifi_High", title: "Signal Detection",
-                            subtitle:
-                                "Detects Bluetooth emissions from popular smart glasses like Ray-Ban Meta and other smart glasses.",
-                            iconColor: .blue)
-                        FeatureRow(
-                            icon: "Bell_Notification", title: "Alerts & Notifications",
-                            subtitle:
-                                "Get notified when potential surveillance devices are nearby.",
-                            iconColor: .orange)
-                        FeatureRow(
-                            icon: "Shield_Check", title: "Privacy First",
-                            subtitle:
-                                "Nearby doesn't collect your data. Everything happens entirely on your device.",
-                            iconColor: .green)
-                    }
-                    .padding(.horizontal, 24)
-                }
-                .padding(.bottom, 40)
+            // Notification Preview Card
+            NotificationPreviewCard()
+                .padding(.bottom, 24)
+
+            // Text Content
+            VStack(spacing: 16) {
+                Text("Get Notified when\nDevices are Detected")
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.center)
+
+                Text("Notifications include alerts about surveillance\ndevices, trackers, and nearby wearables.")
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+                    .lineSpacing(4)
             }
 
-            ZStack(alignment: .bottom) {
+            Spacer()
+
+            // Action Buttons
+            VStack(spacing: 8) {
                 Button {
                     UNUserNotificationCenter.current().requestAuthorization(options: [
                         .alert, .sound, .badge,
@@ -150,27 +143,39 @@ struct OnboardingView: View {
                         }
                     }
                 } label: {
-                    Text("Continue")
+                    Text("Enable Notifications")
                         .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(Color(UIColor.systemBackground))
+                        .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
-                        .background(Color.primary)
+                        .background(Color.blue)
                         .clipShape(Capsule())
                 }
-                .padding(.horizontal, 24)
-                
-                Text(
-                    "By continuing, you agree to our [Terms of Service](https://github.com/HenriquesPontes/Near/blob/main/TERMS.md) and [Privacy Policy](https://github.com/HenriquesPontes/Near/blob/main/PRIVACY.md)."
-                )
-                .tint(.blue)
-                .font(.system(size: 12))
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
-                .offset(y: 38)
+
+                Button {
+                    withAnimation {
+                        hasSeenOnboarding = true
+                    }
+                } label: {
+                    Text("Not Now")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(.blue)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                }
             }
-            .padding(.bottom, 32)
+            .padding(.horizontal, 24)
+            .padding(.bottom, 8)
+            
+            Text(
+                "By continuing, you agree to our [Terms of Service](https://github.com/HenriquesPontes/Near/blob/main/TERMS.md) and [Privacy Policy](https://github.com/HenriquesPontes/Near/blob/main/PRIVACY.md)."
+            )
+            .tint(.blue)
+            .font(.system(size: 11))
+            .foregroundColor(.secondary)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 40)
+            .padding(.bottom, 24)
         }
     }
 
@@ -350,5 +355,66 @@ struct OnboardingPingNode: View {
                 .shadow(color: color, radius: 4)
         }
         .position(x: x, y: y)
+    }
+}
+
+struct NotificationPreviewCard: View {
+    var body: some View {
+        VStack(spacing: 12) {
+            // Lock screen time representation
+            Text("09:41")
+                .font(.system(size: 54, weight: .light))
+                .foregroundColor(Color.primary.opacity(0.6))
+                .padding(.top, 24)
+            
+            // Notification Banner representation
+            HStack(spacing: 12) {
+                // App Icon / Bell Icon
+                ZStack {
+                    Circle()
+                        .fill(Color.blue)
+                        .frame(width: 38, height: 38)
+                    Image(systemName: "bell.fill")
+                        .font(.system(size: 18))
+                        .foregroundColor(.white)
+                }
+                
+                // Notification Content
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Nearby Alert")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(.primary)
+                    Text("Smart glasses detected nearby.")
+                        .font(.system(size: 13, weight: .regular))
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .background(
+                RoundedRectangle(cornerRadius: 18)
+                    .fill(Color(UIColor.secondarySystemGroupedBackground))
+                    .shadow(color: Color.black.opacity(0.08), radius: 10, x: 0, y: 4)
+            )
+            .padding(.horizontal, 20)
+            .padding(.bottom, 24)
+        }
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 24)
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color(UIColor.secondarySystemBackground).opacity(0.5),
+                            Color(UIColor.systemBackground)
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+        )
+        .padding(.horizontal, 24)
     }
 }
