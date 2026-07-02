@@ -146,80 +146,26 @@ struct NearWidgetEntryView : View {
     }
     
     private var mediumLayout: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Header Row
-            HStack {
-                HStack(spacing: 6) {
-                    Image(systemName: "eyeglasses")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.white)
-                    Text("Nearby")
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
-                }
-                
-                Spacer()
-                
-                // Settings button Link
-                Link(destination: URL(string: "nearbyapp://settings")!) {
-                    Image(systemName: "gearshape")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(.white)
-                        .frame(width: 28, height: 28)
-                        .background(Color.white.opacity(0.1))
-                        .clipShape(Circle())
-                }
-            }
+        HStack(spacing: 24) {
+            Spacer()
             
-            // Middle Content: Radar & Stats
-            HStack(spacing: 16) {
-                RadarHUDView(scanning: entry.scanning)
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Devices Found")
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .foregroundColor(.white.opacity(0.6))
-                    
-                    Text("\(entry.detectedCount)")
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
-                    
-                    Text(entry.detectedCount == 0 ? "No devices detected yet" : (entry.detectedCount == 1 ? "1 device nearby" : "\(entry.detectedCount) devices nearby"))
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundColor(.white.opacity(0.7))
-                }
-                
-                Spacer()
-            }
+            RadarHUDView(scanning: entry.scanning)
             
-            // Bottom Controls Row
-            HStack(spacing: 12) {
-                // Interactive Scan Toggle button
-                Button(intent: ToggleScanIntent()) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "arrow.triangle.2.circlepath")
-                            .font(.system(size: 12, weight: .bold))
-                        Text(entry.scanning ? "Stop Scanning" : "Start Scanning")
-                            .font(.system(size: 13, weight: .bold, design: .rounded))
-                    }
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Devices Found")
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundColor(.white.opacity(0.6))
+                
+                Text("\(entry.detectedCount)")
+                    .font(.system(size: 44, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.blue)
-                    .cornerRadius(20)
-                }
-                .buttonStyle(.plain)
-                .frame(height: 38)
                 
-                // History Link button
-                Link(destination: URL(string: "nearbyapp://history")!) {
-                    Image(systemName: "clock")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(.white)
-                        .frame(width: 38, height: 38)
-                        .background(Color.white.opacity(0.12))
-                        .clipShape(Circle())
-                }
+                Text(entry.detectedCount == 0 ? "No devices detected yet" : (entry.detectedCount == 1 ? "1 device nearby" : "\(entry.detectedCount) devices nearby"))
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundColor(.white.opacity(0.7))
             }
+            
+            Spacer()
         }
         .padding(16)
         .containerBackground(for: .widget) {
@@ -241,25 +187,18 @@ struct NearWidgetEntryView : View {
     }
     
     private var smallLayout: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Image(systemName: "eyeglasses")
-                    .foregroundColor(.white)
-                Spacer()
-                if entry.scanning {
-                    Circle()
-                        .fill(Color.green)
-                        .frame(width: 6, height: 6)
-                        .shadow(color: .green, radius: 3)
-                }
-            }
-            
+        VStack(spacing: 12) {
             Spacer()
             
-            VStack(alignment: .leading, spacing: 2) {
+            RadarHUDView(scanning: entry.scanning)
+                .scaleEffect(0.8)
+                .frame(width: 60, height: 60)
+            
+            VStack(spacing: 2) {
                 Text("\(entry.detectedCount)")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
+                
                 Text(entry.detectedCount == 1 ? "device" : "devices")
                     .font(.system(size: 9, weight: .bold, design: .rounded))
                     .foregroundColor(.white.opacity(0.6))
@@ -267,21 +206,6 @@ struct NearWidgetEntryView : View {
             }
             
             Spacer()
-            
-            Button(intent: ToggleScanIntent()) {
-                HStack(spacing: 4) {
-                    Image(systemName: "arrow.triangle.2.circlepath")
-                        .font(.system(size: 10, weight: .bold))
-                    Text(entry.scanning ? "Stop" : "Start")
-                        .font(.system(size: 10, weight: .bold, design: .rounded))
-                }
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 6)
-                .background(entry.scanning ? Color.white.opacity(0.12) : Color.blue)
-                .cornerRadius(12)
-            }
-            .buttonStyle(.plain)
         }
         .padding(12)
         .containerBackground(for: .widget) {
