@@ -349,21 +349,21 @@ struct OnboardingPingNode: View {
 
 struct PhoneNotificationMockupView: View {
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             // Mock Phone Frame
             Image("iPhone 16 Pro")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 320, height: 280, alignment: .top)
+                .frame(width: 450, height: 600, alignment: .top)
+                .offset(y: 20)
                 // Mask with gradient to fade out bottom edge
                 .mask(
                     LinearGradient(
-                        gradient: Gradient(colors: [.black, .black, .black, .clear]),
+                        gradient: Gradient(colors: [.black, .black, .black.opacity(0.8), .clear]),
                         startPoint: .top,
                         endPoint: .bottom
                     )
                 )
-                .offset(y: 40)
             
             VStack(spacing: 12) {
                 // First Notification Banner
@@ -382,10 +382,11 @@ struct PhoneNotificationMockupView: View {
                     subtitle: "An unidentified beacon is moving with you."
                 )
             }
-            .padding(.horizontal, 24)
-            .padding(.top, 20)
+            .padding(.horizontal, 32)
+            .padding(.top, 64)
         }
-        .frame(height: 240)
+        .frame(height: 260)
+        .frame(maxWidth: .infinity)
     }
 }
 
