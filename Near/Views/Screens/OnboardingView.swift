@@ -68,27 +68,32 @@ struct OnboardingView: View {
                 .padding(.bottom, 40)
 
             // Text Content
-            VStack(spacing: 12) {
-                Text("Welcome to Near")
-                    .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(.primary)
-                    .multilineTextAlignment(.center)
+            VStack(spacing: 16) {
+                VStack(spacing: 4) {
+                    Text("Welcome to")
+                        .font(.system(size: 32, weight: .semibold))
+                        .foregroundColor(.primary)
+                    Text("Near")
+                        .font(.system(size: 38, weight: .bold))
+                        .foregroundColor(.primary)
+                }
+                .multilineTextAlignment(.center)
 
-                Text("This app brings your awareness and privacy tools together in one place.")
-                    .font(.system(size: 17, weight: .regular))
+                Text("This app brings your awareness and privacy\ntools together in one place.")
+                    .font(.system(size: 16, weight: .medium))
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
-
+                    .lineSpacing(4)
             }
 
             Spacer()
 
-            // Continue Button
+            // Next Button
             Button {
                 path.append(OnboardingStep.features)
             } label: {
-                Text("Continue")
+                Text("Next")
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(Color(UIColor.systemBackground))
                     .frame(maxWidth: .infinity)
