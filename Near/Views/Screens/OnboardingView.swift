@@ -104,11 +104,11 @@ struct OnboardingView: View {
 
             // Text Content (Left-Aligned to match mockup)
             VStack(alignment: .leading, spacing: 12) {
-                Text("Don't miss anything")
+                Text("Get Notified when\nDevices are Detected")
                     .font(.system(size: 32, weight: .bold))
                     .foregroundColor(.primary)
 
-                Text("Allow notifications to get alerts when smart glasses, trackers, and other hidden surveillance devices are detected nearby.")
+                Text("Notifications include alerts about surveillance devices, trackers, and nearby wearables.")
                     .font(.system(size: 15, weight: .regular))
                     .foregroundColor(.secondary)
                     .lineSpacing(4)
