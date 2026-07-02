@@ -116,7 +116,6 @@ struct DashboardView: View {
             .navigationTitle("Nearby")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     // Settings Button
@@ -126,7 +125,7 @@ struct DashboardView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 20, height: 20)
-                            .foregroundColor(.white)
+                            .foregroundColor(.primary)
                     }
                 }
             }
