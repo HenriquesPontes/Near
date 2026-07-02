@@ -350,12 +350,12 @@ struct OnboardingPingNode: View {
 struct PhoneNotificationMockupView: View {
     var body: some View {
         ZStack {
-            // Device Outline Image
+            // Mock Phone Frame
             Image("Device")
-                .renderingMode(.template)
                 .resizable()
-                .scaledToFit()
+                .renderingMode(.template)
                 .foregroundColor(Color.primary.opacity(0.12))
+                .aspectRatio(contentMode: .fit)
                 .frame(width: 320, height: 260)
                 // Mask with gradient to fade out bottom edge
                 .mask(
