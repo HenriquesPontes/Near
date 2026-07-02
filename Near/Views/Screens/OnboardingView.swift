@@ -419,7 +419,7 @@ struct WaterShape: Shape {
         )
         path.addLine(to: CGPoint(x: 0, y: rect.height))
         path.addLine(to: CGPoint(x: rect.width, y: rect.height))
-        path.close()
+        path.closeSubpath()
         return path
     }
 }
@@ -564,7 +564,7 @@ struct Triangle: Shape {
         path.move(to: CGPoint(x: rect.midX, y: rect.maxY))
         path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
         path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
-        path.close()
+        path.closeSubpath()
         return path
     }
 }
