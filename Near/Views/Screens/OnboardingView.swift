@@ -117,42 +117,28 @@ struct OnboardingView: View {
             }
             .padding(.bottom, 32)
 
-            // Action Buttons
-            VStack(spacing: 8) {
-                Button {
-                    UNUserNotificationCenter.current().requestAuthorization(options: [
-                        .alert, .sound, .badge,
-                    ]) { _, _ in
-                        DispatchQueue.main.async {
-                            withAnimation {
-                                hasSeenOnboarding = true
-                            }
+            // Action Button
+            Button {
+                UNUserNotificationCenter.current().requestAuthorization(options: [
+                    .alert, .sound, .badge,
+                ]) { _, _ in
+                    DispatchQueue.main.async {
+                        withAnimation {
+                            hasSeenOnboarding = true
                         }
                     }
-                } label: {
-                    Text("Enable Notifications")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(Color.blue)
-                        .clipShape(Capsule())
                 }
-
-                Button {
-                    withAnimation {
-                        hasSeenOnboarding = true
-                    }
-                } label: {
-                    Text("Not Now")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(.blue)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                }
+            } label: {
+                Text("Enable Notifications")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundColor(Color(UIColor.systemBackground))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Color.primary)
+                    .clipShape(Capsule())
             }
             .padding(.horizontal, 24)
-            .padding(.bottom, 8)
+            .padding(.bottom, 16)
             
             Text(
                 "By continuing, you agree to our [Terms of Service](https://github.com/HenriquesPontes/Near/blob/main/TERMS.md) and [Privacy Policy](https://github.com/HenriquesPontes/Near/blob/main/PRIVACY.md)."
