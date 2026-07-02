@@ -453,9 +453,9 @@ struct DashboardView: View {
                     showingClearConfirmation = true
                 }) {
                     Text("Clear Search History")
-                        .font(.system(size: 17, weight: .bold))
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.blue)
-                        .frame(maxWidth: .infinity, alignment: .center)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .listRowInsets(EdgeInsets(top: 12, leading: 28, bottom: 12, trailing: 28))
                 .listRowBackground(
