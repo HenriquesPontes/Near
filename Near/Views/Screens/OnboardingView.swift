@@ -96,8 +96,9 @@ struct OnboardingView: View {
         VStack(spacing: 0) {
             Spacer()
 
-            // Dark Map View
-            DarkMapView()
+            // Notification Radar Graphic
+            NotificationRadarGraphicView()
+                .frame(height: 300)
 
             Spacer()
 
@@ -331,240 +332,141 @@ struct OnboardingPingNode: View {
     }
 }
 
-struct DarkMapView: View {
-    @State private var routeProgress: CGFloat = 0
-    @State private var pointBPulse: CGFloat = 1.0
-    @State private var showCallout: Bool = false
-    
+struct NotificationRadarGraphicView: View {
+    @State private var pulseScale: CGFloat = 1.0
+    @State private var sweepAngle: Double = 0.0
+
     var body: some View {
         GeometryReader { geometry in
-            let w = geometry.size.width
-            let h = geometry.size.height
-            
             ZStack {
-                // Map Base Background
-                Color(red: 0.08, green: 0.08, blue: 0.08)
+                // Background gradient: Deep navy/dark indigo matching the scan view background
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color(red: 10/255, green: 17/255, blue: 40/255),
+                        Color(red: 26/255, green: 43/255, blue: 76/255)
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
                 
-                // Abstract Water / Coastline Shape
-                WaterShape()
-                    .fill(Color(red: 0.05, green: 0.06, blue: 0.08))
+                // Concentric radar rings matching the dashboard sweep style
+                ForEach(1...4, id: \.self) { index in
+                    Circle()
+                        .stroke(Color.white.opacity(0.07), lineWidth: 1)
+                        .frame(width: CGFloat(index) * 60, height: CGFloat(index) * 60)
+                }
                 
-                // Abstract Grid / Roads
-                RoadNetworkShape()
-                    .stroke(Color.white.opacity(0.12), lineWidth: 1.5)
+                // Crosshairs
+                Rectangle()
+                    .fill(Color.white.opacity(0.04))
+                    .frame(width: 1, height: 260)
+                Rectangle()
+                    .fill(Color.white.opacity(0.04))
+                    .frame(width: 260, height: 1)
                 
-                // Major highways/streets
-                HighwayNetworkShape()
-                    .stroke(Color.white.opacity(0.18), lineWidth: 3.5)
+                // Active Radar Sweep animation
+                Circle()
+                    .fill(
+                        AngularGradient(
+                            gradient: Gradient(colors: [
+                                Color.blue.opacity(0.25),
+                                Color.blue.opacity(0.0)
+                            ]),
+                            center: .center,
+                            startAngle: .degrees(0),
+                            endAngle: .degrees(90)
+                        )
+                    )
+                    .frame(width: 240, height: 240)
+                    .rotationEffect(.degrees(sweepAngle))
                 
-                // Animated Orange Route Path
-                RoutePathShape()
-                    .trim(from: 0, to: routeProgress)
-                    .stroke(Color.orange, style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round, dash: [4, 4]))
-                    .shadow(color: .orange.opacity(0.5), radius: 3)
+                // Simulated device ping indicators with glowing alert rings
+                // Green Ping (Safe)
+                ZStack {
+                    Circle()
+                        .fill(Color.green.opacity(0.15 * pulseScale))
+                        .frame(width: 24, height: 24)
+                    Circle()
+                        .fill(Color.green)
+                        .frame(width: 6, height: 6)
+                }
+                .position(x: geometry.size.width * 0.35, y: geometry.size.height * 0.32)
                 
-                // Point A (User Location)
-                UserLocationDot()
-                    .position(x: w * 0.25, y: h * 0.65)
+                // Purple Ping (Wearable)
+                ZStack {
+                    Circle()
+                        .fill(Color.purple.opacity(0.15 * pulseScale))
+                        .frame(width: 28, height: 28)
+                    Circle()
+                        .fill(Color.purple)
+                        .frame(width: 7, height: 7)
+                }
+                .position(x: geometry.size.width * 0.72, y: geometry.size.height * 0.42)
                 
-                // Point B (Orange Alert Device Location)
-                DeviceAlertPin(pulse: pointBPulse, showCallout: showCallout)
-                    .position(x: w * 0.7, y: h * 0.3)
+                // Red Ping (Alert/Glasses)
+                ZStack {
+                    Circle()
+                        .fill(Color.red.opacity(0.2 * pulseScale))
+                        .frame(width: 36, height: 36)
+                    Circle()
+                        .fill(Color.red)
+                        .frame(width: 9, height: 9)
+                        .shadow(color: .red, radius: 4)
+                }
+                .position(x: geometry.size.width * 0.52, y: geometry.size.height * 0.65)
+                
+                // Floating mockup notification banner at the bottom
+                VStack {
+                    Spacer()
+                    
+                    HStack(spacing: 12) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 36, height: 36)
+                                .shadow(color: .red.opacity(0.3), radius: 4, x: 0, y: 2)
+                            Image(systemName: "bell.fill")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.white)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("Nearby Alert")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.primary)
+                            Text("Smart glasses detected nearby.")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        Text("now")
+                            .font(.system(size: 11, weight: .regular))
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(UIColor.secondarySystemGroupedBackground))
+                            .shadow(color: Color.black.opacity(0.12), radius: 10, x: 0, y: 5)
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
+                }
             }
         }
-        .frame(height: 280)
+        .frame(height: 300)
         .clipShape(RoundedRectangle(cornerRadius: 24))
         .padding(.horizontal, 24)
         .onAppear {
-            animateSequence()
-        }
-    }
-    
-    private func animateSequence() {
-        routeProgress = 0
-        showCallout = false
-        
-        // Route draws over 2.2 seconds
-        withAnimation(.easeOut(duration: 2.2)) {
-            routeProgress = 1.0
-        }
-        
-        // Show callout banner after route finishes
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
-                showCallout = true
+            withAnimation(.linear(duration: 4.5).repeatForever(autoreverses: false)) {
+                sweepAngle = 360
+            }
+            withAnimation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true)) {
+                pulseScale = 1.5
             }
         }
-        
-        // Trigger pulse loop
-        withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
-            pointBPulse = 1.4
-        }
-        
-        // Cycle sequence every 5.5 seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.5) {
-            animateSequence()
-        }
-    }
-}
-
-struct WaterShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.width, y: rect.height * 0.4))
-        path.addCurve(
-            to: CGPoint(x: 0, y: rect.height * 0.85),
-            control1: CGPoint(x: rect.width * 0.6, y: rect.height * 0.5),
-            control2: CGPoint(x: rect.width * 0.4, y: rect.height * 0.8)
-        )
-        path.addLine(to: CGPoint(x: 0, y: rect.height))
-        path.addLine(to: CGPoint(x: rect.width, y: rect.height))
-        path.closeSubpath()
-        return path
-    }
-}
-
-struct RoadNetworkShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        // Horizontal roads
-        path.move(to: CGPoint(x: 0, y: rect.height * 0.15))
-        path.addLine(to: CGPoint(x: rect.width, y: rect.height * 0.2))
-        
-        path.move(to: CGPoint(x: 0, y: rect.height * 0.45))
-        path.addLine(to: CGPoint(x: rect.width, y: rect.height * 0.5))
-        
-        path.move(to: CGPoint(x: 0, y: rect.height * 0.75))
-        path.addLine(to: CGPoint(x: rect.width, y: rect.height * 0.8))
-        
-        // Vertical roads
-        path.move(to: CGPoint(x: rect.width * 0.15, y: 0))
-        path.addLine(to: CGPoint(x: rect.width * 0.2, y: rect.height))
-        
-        path.move(to: CGPoint(x: rect.width * 0.45, y: 0))
-        path.addLine(to: CGPoint(x: rect.width * 0.5, y: rect.height))
-        
-        path.move(to: CGPoint(x: rect.width * 0.75, y: 0))
-        path.addLine(to: CGPoint(x: rect.width * 0.8, y: rect.height))
-        
-        return path
-    }
-}
-
-struct HighwayNetworkShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: 0, y: rect.height * 0.2))
-        path.addCurve(
-            to: CGPoint(x: rect.width, y: rect.height * 0.75),
-            control1: CGPoint(x: rect.width * 0.4, y: rect.height * 0.1),
-            control2: CGPoint(x: rect.width * 0.5, y: rect.height * 0.9)
-        )
-        
-        path.move(to: CGPoint(x: rect.width * 0.2, y: 0))
-        path.addCurve(
-            to: CGPoint(x: rect.width * 0.8, y: rect.height),
-            control1: CGPoint(x: rect.width * 0.3, y: rect.height * 0.5),
-            control2: CGPoint(x: rect.width * 0.7, y: rect.height * 0.5)
-        )
-        return path
-    }
-}
-
-struct RoutePathShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.width * 0.25, y: rect.height * 0.65))
-        path.addCurve(
-            to: CGPoint(x: rect.width * 0.7, y: rect.height * 0.3),
-            control1: CGPoint(x: rect.width * 0.35, y: rect.height * 0.45),
-            control2: CGPoint(x: rect.width * 0.55, y: rect.height * 0.4)
-        )
-        return path
-    }
-}
-
-struct UserLocationDot: View {
-    var body: some View {
-        ZStack {
-            Circle()
-                .fill(Color.blue.opacity(0.15))
-                .frame(width: 32, height: 32)
-            
-            Circle()
-                .fill(Color.white)
-                .frame(width: 14, height: 14)
-                .shadow(color: .black.opacity(0.3), radius: 2)
-            
-            Circle()
-                .fill(Color.blue)
-                .frame(width: 10, height: 10)
-        }
-    }
-}
-
-struct DeviceAlertPin: View {
-    var pulse: CGFloat
-    var showCallout: Bool
-    
-    var body: some View {
-        ZStack {
-            Circle()
-                .stroke(Color.orange.opacity(0.4), lineWidth: 2)
-                .frame(width: 36 * pulse, height: 36 * pulse)
-                .opacity(2.0 - Double(pulse))
-            
-            Circle()
-                .stroke(Color.orange.opacity(0.2), lineWidth: 1)
-                .frame(width: 64 * pulse, height: 64 * pulse)
-                .opacity(2.0 - Double(pulse))
-            
-            Circle()
-                .fill(Color.orange)
-                .frame(width: 14, height: 14)
-                .shadow(color: .orange.opacity(0.6), radius: 4)
-            
-            Circle()
-                .fill(Color.white)
-                .frame(width: 6, height: 6)
-            
-            if showCallout {
-                VStack(spacing: 0) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(.white)
-                        Text("Device nearby • 1m")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundColor(.white)
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(Color.orange)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .shadow(color: Color.black.opacity(0.25), radius: 5, x: 0, y: 3)
-                    
-                    Triangle()
-                        .fill(Color.orange)
-                        .frame(width: 10, height: 6)
-                }
-                .offset(y: -42)
-                .transition(.asymmetric(
-                    insertion: .scale(scale: 0.8, anchor: .bottom).combined(with: .opacity),
-                    removal: .opacity
-                ))
-            }
-        }
-    }
-}
-
-struct Triangle: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.midX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
-        path.closeSubpath()
-        return path
     }
 }
