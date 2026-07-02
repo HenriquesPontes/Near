@@ -96,46 +96,62 @@ struct OnboardingView: View {
         VStack(spacing: 0) {
             Spacer()
 
-            // Notification Preview Card
-            NotificationPreviewCard()
+            // Phone Frame with Stacked Notifications Mockup
+            PhoneNotificationMockupView()
+                .padding(.bottom, 24)
 
             Spacer()
 
-            // Text Content
-            VStack(spacing: 16) {
-                Text("Get Notified when\nDevices are Detected")
-                    .font(.system(size: 28, weight: .bold))
+            // Text Content (Left-Aligned to match mockup)
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Don't miss anything")
+                    .font(.system(size: 32, weight: .bold))
                     .foregroundColor(.primary)
-                    .multilineTextAlignment(.center)
 
-                Text("Notifications include alerts about surveillance\ndevices, trackers, and nearby wearables.")
-                    .font(.system(size: 16, weight: .regular))
+                Text("Allow notifications to get alerts when smart glasses, trackers, and other hidden surveillance devices are detected nearby.")
+                    .font(.system(size: 15, weight: .regular))
                     .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
                     .lineSpacing(4)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 24)
             .padding(.bottom, 32)
 
-            // Action Button
-            Button {
-                UNUserNotificationCenter.current().requestAuthorization(options: [
-                    .alert, .sound, .badge,
-                ]) { _, _ in
-                    DispatchQueue.main.async {
-                        withAnimation {
-                            hasSeenOnboarding = true
+            // Action Buttons (Allow notifications / Not right now)
+            VStack(spacing: 12) {
+                Button {
+                    UNUserNotificationCenter.current().requestAuthorization(options: [
+                        .alert, .sound, .badge,
+                    ]) { _, _ in
+                        DispatchQueue.main.async {
+                            withAnimation {
+                                hasSeenOnboarding = true
+                            }
                         }
                     }
+                } label: {
+                    Text("Allow notifications")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(Color(UIColor.systemBackground))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Color.primary)
+                        .clipShape(Capsule())
                 }
-            } label: {
-                Text("Enable Notifications")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(Color(UIColor.systemBackground))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(Color.primary)
-                    .clipShape(Capsule())
+
+                Button {
+                    withAnimation {
+                        hasSeenOnboarding = true
+                    }
+                } label: {
+                    Text("Not right now")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(.primary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Color(UIColor.systemGray6))
+                        .clipShape(Capsule())
+                }
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 16)
@@ -331,94 +347,85 @@ struct OnboardingPingNode: View {
     }
 }
 
-struct NotificationPreviewCard: View {
+struct PhoneNotificationMockupView: View {
     var body: some View {
         ZStack {
-            // Background Gradient
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color(red: 0.08, green: 0.1, blue: 0.25),   // Midnight Blue
-                    Color(red: 0.15, green: 0.08, blue: 0.3)    // Deep Indigo
-                ]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            
-            // Glowing Orbs
-            Circle()
-                .fill(Color.blue.opacity(0.3))
-                .frame(width: 150, height: 150)
-                .blur(radius: 40)
-                .offset(x: -80, y: -40)
-            
-            Circle()
-                .fill(Color.purple.opacity(0.3))
-                .frame(width: 180, height: 180)
-                .blur(radius: 55)
-                .offset(x: 80, y: 40)
-            
-            VStack(spacing: 0) {
-                // Time
-                Text("09:41")
-                    .font(.system(size: 58, weight: .thin))
-                    .foregroundColor(.white)
-                    .padding(.top, 24)
-                
-                // Date
-                Text("Thursday, July 2")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.white.opacity(0.7))
-                    .padding(.top, 4)
-                
-                Spacer()
-                
-                // Glassmorphic Banner
-                HStack(spacing: 12) {
-                    // App logo / radar representation
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.blue)
-                            .frame(width: 38, height: 38)
-                        
-                        Image(systemName: "sensor.tag.radiowaves.forward")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.white)
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 2) {
-                        HStack {
-                            Text("Nearby Alert")
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundColor(.white)
-                            Spacer()
-                            Text("now")
-                                .font(.system(size: 11))
-                                .foregroundColor(.white.opacity(0.6))
-                        }
-                        
-                        Text("Smart glasses detected nearby.")
-                            .font(.system(size: 13))
-                            .foregroundColor(.white.opacity(0.85))
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 18)
-                        .fill(Color.white.opacity(0.08))
-                        .background(.ultraThinMaterial)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 18)
-                                .stroke(Color.white.opacity(0.12), lineWidth: 0.5)
-                        )
+            // Mock Phone Frame
+            RoundedRectangle(cornerRadius: 40)
+                .stroke(Color.primary.opacity(0.08), lineWidth: 8)
+                .frame(width: 320, height: 260)
+                // Mask with gradient to fade out bottom edge
+                .mask(
+                    LinearGradient(
+                        gradient: Gradient(colors: [.black, .black, .black, .clear]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
                 )
-                .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 4)
-                .padding(.horizontal, 16)
-                .padding(.bottom, 24)
+                .offset(y: 40)
+            
+            VStack(spacing: 12) {
+                // First Notification Banner
+                NotificationBannerView(
+                    iconName: "N",
+                    title: "Smart Glasses Detected",
+                    time: "Just now",
+                    subtitle: "Ray-Ban Meta detected nearby."
+                )
+                
+                // Second Notification Banner
+                NotificationBannerView(
+                    iconName: "N",
+                    title: "Unknown Tracker Nearby",
+                    time: "10m ago",
+                    subtitle: "An unidentified beacon is moving with you."
+                )
             }
+            .padding(.horizontal, 24)
+            .padding(.top, 20)
         }
         .frame(height: 240)
-        .clipShape(RoundedRectangle(cornerRadius: 28))
-        .padding(.horizontal, 24)
+    }
+}
+
+struct NotificationBannerView: View {
+    let iconName: String
+    let title: String
+    let time: String
+    let subtitle: String
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            // App Logo Icon
+            Text(iconName)
+                .font(.system(size: 20, weight: .bold, design: .serif))
+                .foregroundColor(.primary)
+                .frame(width: 38, height: 38)
+                .background(Color(UIColor.systemGray5))
+                .cornerRadius(10)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                HStack {
+                    Text(title)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.primary)
+                    Spacer()
+                    Text(time)
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                }
+                
+                Text(subtitle)
+                    .font(.system(size: 13))
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color(UIColor.secondarySystemGroupedBackground))
+                .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 3)
+        )
     }
 }
