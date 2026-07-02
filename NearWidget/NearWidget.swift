@@ -71,92 +71,64 @@ struct SimpleEntry: TimelineEntry {
     let detectedCount: Int
 }
 
-struct WidgetBackground: View {
-    let scanning: Bool
-    
-    var body: some View {
-        LinearGradient(
-            gradient: Gradient(colors: scanning ? [
-                Color(hex: "0E1A30"), // Rich navy
-                Color(hex: "050B14")  // Midnight black
-            ] : [
-                Color(hex: "1F2124"), // Charcoal
-                Color(hex: "101112")  // Muted dark
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-}
-
 struct RadarHUDView: View {
     let scanning: Bool
-    let count: Int
     
     var body: some View {
         ZStack {
-            // Outer Ring
-            Circle()
-                .stroke(Color.blue.opacity(0.15), lineWidth: 1.5)
-                .frame(width: 80, height: 80)
+            // Concentric Circles
+            ForEach(1...4, id: \.self) { ring in
+                Circle()
+                    .stroke(Color(hex: "1A66FF").opacity(0.3), lineWidth: 1)
+                    .frame(width: CGFloat(ring) * 76 / 4, height: CGFloat(ring) * 76 / 4)
+            }
             
-            // Middle Dashed Ring
-            Circle()
-                .stroke(Color.blue.opacity(0.25), style: StrokeStyle(lineWidth: 1, lineCap: .round, lineJoin: .round, miterLimit: 10, dash: [4, 4], dashPhase: 0))
-                .frame(width: 54, height: 54)
-            
-            // Inner Ring
-            Circle()
-                .stroke(Color.blue.opacity(0.15), lineWidth: 1)
-                .frame(width: 28, height: 28)
+            // Crosshairs
+            Path { path in
+                path.move(to: CGPoint(x: 4, y: 38))
+                path.addLine(to: CGPoint(x: 72, y: 38))
+                path.move(to: CGPoint(x: 38, y: 4))
+                path.addLine(to: CGPoint(x: 38, y: 72))
+            }
+            .stroke(Color(hex: "1A66FF").opacity(0.15), lineWidth: 1)
             
             if scanning {
-                // Glow sweep
+                // Sweep angle
                 Circle()
                     .fill(
                         AngularGradient(
                             gradient: Gradient(colors: [
-                                Color.blue.opacity(0.0),
-                                Color.cyan.opacity(0.4),
-                                Color.blue.opacity(0.0)
+                                Color(hex: "1A66FF").opacity(0.0),
+                                Color(hex: "3399FF").opacity(0.4),
+                                Color(hex: "1A66FF").opacity(0.0)
                             ]),
                             center: .center,
                             startAngle: .degrees(-60),
                             endAngle: .degrees(120)
                         )
                     )
-                    .frame(width: 80, height: 80)
+                    .frame(width: 76, height: 76)
                     .rotationEffect(.degrees(30))
                 
-                // Simulated detected device targets (little glowing dots in the radar field)
-                if count > 0 {
-                    Circle()
-                        .fill(Color.green)
-                        .frame(width: 5, height: 5)
-                        .offset(x: 18, y: -22)
-                        .shadow(color: .green, radius: 4)
+                // Sweep line
+                Path { path in
+                    path.move(to: CGPoint(x: 38, y: 38))
+                    path.addLine(to: CGPoint(x: 38 + 26.8, y: 38 - 26.8)) // 45 degree angle line
                 }
+                .stroke(Color(hex: "3399FF"), lineWidth: 1.5)
                 
-                if count > 1 {
-                    Circle()
-                        .fill(Color.green)
-                        .frame(width: 4, height: 4)
-                        .offset(x: -24, y: 12)
-                        .shadow(color: .green, radius: 3)
-                }
-                
-                // Pulsing Center dot
+                // Center point
                 Circle()
-                    .fill(Color.cyan)
-                    .frame(width: 8, height: 8)
-                    .shadow(color: .cyan, radius: 4)
+                    .fill(Color(hex: "3399FF"))
+                    .frame(width: 6, height: 6)
+                    .shadow(color: Color(hex: "3399FF"), radius: 3)
             } else {
-                // Static paused dot
                 Circle()
-                    .fill(Color.secondary.opacity(0.4))
-                    .frame(width: 8, height: 8)
+                    .fill(Color.white.opacity(0.4))
+                    .frame(width: 6, height: 6)
             }
         }
+        .frame(width: 76, height: 76)
     }
 }
 
@@ -174,95 +146,105 @@ struct NearWidgetEntryView : View {
     }
     
     private var mediumLayout: some View {
-        HStack(spacing: 20) {
-            // Left Side: App logo, status, and button
-            VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 12) {
+            // Header Row
+            HStack {
                 HStack(spacing: 6) {
                     Image(systemName: "eyeglasses")
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(.cyan)
-                        .shadow(color: .cyan.opacity(0.5), radius: 4)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white)
                     Text("Nearby")
-                        .font(.system(.title3, design: .rounded))
-                        .fontWeight(.bold)
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
                 }
                 
-                HStack(spacing: 6) {
-                    if entry.scanning {
-                        Circle()
-                            .fill(Color.green)
-                            .frame(width: 6, height: 6)
-                            .shadow(color: .green, radius: 3)
-                        Text("Radar Active")
-                            .font(.system(size: 12, weight: .medium, design: .rounded))
-                            .foregroundColor(.green)
-                    } else {
-                        Circle()
-                            .fill(Color.secondary)
-                            .frame(width: 6, height: 6)
-                        Text("Radar Paused")
-                            .font(.system(size: 12, weight: .medium, design: .rounded))
-                            .foregroundColor(.secondary)
-                    }
+                Spacer()
+                
+                // Settings button Link
+                Link(destination: URL(string: "nearbyapp://settings")!) {
+                    Image(systemName: "gearshape")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(width: 28, height: 28)
+                        .background(Color.white.opacity(0.1))
+                        .clipShape(Circle())
+                }
+            }
+            
+            // Middle Content: Radar & Stats
+            HStack(spacing: 16) {
+                RadarHUDView(scanning: entry.scanning)
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Devices Found")
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .foregroundColor(.white.opacity(0.6))
+                    
+                    Text("\(entry.detectedCount)")
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                    
+                    Text(entry.detectedCount == 0 ? "No devices detected yet" : (entry.detectedCount == 1 ? "1 device nearby" : "\(entry.detectedCount) devices nearby"))
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundColor(.white.opacity(0.7))
                 }
                 
-                Spacer(minLength: 4)
-                
+                Spacer()
+            }
+            
+            // Bottom Controls Row
+            HStack(spacing: 12) {
+                // Interactive Scan Toggle button
                 Button(intent: ToggleScanIntent()) {
-                    HStack(spacing: 6) {
-                        Image(systemName: entry.scanning ? "pause.fill" : "play.fill")
+                    HStack(spacing: 8) {
+                        Image(systemName: "arrow.triangle.2.circlepath")
                             .font(.system(size: 12, weight: .bold))
-                        Text(entry.scanning ? "Pause Radar" : "Start Radar")
+                        Text(entry.scanning ? "Stop Scanning" : "Start Scanning")
                             .font(.system(size: 13, weight: .bold, design: .rounded))
                     }
                     .foregroundColor(.white)
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 16)
-                    .frame(maxWidth: .infinity)
-                    .background(
-                        entry.scanning ? Color.white.opacity(0.12) : Color.blue
-                    )
-                    .cornerRadius(12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(entry.scanning ? Color.white.opacity(0.15) : Color.blue.opacity(0.3), lineWidth: 1)
-                    )
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.blue)
+                    .cornerRadius(20)
                 }
                 .buttonStyle(.plain)
-            }
-            
-            // Divider
-            Spacer()
-            
-            // Right Side: Radar graphic and count
-            VStack(spacing: 10) {
-                RadarHUDView(scanning: entry.scanning, count: entry.detectedCount)
-                    .frame(width: 80, height: 80)
+                .frame(height: 38)
                 
-                HStack(spacing: 4) {
-                    Text("\(entry.detectedCount)")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                // History Link button
+                Link(destination: URL(string: "nearbyapp://history")!) {
+                    Image(systemName: "clock")
+                        .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(.white)
-                    Text(entry.detectedCount == 1 ? "device" : "devices")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundColor(.secondary)
+                        .frame(width: 38, height: 38)
+                        .background(Color.white.opacity(0.12))
+                        .clipShape(Circle())
                 }
             }
         }
         .padding(16)
         .containerBackground(for: .widget) {
-            WidgetBackground(scanning: entry.scanning)
+            ZStack {
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color(hex: "0A3580"),
+                        Color(hex: "021438")
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                
+                RoundedRectangle(cornerRadius: 24)
+                    .stroke(Color(hex: "1A66FF").opacity(0.3), lineWidth: 1.5)
+                    .padding(1)
+            }
         }
     }
     
     private var smallLayout: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Image(systemName: "eyeglasses")
-                    .font(.title2)
-                    .foregroundColor(.cyan)
-                    .shadow(color: .cyan.opacity(0.5), radius: 4)
+                    .foregroundColor(.white)
                 Spacer()
                 if entry.scanning {
                     Circle()
@@ -278,9 +260,9 @@ struct NearWidgetEntryView : View {
                 Text("\(entry.detectedCount)")
                     .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
-                Text(entry.detectedCount == 1 ? "device nearby" : "devices nearby")
+                Text(entry.detectedCount == 1 ? "device" : "devices")
                     .font(.system(size: 9, weight: .bold, design: .rounded))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.white.opacity(0.6))
                     .textCase(.uppercase)
             }
             
@@ -288,22 +270,35 @@ struct NearWidgetEntryView : View {
             
             Button(intent: ToggleScanIntent()) {
                 HStack(spacing: 4) {
-                    Image(systemName: entry.scanning ? "pause.fill" : "play.fill")
+                    Image(systemName: "arrow.triangle.2.circlepath")
                         .font(.system(size: 10, weight: .bold))
-                    Text(entry.scanning ? "Pause" : "Scan")
+                    Text(entry.scanning ? "Stop" : "Start")
                         .font(.system(size: 10, weight: .bold, design: .rounded))
                 }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 6)
                 .background(entry.scanning ? Color.white.opacity(0.12) : Color.blue)
-                .cornerRadius(8)
+                .cornerRadius(12)
             }
             .buttonStyle(.plain)
         }
         .padding(12)
         .containerBackground(for: .widget) {
-            WidgetBackground(scanning: entry.scanning)
+            ZStack {
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color(hex: "0A3580"),
+                        Color(hex: "021438")
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                
+                RoundedRectangle(cornerRadius: 24)
+                    .stroke(Color(hex: "1A66FF").opacity(0.3), lineWidth: 1.5)
+                    .padding(1)
+            }
         }
     }
 }
