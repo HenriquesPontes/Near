@@ -73,7 +73,7 @@ struct OnboardingView: View {
                     Text("Welcome to")
                         .font(.system(size: 32, weight: .semibold))
                         .foregroundColor(.primary)
-                    Text("Near")
+                    Text("Nearby")
                         .font(.system(size: 38, weight: .bold))
                         .foregroundColor(.primary)
                 }
@@ -131,7 +131,7 @@ struct OnboardingView: View {
                         FeatureRow(
                             icon: "Shield_Check", title: "Privacy First",
                             subtitle:
-                                "NearbyGlasses doesn't collect your data. Everything happens entirely on your device.",
+                                "Nearby doesn't collect your data. Everything happens entirely on your device.",
                             iconColor: .green)
                     }
                     .padding(.horizontal, 24)
