@@ -103,15 +103,13 @@ struct OnboardingView: View {
 
             // Text Content
             VStack(spacing: 16) {
-                VStack(spacing: 8) {
+                VStack(spacing: 4) {
                     Text("Get Notified when")
                         .font(.system(size: 32, weight: .semibold))
                         .foregroundColor(.primary)
-                        .minimumScaleFactor(0.8)
                     Text("Devices are Detected")
                         .font(.system(size: 38, weight: .bold))
                         .foregroundColor(.primary)
-                        .minimumScaleFactor(0.7)
                 }
                 .multilineTextAlignment(.center)
 
