@@ -259,35 +259,35 @@ struct OnboardingRadarView: View {
         TimelineView(.animation) { timelineContext in
             let time = timelineContext.date.timeIntervalSinceReferenceDate
             let progress = (time.truncatingRemainder(dividingBy: 3.0) / 3.0)
-            let waveScale = 0.3 + (progress * 1.1)
-            let waveOpacity = 1.0 - progress
+            let waveScale = 0.5 + (progress * 0.5)
+            let waveOpacity = 0.8 * (1.0 - progress)
             let angle = (time.truncatingRemainder(dividingBy: 4.0) / 4.0) * 360.0
             
             ZStack {
-                // Concentric circles
+                // Concentric circles matching ScanRadarView rings
                 ForEach(1...4, id: \.self) { ring in
                     Circle()
-                        .stroke(Color.blue.opacity(0.18), lineWidth: 1.5)
+                        .stroke(Color.blue.opacity(0.15), lineWidth: 1)
                         .frame(width: CGFloat(ring) * 280 / 4, height: CGFloat(ring) * 280 / 4)
                 }
                 
-                // Crosshair lines
+                // Crosshair lines matching ScanRadarView
                 Path { path in
-                    path.move(to: CGPoint(x: 10, y: 140))
-                    path.addLine(to: CGPoint(x: 270, y: 140))
-                    path.move(to: CGPoint(x: 140, y: 10))
-                    path.addLine(to: CGPoint(x: 140, y: 270))
+                    path.move(to: CGPoint(x: 20, y: 140))
+                    path.addLine(to: CGPoint(x: 260, y: 140))
+                    path.move(to: CGPoint(x: 140, y: 20))
+                    path.addLine(to: CGPoint(x: 140, y: 260))
                 }
-                .stroke(Color.blue.opacity(0.1), lineWidth: 1.5)
+                .stroke(Color.blue.opacity(0.08), lineWidth: 1)
                 
-                // Pulse Wave
+                // Pulse Wave matching ScanRadarView
                 Circle()
-                    .stroke(Color.blue.opacity(0.4), lineWidth: 3)
+                    .stroke(Color.blue.opacity(0.2), lineWidth: 3)
                     .scaleEffect(waveScale)
                     .opacity(waveOpacity)
                     .frame(width: 280, height: 280)
                 
-                // Sweep angle sector
+                // 360 degree Sweep angle sector matching ScanRadarView
                 Circle()
                     .fill(
                         AngularGradient(
@@ -296,45 +296,58 @@ struct OnboardingRadarView: View {
                                 Color.blue.opacity(0.0)
                             ]),
                             center: .center,
-                            startAngle: .degrees(0),
-                            endAngle: .degrees(90)
+                            angle: .degrees(0)
                         )
                     )
                     .frame(width: 280, height: 280)
                     .rotationEffect(.degrees(angle))
                 
-                // Center node
+                // Center node matching ScanRadarView scanner core
                 Circle()
                     .fill(Color.blue)
-                    .frame(width: 12, height: 12)
+                    .frame(width: 14, height: 14)
                     .shadow(color: Color.blue, radius: 8)
                 
-                // Simulated glowing device pings
-                // Position 1: top right
-                Circle()
-                    .fill(Color.blue)
-                    .frame(width: 8, height: 8)
-                    .shadow(color: Color.blue, radius: 4)
-                    .position(x: 196, y: 84)
-                    .opacity(0.8)
-                
-                // Position 2: bottom left
-                Circle()
-                    .fill(Color.blue)
-                    .frame(width: 8, height: 8)
-                    .shadow(color: Color.blue, radius: 4)
-                    .position(x: 84, y: 182)
-                    .opacity(0.5)
-                
-                // Position 3: top left
-                Circle()
-                    .fill(Color.blue)
-                    .frame(width: 8, height: 8)
-                    .shadow(color: Color.blue, radius: 4)
-                    .position(x: 70, y: 84)
-                    .opacity(0.3)
+                // High fidelity pulsating device pings matching ScanRadarView's dynamic dots
+                OnboardingPingNode(x: 196, y: 84, delay: 0.0)
+                OnboardingPingNode(x: 84, y: 182, delay: 0.8)
+                OnboardingPingNode(x: 70, y: 84, delay: 1.5)
             }
             .frame(width: 280, height: 280)
         }
+    }
+}
+
+struct OnboardingPingNode: View {
+    let x: CGFloat
+    let y: CGFloat
+    let delay: Double
+    @State private var scale: CGFloat = 1.0
+    @State private var opacity: Double = 0.6
+    
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(Color.blue.opacity(0.4), lineWidth: 2)
+                .scaleEffect(scale)
+                .opacity(opacity)
+                .frame(width: 24, height: 24)
+                .onAppear {
+                    withAnimation(
+                        Animation.easeOut(duration: 2.0)
+                            .repeatForever(autoreverses: false)
+                            .delay(delay)
+                    ) {
+                        scale = 2.2
+                        opacity = 0.0
+                    }
+                }
+            
+            Circle()
+                .fill(Color.blue)
+                .frame(width: 10, height: 10)
+                .shadow(color: Color.blue, radius: 4)
+        }
+        .position(x: x, y: y)
     }
 }
