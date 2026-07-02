@@ -49,24 +49,9 @@ struct StatusHeaderCard: View {
             .padding(.top, 16)
             .padding(.bottom, 24)
             .background(
-                ZStack {
-                    // Stretches card background color upwards behind navigation and status bars
-                    DesignSystem.cardBackground
-                        .padding(.top, -1000)
-                        .ignoresSafeArea()
-                    
-                    // Fades the bottom padding area into the background color
-                    LinearGradient(
-                        stops: [
-                            .init(color: DesignSystem.cardBackground, location: 0.0),
-                            .init(color: DesignSystem.cardBackground, location: 0.7),
-                            .init(color: DesignSystem.backgroundColor, location: 1.0)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                }
-                .ignoresSafeArea()
+                DesignSystem.cardBackground
+                    .padding(.top, -1000)
+                    .ignoresSafeArea()
             )
         }
         .buttonStyle(PlainButtonStyle())

@@ -76,7 +76,7 @@ struct DashboardView: View {
                                         .foregroundColor(.white)
                                         .frame(maxWidth: .infinity)
                                         .frame(height: 52)
-                                        .background(DesignSystem.heroBackground)
+                                        .background(DesignSystem.primaryBlue)
                                         .clipShape(Capsule())
                                 }
                                 
