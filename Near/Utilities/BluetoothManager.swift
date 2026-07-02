@@ -11,6 +11,7 @@ import Foundation
 import SwiftUI
 import UIKit
 import UserNotifications
+import WidgetKit
 
 struct BluetoothDevice: Identifiable, Hashable {
     var id: UUID = UUID()
@@ -40,8 +41,38 @@ struct BluetoothDevice: Identifiable, Hashable {
 class BluetoothManager: NSObject, ObservableObject {
     static let shared = BluetoothManager()
 
-    @Published var detectedDevices: [BluetoothDevice] = []
-    @Published var isScanning: Bool = false
+    @Published var detectedDevices: [BluetoothDevice] = [] {
+        didSet {
+            updateWidgetData()
+        }
+    }
+    @Published var isScanning: Bool = false {
+        didSet {
+            updateWidgetData()
+        }
+    }
+
+    private func updateWidgetData() {
+        if let sharedDefaults = UserDefaults(suiteName: "group.com.luvlu.Near") {
+            sharedDefaults.set(isScanning, forKey: "isScanning")
+            sharedDefaults.set(detectedDevices.count, forKey: "detectedCount")
+            sharedDefaults.synchronize()
+        }
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
+    @objc func syncFromWidget() {
+        if let sharedDefaults = UserDefaults(suiteName: "group.com.luvlu.Near") {
+            let widgetScanning = sharedDefaults.bool(forKey: "isScanning")
+            if widgetScanning != isScanning {
+                if widgetScanning {
+                    startScanning()
+                } else {
+                    stopScanning()
+                }
+            }
+        }
+    }
 
     @AppStorage("alertOnNewDevices") var alertOnNewDevices: Bool = true
     @AppStorage("enableAppBadge") var enableAppBadge: Bool = false {
@@ -164,6 +195,16 @@ class BluetoothManager: NSObject, ObservableObject {
         loadCompanyIdentifiers()
         self.centralManager = CBCentralManager(delegate: self, queue: nil)
         NotificationManager.shared.requestNotificationPermission()
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(syncFromWidget),
+            name: UIApplication.willEnterForegroundNotification,
+            object: nil
+        )
+
+        // Perform initial sync from widget state
+        syncFromWidget()
 
         if autoStartScanning || continueScanInBackground {
             isScanning = true
