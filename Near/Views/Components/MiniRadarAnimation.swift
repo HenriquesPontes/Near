@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MiniRadarAnimation: View {
     var isActive: Bool
+    var color: Color = .primary
     
     @State private var rotation: Double = 0
     @State private var rippleScale: CGFloat = 0.1
@@ -11,7 +12,7 @@ struct MiniRadarAnimation: View {
         ZStack {
             // Background
             Circle()
-                .fill(Color.white.opacity(0.2))
+                .fill(color.opacity(0.12))
                 .frame(width: 44, height: 44)
             
             if isActive {
@@ -27,7 +28,7 @@ struct MiniRadarAnimation: View {
                         Circle()
                             .fill(
                                 AngularGradient(
-                                    gradient: Gradient(colors: [Color.white.opacity(0.0), Color.white.opacity(0.8)]),
+                                    gradient: Gradient(colors: [color.opacity(0.0), color.opacity(0.6)]),
                                     center: .center,
                                     startAngle: .degrees(0),
                                     endAngle: .degrees(90)
@@ -38,7 +39,7 @@ struct MiniRadarAnimation: View {
                         
                         // Ripple
                         Circle()
-                            .stroke(Color.white.opacity(0.5), lineWidth: 1)
+                            .stroke(color.opacity(0.3), lineWidth: 1)
                             .frame(width: 44, height: 44)
                             .scaleEffect(waveScale)
                             .opacity(waveOpacity)
@@ -49,7 +50,7 @@ struct MiniRadarAnimation: View {
                 Circle()
                     .fill(
                         AngularGradient(
-                            gradient: Gradient(colors: [Color.white.opacity(0.0), Color.white.opacity(0.8)]),
+                            gradient: Gradient(colors: [color.opacity(0.0), color.opacity(0.6)]),
                             center: .center,
                             startAngle: .degrees(0),
                             endAngle: .degrees(90)
@@ -60,7 +61,7 @@ struct MiniRadarAnimation: View {
             
             // Center dot
             Circle()
-                .fill(Color.white)
+                .fill(color)
                 .frame(width: 6, height: 6)
         }
     }

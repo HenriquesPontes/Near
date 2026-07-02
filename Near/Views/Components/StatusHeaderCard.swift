@@ -11,28 +11,28 @@ struct StatusHeaderCard: View {
             impact.impactOccurred()
             onRadarModeToggle()
         }) {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 16) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Radar Mode")
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.white.opacity(0.8))
+                            .foregroundColor(.secondary)
                         
                         HStack(alignment: .firstTextBaseline, spacing: 6) {
                             Text("\(deviceCount)")
-                                .font(.system(size: 56, weight: .bold))
-                                .foregroundColor(.white)
+                                .font(.system(size: 48, weight: .bold))
+                                .foregroundColor(.primary)
                                 .contentTransition(.numericText())
                             
                             Text("devices")
-                                .font(.system(size: 18, weight: .semibold))
-                                .foregroundColor(.white.opacity(0.8))
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.secondary)
                         }
                     }
                     
                     Spacer()
                     
-                    MiniRadarAnimation(isActive: isRadarActive)
+                    MiniRadarAnimation(isActive: isRadarActive, color: DesignSystem.primaryBlue)
                 }
                 
                 if isRadarActive {
@@ -42,17 +42,11 @@ struct StatusHeaderCard: View {
                 }
             }
             .font(.system(size: 14, weight: .regular))
-            .foregroundColor(.white.opacity(0.9))
+            .foregroundColor(.secondary)
             .multilineTextAlignment(.leading)
-            .frame(maxWidth: .infinity, minHeight: 150, maxHeight: 150, alignment: .topLeading)
             .padding(.horizontal, 16)
-            .padding(.top, 16)
-            .padding(.bottom, 24)
-            .background(
-                DesignSystem.heroBackground
-                    .padding(.top, -1000)
-                    .ignoresSafeArea()
-            )
+            .padding(.vertical, 16)
+            .background(Color.clear)
         }
         .buttonStyle(PlainButtonStyle())
     }

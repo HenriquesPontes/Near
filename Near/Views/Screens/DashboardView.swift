@@ -19,7 +19,6 @@ struct DashboardView: View {
     @State private var showRadarWarning = false
     @State private var showLocationSettingsAlert = false
     @State private var showingClearConfirmation = false
-    @State private var navigateToScan = false
     
     var body: some View {
         NavigationStack {
@@ -160,18 +159,6 @@ struct DashboardView: View {
                     addHistoricalLog(device: btDevice)
                 }
             }
-            .navigationDestination(isPresented: $navigateToScan) {
-                ScanRadarView()
-            }
-            .onOpenURL { url in
-                if url.absoluteString == "nearbyapp://scan" {
-                    btManager.detectedDevices.removeAll()
-                    if !btManager.isScanning {
-                        btManager.startScanning()
-                    }
-                    navigateToScan = true
-                }
-            }
         }
     }
     
@@ -289,8 +276,10 @@ struct DashboardView: View {
                 }
             }
         )
-        .listRowInsets(EdgeInsets())
-        .listRowBackground(Color.clear)
+        .listRowInsets(EdgeInsets(top: 16, leading: 28, bottom: 8, trailing: 28))
+        .listRowBackground(
+            GroupedRowBackground(index: 0, count: 1)
+        )
         .listRowSeparator(.hidden)
     }
     
