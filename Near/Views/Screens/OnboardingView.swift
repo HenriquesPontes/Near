@@ -264,15 +264,15 @@ struct OnboardingRadarView: View {
                 ForEach(1...4, id: \.self) { ring in
                     Circle()
                         .stroke(Color.blue.opacity(0.18), lineWidth: 1.5)
-                        .frame(width: CGFloat(ring) * 200 / 4, height: CGFloat(ring) * 200 / 4)
+                        .frame(width: CGFloat(ring) * 280 / 4, height: CGFloat(ring) * 280 / 4)
                 }
                 
                 // Crosshair lines
                 Path { path in
-                    path.move(to: CGPoint(x: 10, y: 100))
-                    path.addLine(to: CGPoint(x: 190, y: 100))
-                    path.move(to: CGPoint(x: 100, y: 10))
-                    path.addLine(to: CGPoint(x: 100, y: 190))
+                    path.move(to: CGPoint(x: 10, y: 140))
+                    path.addLine(to: CGPoint(x: 270, y: 140))
+                    path.move(to: CGPoint(x: 140, y: 10))
+                    path.addLine(to: CGPoint(x: 140, y: 270))
                 }
                 .stroke(Color.blue.opacity(0.1), lineWidth: 1.5)
                 
@@ -281,7 +281,7 @@ struct OnboardingRadarView: View {
                     .stroke(Color.blue.opacity(0.4), lineWidth: 3)
                     .scaleEffect(waveScale)
                     .opacity(waveOpacity)
-                    .frame(width: 200, height: 200)
+                    .frame(width: 280, height: 280)
                 
                 // Sweep angle sector
                 Circle()
@@ -296,7 +296,7 @@ struct OnboardingRadarView: View {
                             endAngle: .degrees(90)
                         )
                     )
-                    .frame(width: 200, height: 200)
+                    .frame(width: 280, height: 280)
                     .rotationEffect(.degrees(angle))
                 
                 // Center node
@@ -311,7 +311,7 @@ struct OnboardingRadarView: View {
                     .fill(Color.blue)
                     .frame(width: 8, height: 8)
                     .shadow(color: Color.blue, radius: 4)
-                    .position(x: 140, y: 60)
+                    .position(x: 196, y: 84)
                     .opacity(0.8)
                 
                 // Position 2: bottom left
@@ -319,7 +319,7 @@ struct OnboardingRadarView: View {
                     .fill(Color.blue)
                     .frame(width: 8, height: 8)
                     .shadow(color: Color.blue, radius: 4)
-                    .position(x: 60, y: 130)
+                    .position(x: 84, y: 182)
                     .opacity(0.5)
                 
                 // Position 3: top left
@@ -327,10 +327,10 @@ struct OnboardingRadarView: View {
                     .fill(Color.blue)
                     .frame(width: 8, height: 8)
                     .shadow(color: Color.blue, radius: 4)
-                    .position(x: 50, y: 60)
+                    .position(x: 70, y: 84)
                     .opacity(0.3)
             }
-            .frame(width: 200, height: 200)
+            .frame(width: 280, height: 280)
         }
     }
 }
