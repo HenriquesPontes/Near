@@ -33,20 +33,7 @@ struct OnboardingView: View {
                         featuresStep
                     }
                 }
-                // Custom back button in toolbar to match health app
                 .navigationBarBackButtonHidden(true)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button {
-                            path.removeLast()
-                        } label: {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.primary)
-                                .frame(width: 36, height: 36)
-                        }
-                    }
-                }
             }
         }
         .onAppear {
