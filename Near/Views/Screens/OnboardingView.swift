@@ -308,10 +308,10 @@ struct OnboardingRadarView: View {
                     .frame(width: 14, height: 14)
                     .shadow(color: Color.blue, radius: 8)
                 
-                // High fidelity pulsating device pings matching ScanRadarView's dynamic dots
-                OnboardingPingNode(x: 196, y: 84, delay: 0.0)
-                OnboardingPingNode(x: 84, y: 182, delay: 0.8)
-                OnboardingPingNode(x: 70, y: 84, delay: 1.5)
+                // High fidelity pulsating device pings in different colors
+                OnboardingPingNode(x: 196, y: 84, delay: 0.0, color: .green)
+                OnboardingPingNode(x: 84, y: 182, delay: 0.8, color: .red)
+                OnboardingPingNode(x: 70, y: 84, delay: 1.5, color: .purple)
             }
             .frame(width: 280, height: 280)
         }
@@ -322,13 +322,14 @@ struct OnboardingPingNode: View {
     let x: CGFloat
     let y: CGFloat
     let delay: Double
+    let color: Color
     @State private var scale: CGFloat = 1.0
     @State private var opacity: Double = 0.6
     
     var body: some View {
         ZStack {
             Circle()
-                .stroke(Color.blue.opacity(0.4), lineWidth: 2)
+                .stroke(color.opacity(0.4), lineWidth: 2)
                 .scaleEffect(scale)
                 .opacity(opacity)
                 .frame(width: 24, height: 24)
@@ -344,9 +345,9 @@ struct OnboardingPingNode: View {
                 }
             
             Circle()
-                .fill(Color.blue)
+                .fill(color)
                 .frame(width: 10, height: 10)
-                .shadow(color: Color.blue, radius: 4)
+                .shadow(color: color, radius: 4)
         }
         .position(x: x, y: y)
     }
