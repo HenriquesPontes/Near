@@ -54,6 +54,7 @@ struct AboutNearView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .background(DesignSystem.backgroundColor)
+        .listRowBackground(DesignSystem.cardBackground)
         .navigationTitle("About NearbyGlasses")
         .navigationBarTitleDisplayMode(.inline)
     }

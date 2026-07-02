@@ -14,7 +14,7 @@ import SwiftUI
 /// Returns the appropriate SF Symbol name for a device type string.
 func iconForType(_ type: String) -> String {
     switch type {
-    case "rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses":
+    case "rayban_meta", "oakley_meta", "oakley_meta_vanguard", "project_aria", "meta_orion", "meta_rayban_display", "other_meta_glasses":
         return "Meta"
     case "vision_pro": return "Apple"
     case "snap_spectacles": return "snapchat_icon"
@@ -29,7 +29,7 @@ func iconForType(_ type: String) -> String {
 /// Returns the brand color associated with a device type string.
 func colorForType(_ type: String) -> Color {
     switch type {
-    case "rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses":
+    case "rayban_meta", "oakley_meta", "oakley_meta_vanguard", "project_aria", "meta_orion", "meta_rayban_display", "other_meta_glasses":
         return .red
     case "vision_pro": return .purple
     case "snap_spectacles": return .yellow
@@ -55,10 +55,12 @@ func displayNameForType(_ type: String, manufacturer: String? = nil) -> String {
     switch type {
     case "rayban_meta": return String(localized: "Ray-Ban Meta glasses")
     case "oakley_meta": return String(localized: "Oakley Meta glasses")
-    case "project_aria": return String(localized: "Meta Ray-Ban Display")
+    case "oakley_meta_vanguard": return String(localized: "Oakley Meta Vanguard")
+    case "project_aria": return String(localized: "Project Aria")
     case "meta_orion": return String(localized: "Meta Orion")
+    case "meta_rayban_display": return String(localized: "Meta Ray-Ban Display")
     case "other_meta_glasses": return String(localized: "Meta AI Glasses")
-    case "vision_pro": return String(localized: "Apple Vision Pro")
+    case "vision_pro": return String(localized: "Apple Devices")
     case "snap_spectacles": return String(localized: "Snapchat Spectacles")
     case "google_glass": return String(localized: "Google Glass")
     case "google_gentle_monster": return String(localized: "Google x Gentle Monster")

@@ -22,7 +22,7 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
     func sendDeviceDetectedNotification(device: BluetoothDevice, deviceCount: Int = 1) {
         let content = UNMutableNotificationContent()
         
-        var baseTitle = "Device Nearby"
+        var baseTitle = String(localized: "Device Nearby")
         if device.threatLevel == "High" {
             baseTitle = String(localized: "Spyware Detected")
         } else if device.threatLevel == "Medium" {
@@ -36,7 +36,12 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         content.title = "\(baseTitle) ⚠️"
         content.body = "\(String(localized: "Detected:")) \(device.name)"
         content.sound = .default
-        content.badge = NSNumber(value: deviceCount)
+        let enableAppBadge = UserDefaults.standard.object(forKey: "enableAppBadge") as? Bool ?? false
+        if enableAppBadge {
+            content.badge = NSNumber(value: deviceCount)
+        } else {
+            content.badge = NSNumber(value: 0)
+        }
         
         // Add custom data
         content.userInfo = ["deviceName": device.name, "deviceCount": deviceCount]
@@ -83,7 +88,12 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
-        // Only show in notification center list and update badge, avoid banners/sound while actively using the app
-        completionHandler([.list, .badge])
+        // Show in notification center list, update badge, and show banner/sound even while using the app
+        let enableAppBadge = UserDefaults.standard.object(forKey: "enableAppBadge") as? Bool ?? false
+        if enableAppBadge {
+            completionHandler([.banner, .sound, .list, .badge])
+        } else {
+            completionHandler([.banner, .sound, .list])
+        }
     }
 }

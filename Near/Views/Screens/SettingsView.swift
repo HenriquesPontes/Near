@@ -15,7 +15,6 @@ struct SettingsView: View {
     @Query(sort: \DetectedDevice.timestamp, order: .reverse) private var historicalDevices: [DetectedDevice]
     @AppStorage("selectedLanguage") var selectedLanguage: String = Bundle.main.preferredLocalizations.first ?? "en"
     @AppStorage("isDeveloperModeEnabled") private var isDeveloperModeEnabled = false
-    @AppStorage("enableThreatMapBeta") private var enableThreatMapBeta = false
     @State private var versionTapCount = 0
     
     private var appVersion: String {
@@ -43,6 +42,23 @@ struct SettingsView: View {
                         .font(.system(size: 16, weight: .medium))
                     Spacer()
                     Toggle("", isOn: $btManager.alertOnNewDevices)
+                        .toggleStyle(SwitchToggleStyle(tint: .green))
+                        .labelsHidden()
+                }
+                
+                // App Badge Row
+                HStack(spacing: 16) {
+                    Image(systemName: "app.badge")
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(.blue)
+                        .font(.system(size: 18))
+                        .frame(width: 24, height: 24)
+                    Text("App Badge")
+                        .font(.system(size: 16, weight: .medium))
+                    Spacer()
+                    Toggle("", isOn: $btManager.enableAppBadge)
                         .toggleStyle(SwitchToggleStyle(tint: .green))
                         .labelsHidden()
                 }
@@ -247,17 +263,18 @@ struct SettingsView: View {
                     }
                     
                     HStack(spacing: 16) {
-                        Image(systemName: "map.fill")
+                        Image(systemName: "cpu")
                             .renderingMode(.template)
                             .resizable()
                             .scaledToFit()
                             .foregroundColor(.blue)
                             .font(.system(size: 18))
                             .frame(width: 24, height: 24)
-                        Toggle("Threat Map (Beta)", isOn: $enableThreatMapBeta.animation())
+                        Toggle("Simulation Devices", isOn: $btManager.isSimulationEnabled.animation())
                             .font(.system(size: 16, weight: .medium))
                             .tint(.blue)
                     }
+
                     Button(action: {
                         btManager.simulateAllNotifications()
                     }) {
@@ -280,6 +297,7 @@ struct SettingsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .background(DesignSystem.backgroundColor)
+        .listRowBackground(DesignSystem.cardBackground)
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -324,6 +342,7 @@ struct TrustedDevicesSettingsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .background(DesignSystem.backgroundColor)
+        .listRowBackground(DesignSystem.cardBackground)
         .navigationTitle("Trusted Devices")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -433,9 +452,15 @@ struct ScanRangeSettingsView: View {
                             .font(.system(size: 16, weight: .medium))
                             .foregroundColor(.primary)
                         Spacer()
-                        Text("\(Int(btManager.notificationCooldown / 60000)) min")
-                            .font(.system(size: 15))
-                            .foregroundColor(.secondary)
+                        if btManager.isNotificationCooldownEnabled {
+                            Text("\(Int(btManager.notificationCooldown / 60000)) min")
+                                .font(.system(size: 15))
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("Off")
+                                .font(.system(size: 15))
+                                .foregroundColor(.secondary)
+                        }
                     }
                 }
             }
@@ -473,6 +498,7 @@ struct ScanRangeSettingsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .background(DesignSystem.backgroundColor)
+        .listRowBackground(DesignSystem.cardBackground)
         .navigationTitle("Scan Preference")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showCooldownSheet) {
@@ -556,15 +582,15 @@ struct DeviceFiltersSettingsView: View {
             Section(header: Text("Detected Glasses Channel")) {
                 SettingsFilterToggleRow(
                     title: "Meta AI Glasses",
-                    description: "Ray-Ban Meta, Oakley Meta, Project Aria, Orion",
+                    description: "Ray-Ban Meta, Oakley Meta, Oakley Meta Vanguard, Meta Ray-Ban Display, Project Aria, Orion",
                     icon: iconForType("rayban_meta"),
                     color: .red,
-                    isOn: bindingForTypes(["rayban_meta", "oakley_meta", "project_aria", "meta_orion", "other_meta_glasses"])
+                    isOn: bindingForTypes(["rayban_meta", "oakley_meta", "oakley_meta_vanguard", "project_aria", "meta_orion", "meta_rayban_display", "other_meta_glasses"])
                 )
                 
                 SettingsFilterToggleRow(
-                    title: "Apple Smart Glasses",
-                    description: "Apple Vision Pro & AR Devices",
+                    title: "Apple Devices",
+                    description: "Apple electronics and wearables",
                     icon: iconForType("vision_pro"),
                     color: .purple,
                     isOn: bindingForTypes(["vision_pro"])
@@ -587,8 +613,8 @@ struct DeviceFiltersSettingsView: View {
                 )
                 
                 SettingsFilterToggleRow(
-                    title: "Samsung Smartglasses",
-                    description: "Samsung wearable HUD and cameras",
+                    title: "Samsung Devices",
+                    description: "Samsung electronics and wearables",
                     icon: iconForType("samsung_glasses"),
                     color: .blue,
                     isOn: bindingForTypes(["samsung_glasses"])
@@ -604,7 +630,7 @@ struct DeviceFiltersSettingsView: View {
                 
                 SettingsFilterToggleRow(
                     title: "Unknown Devices",
-                    description: "Generic smart wear emissions",
+                    description: "Unidentified bluetooth emissions",
                     icon: iconForType("unknown"),
                     color: .gray,
                     isOn: bindingForTypes(["unknown"])
@@ -654,6 +680,7 @@ struct DeviceFiltersSettingsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .background(DesignSystem.backgroundColor)
+        .listRowBackground(DesignSystem.cardBackground)
         .navigationTitle("Device Channel")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showSensitivitySheet) {
@@ -790,6 +817,7 @@ struct PrivacySettingsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .background(DesignSystem.backgroundColor)
+        .listRowBackground(DesignSystem.cardBackground)
         .navigationTitle("Privacy")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showShareSheet) {
@@ -876,6 +904,7 @@ This License will be governed by and construed in accordance with the laws of th
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .background(DesignSystem.backgroundColor)
+        .listRowBackground(DesignSystem.cardBackground)
         .navigationTitle("Licences")
         .navigationBarTitleDisplayMode(.inline)
 
@@ -889,17 +918,22 @@ struct CooldownSettingsView: View {
     var body: some View {
         List {
             Section(header: Text("Notification Cooldown")) {
-                HStack {
-                    Text("Cooldown interval:")
-                        .font(.system(size: 15))
-                    Spacer()
-                    Text("\(Int(btManager.notificationCooldown / 60000)) min")
-                        .font(.system(size: 15, weight: .bold))
-                        .foregroundColor(.blue)
-                }
+                Toggle("Enable Cooldown", isOn: $btManager.isNotificationCooldownEnabled)
+                    .tint(.blue)
                 
-                Slider(value: $btManager.notificationCooldown, in: 300000...3600000, step: 60000)
-                    .accentColor(.blue)
+                if btManager.isNotificationCooldownEnabled {
+                    HStack {
+                        Text("Cooldown interval:")
+                            .font(.system(size: 15))
+                        Spacer()
+                        Text("\(Int(btManager.notificationCooldown / 60000)) min")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(.blue)
+                    }
+                    
+                    Slider(value: $btManager.notificationCooldown, in: 300000...3600000, step: 60000)
+                        .accentColor(.blue)
+                }
             }
             
             Section(footer: Text("Minimum delay between alert notifications and active device tracking resets. A shorter cooldown makes detection highly responsive, while a longer one prevents repeating alerts.")) {
@@ -909,6 +943,7 @@ struct CooldownSettingsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .background(DesignSystem.backgroundColor)
+        .listRowBackground(DesignSystem.cardBackground)
         .navigationTitle("Notification Cooldown")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -946,6 +981,7 @@ struct TimeoutSettingsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .background(DesignSystem.backgroundColor)
+        .listRowBackground(DesignSystem.cardBackground)
         .navigationTitle("Scan Timeout")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -990,6 +1026,7 @@ struct SensitivitySettingsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .background(DesignSystem.backgroundColor)
+        .listRowBackground(DesignSystem.cardBackground)
         .navigationTitle("Sensitivity")
         .navigationBarTitleDisplayMode(.inline)
     }

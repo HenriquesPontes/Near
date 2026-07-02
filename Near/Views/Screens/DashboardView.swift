@@ -13,135 +13,55 @@ struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \DetectedDevice.timestamp, order: .reverse) private var historicalDevices: [DetectedDevice]
     @ObservedObject var btManager = BluetoothManager.shared
+    @ObservedObject var trustedManager = TrustedDeviceManager.shared
     
     @AppStorage("hasAcceptedRadarModeWarning") private var hasAcceptedRadarModeWarning = false
-    @AppStorage("enableThreatMapBeta") private var enableThreatMapBeta = false
     @State private var showRadarWarning = false
     @State private var showLocationSettingsAlert = false
+    @State private var showingClearConfirmation = false
     
     var body: some View {
         NavigationStack {
             ZCenterContainer {
-                Group {
+                List {
+                    headerCardRow
+                    
                     if historicalDevices.isEmpty && btManager.detectedDevices.isEmpty {
-                        VStack(spacing: 12) {
-                            Spacer()
-                            Image("Shield_Warning")
-                                .renderingMode(.template)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 48, height: 48)
-                                .foregroundColor(.secondary.opacity(0.6))
-                                .symbolEffect(.pulse, options: .repeating)
-                                .accessibilityHidden(true)
-                            Text("No devices detected yet")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.primary.opacity(0.8))
-                            Text("Tap Start Scanning below to scan for nearby devices.")
-                                .font(.system(size: 13))
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 40)
-                            Spacer()
-                        }
+                        emptyStateRow
                     } else {
-                        List {
-                            if !btManager.detectedDevices.isEmpty {
-                                Section(header: 
-                                    HStack(spacing: 6) {
-                                        Text("Currently Nearby")
-                                        if btManager.isScanning {
-                                            ProgressView()
-                                                .controlSize(.mini)
-                                                .id(btManager.isScanning)
-                                        }
-                                    }
-                                    .font(.system(size: 15))
-                                    .foregroundColor(.secondary)
-                                ) {
-                                    ForEach(btManager.detectedDevices) { device in
-                                        NavigationLink(value: device) {
-                                                                                        DeviceRowView(
-                                                name: device.name,
-                                                type: device.type,
-                                                manufacturer: device.manufacturer,
-                                                rssi: device.rssi,
-                                                isStarred: false,
-                                                timestamp: nil,
-                                                estimatedDistance: device.estimatedDistance
-                                            )
-                                        }
-                                        .swipeActions(edge: .leading) {
-                                            Button {
-                                                TrustedDeviceManager.shared.trustDevice(id: device.deviceId, name: device.name)
-                                            } label: {
-                                                Label("Trust", systemImage: "checkmark.shield")
-                                            }
-                                            .tint(.green)
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            if !historicalDevices.isEmpty {
-                                Section(header: Text("Recent Detections").font(.system(size: 15)).foregroundColor(.secondary)) {
-                                    ForEach(historicalDevices.prefix(10)) { device in
-                                        NavigationLink(destination: DeviceDetailView(device: device)) {
-                                            DeviceRowView(
-                                                name: device.name,
-                                                type: device.type,
-                                                manufacturer: device.manufacturer,
-                                                rssi: device.rssi,
-                                                isStarred: device.isStarred,
-                                                timestamp: device.timestamp,
-                                                estimatedDistance: Nearbyglasses.estimatedDistance(for: device.rssi)
-                                            )
-                                        }
-                                        .swipeActions(edge: .leading) {
-                                            Button {
-                                                TrustedDeviceManager.shared.trustDevice(id: device.deviceId, name: device.name)
-                                            } label: {
-                                                Label("Trust", systemImage: "checkmark.shield")
-                                            }
-                                            .tint(.green)
-                                        }
-                                    }
-                                    .onDelete(perform: deleteDevices)
-                                    
-                                    if historicalDevices.count > 10 {
-                                        NavigationLink(destination: AllResultsView()) {
-                                            Text("View All Results")
-                                                .font(.system(size: 17, weight: .bold))
-                                                .foregroundColor(.blue)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        .listStyle(.insetGrouped)
-                        .scrollContentBackground(.hidden)
-                        .background(Color.clear)
-                        .refreshable {
-                            btManager.detectedDevices.removeAll()
-                            if !btManager.isScanning {
-                                btManager.startScanning()
-                            }
-                        }
-                        .navigationDestination(for: BluetoothDevice.self) { device in
-                            let historyDevice = historicalDevices.first(where: { $0.deviceId == device.deviceId }) ?? DetectedDevice(
-                                deviceId: device.deviceId,
-                                name: device.name,
-                                type: device.type,
-                                rssi: device.rssi,
-                                isStarred: false,
-                                threatLevel: device.threatLevel,
-                                isSimulated: device.isSimulated,
-                                companyID: device.companyID,
-                                manufacturer: device.manufacturer
-                            )
-                            DeviceDetailView(device: historyDevice)
-                        }
+                        currentlyNearbySection
+                        recentlyScannedSection
+                        clearHistorySection
                     }
+                }
+                .listStyle(.grouped)
+                .scrollContentBackground(.hidden)
+                .background(Color.clear)
+                .refreshable {
+                    btManager.detectedDevices.removeAll()
+                    if !btManager.isScanning {
+                        btManager.startScanning()
+                    }
+                }
+                .navigationDestination(for: BluetoothDevice.self) { device in
+                    let historyDevice = historicalDevices.first(where: { $0.deviceId == device.deviceId }) ?? DetectedDevice(
+                        deviceId: device.deviceId,
+                        name: device.name,
+                        type: device.type,
+                        rssi: device.rssi,
+                        isStarred: false,
+                        threatLevel: device.threatLevel,
+                        isSimulated: device.isSimulated,
+                        companyID: device.companyID,
+                        manufacturer: device.manufacturer
+                    )
+                    DeviceDetailView(device: historyDevice)
+                }
+                .confirmationDialog("Are you sure you want to delete all detections?", isPresented: $showingClearConfirmation, titleVisibility: .visible) {
+                    Button("Delete All Detections", role: .destructive) {
+                        clearSearchHistory()
+                    }
+                    Button("Cancel", role: .cancel) { }
                 }
                 .safeAreaInset(edge: .bottom) {
                     VStack(spacing: 16) {
@@ -149,15 +69,15 @@ struct DashboardView: View {
                         // Buttons
                         VStack(spacing: 12) {
                             HStack(spacing: 12) {
-                                // SCAN Button (Blue)
+                                // SCAN Button
                                 NavigationLink(destination: ScanRadarView()) {
                                     Text("Start Scanning")
-                                        .font(.system(size: 16, weight: .bold))
+                                        .font(.system(size: 17, weight: .semibold))
                                         .foregroundColor(.white)
                                         .frame(maxWidth: .infinity)
                                         .frame(height: 52)
-                                        .background(DesignSystem.primaryBlue)
-                                        .cornerRadius(26)
+                                        .background(DesignSystem.heroBackground)
+                                        .clipShape(Capsule())
                                 }
                                 
                                 // HISTORY Button
@@ -167,26 +87,13 @@ struct DashboardView: View {
                                         .resizable()
                                         .scaledToFit()
                                         .frame(width: 20, height: 20)
-                                        .foregroundColor(.white)
+                                        .foregroundColor(DesignSystem.primaryBlue)
                                         .frame(width: 52, height: 52)
-                                        .background(DesignSystem.primaryBlue)
-                                        .cornerRadius(26)
+                                        .background(Color.white)
+                                        .clipShape(Circle())
+                                        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
                                 }
-                                
-                                // MAP Button
-                                if enableThreatMapBeta {
-                                    NavigationLink(destination: ThreatMapView()) {
-                                        Image(systemName: "map.fill")
-                                            .renderingMode(.template)
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 20, height: 20)
-                                            .foregroundColor(.white)
-                                            .frame(width: 52, height: 52)
-                                            .background(DesignSystem.primaryBlue)
-                                            .cornerRadius(26)
-                                    }
-                                }
+
                             }
                         }
                     }
@@ -208,31 +115,10 @@ struct DashboardView: View {
             }
             .navigationTitle("Nearby")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    // Radar Toggle Button
-                    Button {
-                        if !btManager.continueScanInBackground {
-                            if !hasAcceptedRadarModeWarning {
-                                showRadarWarning = true
-                            } else {
-                                withAnimation(.spring(response: 0.35, dampingFraction: 0.6, blendDuration: 0)) {
-                                    btManager.continueScanInBackground = true
-                                }
-                            }
-                        } else {
-                            withAnimation(.spring(response: 0.35, dampingFraction: 0.6, blendDuration: 0)) {
-                                btManager.continueScanInBackground = false
-                            }
-                        }
-                    } label: {
-                        Image(btManager.continueScanInBackground ? "Wifi_High" : "Wifi_Off")
-                            .renderingMode(.template)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 17, height: 17)
-                    }
-                    
                     // Settings Button
                     NavigationLink(destination: SettingsView()) {
                         Image("Settings")
@@ -240,6 +126,7 @@ struct DashboardView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 20, height: 20)
+                            .foregroundColor(.white)
                     }
                 }
             }
@@ -318,7 +205,7 @@ struct DashboardView: View {
                         let distance = currCLLoc.distance(from: prevCLLoc)
                         // If detected > 500 meters away from a previous detection, and it's not a trusted device
                         if distance > 500 {
-                            NotificationManager.shared.scheduleNotification(title: "Possible Tracking Detected", body: "An unknown device (\(device.name)) is following you. It was detected at multiple distant locations.", identifier: "stalker_\(device.deviceId)")
+                            NotificationManager.shared.scheduleNotification(title: String(localized: "Possible Tracking Detected"), body: String(localized: "An unknown device (\(device.name)) is following you. It was detected at multiple distant locations."), identifier: "stalker_\(device.deviceId)")
                             break
                         }
                     }
@@ -354,11 +241,238 @@ struct DashboardView: View {
             try? modelContext.save()
         }
     }
+    
+    private func deleteDevice(_ device: DetectedDevice) {
+        modelContext.delete(device)
+        try? modelContext.save()
+    }
+    
+    private func clearSearchHistory() {
+        for device in historicalDevices {
+            modelContext.delete(device)
+        }
+        try? modelContext.save()
+        PersistentLogger.shared.logActivity("User cleared all search history manually.")
+    }
+    
+    @ViewBuilder
+    private var headerCardRow: some View {
+        StatusHeaderCard(
+            deviceCount: btManager.detectedDevices.count,
+            isRadarActive: btManager.continueScanInBackground,
+            onRadarModeToggle: {
+                if !btManager.continueScanInBackground {
+                    if !hasAcceptedRadarModeWarning {
+                        showRadarWarning = true
+                    } else {
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.6, blendDuration: 0)) {
+                            btManager.continueScanInBackground = true
+                        }
+                    }
+                } else {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.6, blendDuration: 0)) {
+                        btManager.continueScanInBackground = false
+                    }
+                }
+            }
+        )
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+    }
+    
+    @ViewBuilder
+    private var emptyStateRow: some View {
+        VStack(spacing: 12) {
+            Spacer().frame(height: 100)
+            Image("Shield_Warning")
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 48, height: 48)
+                .foregroundColor(.secondary.opacity(0.6))
+                .symbolEffect(.pulse, options: .repeating)
+                .accessibilityHidden(true)
+            Text("No devices detected yet")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(.primary.opacity(0.8))
+            Text("Tap Start Scanning below to scan for nearby devices.")
+                .font(.system(size: 13))
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+            Spacer()
+        }
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+        .frame(maxWidth: .infinity, minHeight: 320)
+    }
+    
+    @ViewBuilder
+    private var currentlyNearbySection: some View {
+        if !btManager.detectedDevices.isEmpty {
+            Section(header: 
+                HStack(spacing: 6) {
+                    Text("Currently Nearby")
+                    if btManager.isScanning {
+                        ProgressView()
+                            .controlSize(.mini)
+                            .id(btManager.isScanning)
+                    }
+                }
+                .font(.system(size: 15))
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+                .padding(.bottom, 8)
+            ) {
+                let count = btManager.detectedDevices.count
+                ForEach(Array(btManager.detectedDevices.enumerated()), id: \.element.id) { index, device in
+                    VStack(spacing: 0) {
+                        NavigationLink(value: device) {
+                            DeviceRowView(
+                                name: device.name,
+                                type: device.type,
+                                manufacturer: device.manufacturer,
+                                rssi: device.rssi,
+                                isStarred: false,
+                                isTrusted: trustedManager.isTrusted(id: device.deviceId),
+                                timestamp: nil,
+                                estimatedDistance: device.estimatedDistance
+                            )
+                        }
+                        
+                        if index < count - 1 {
+                            Divider()
+                                .padding(.leading, 44)
+                                .padding(.top, 8)
+                        }
+                    }
+                    .swipeActions(edge: .leading) {
+                        if trustedManager.isTrusted(id: device.deviceId) {
+                            Button(role: .destructive) {
+                                trustedManager.untrustDevice(id: device.deviceId)
+                            } label: {
+                                Label("Untrust", systemImage: "xmark.shield")
+                            }
+                        } else {
+                            Button {
+                                trustedManager.trustDevice(id: device.deviceId, name: device.name)
+                            } label: {
+                                Label("Trust", systemImage: "checkmark.shield")
+                            }
+                            .tint(.green)
+                        }
+                    }
+                    .listRowInsets(EdgeInsets(top: 8, leading: 28, bottom: index == count - 1 ? 8 : 0, trailing: 28))
+                    .listRowBackground(
+                        GroupedRowBackground(index: index, count: count)
+                    )
+                    .listRowSeparator(.hidden)
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var recentlyScannedSection: some View {
+        if !historicalDevices.isEmpty {
+            Section(header:
+                Text("Recently Scanned")
+                    .font(.system(size: 15))
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
+                    .padding(.bottom, 8)
+            ) {
+                let count = historicalDevices.count
+                ForEach(Array(historicalDevices.enumerated()), id: \.element.id) { index, device in
+                    let isTrusted = trustedManager.isTrusted(id: device.deviceId)
+                    VStack(spacing: 0) {
+                        NavigationLink(value: device) {
+                            DeviceRowView(
+                                name: device.name,
+                                type: device.type,
+                                manufacturer: device.manufacturer,
+                                rssi: device.rssi,
+                                isStarred: false,
+                                isTrusted: isTrusted,
+                                timestamp: device.timestamp,
+                                estimatedDistance: estimatedDistance(for: device.rssi)
+                            )
+                        }
+                        
+                        if index < count - 1 {
+                            Divider()
+                                .padding(.leading, 44)
+                                .padding(.top, 8)
+                        }
+                    }
+                    .swipeActions(edge: .leading) {
+                        if isTrusted {
+                            Button(role: .destructive) {
+                                trustedManager.untrustDevice(id: device.deviceId)
+                            } label: {
+                                Label("Untrust", systemImage: "xmark.shield")
+                            }
+                        } else {
+                            Button {
+                                trustedManager.trustDevice(id: device.deviceId, name: device.name)
+                            } label: {
+                                Label("Trust", systemImage: "checkmark.shield")
+                            }
+                            .tint(.green)
+                        }
+                    }
+                    .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) {
+                            withAnimation {
+                                deleteDevice(device)
+                            }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+                    .listRowInsets(EdgeInsets(top: 8, leading: 28, bottom: index == count - 1 ? 8 : 0, trailing: 28))
+                    .listRowBackground(
+                        GroupedRowBackground(index: index, count: count)
+                    )
+                    .listRowSeparator(.hidden)
+                }
+                .onDelete(perform: deleteDevices)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var clearHistorySection: some View {
+        if !historicalDevices.isEmpty {
+            let totalRows = 1
+            Section {
+                Button(action: {
+                    showingClearConfirmation = true
+                }) {
+                    Text("Clear Search History")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(.blue)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                }
+                .listRowInsets(EdgeInsets(top: 12, leading: 28, bottom: 12, trailing: 28))
+                .listRowBackground(
+                    GroupedRowBackground(index: totalRows - 1, count: totalRows)
+                )
+                .listRowSeparator(.hidden)
+            }
+        }
+    }
 }
 
 struct AllResultsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \DetectedDevice.timestamp, order: .reverse) private var historicalDevices: [DetectedDevice]
+    @ObservedObject var trustedManager = TrustedDeviceManager.shared
+    
     @State private var showingClearConfirmation = false
     @State private var searchText = ""
     @State private var showingSettings = false
@@ -427,17 +541,26 @@ struct AllResultsView: View {
                         manufacturer: device.manufacturer,
                         rssi: device.rssi,
                         isStarred: device.isStarred,
+                        isTrusted: trustedManager.isTrusted(id: device.deviceId),
                         timestamp: device.timestamp,
                         estimatedDistance: Nearbyglasses.estimatedDistance(for: device.rssi)
                     )
                 }
                 .swipeActions(edge: .leading) {
-                    Button {
-                        TrustedDeviceManager.shared.trustDevice(id: device.deviceId, name: device.name)
-                    } label: {
-                        Label("Trust", systemImage: "checkmark.shield")
+                    if trustedManager.isTrusted(id: device.deviceId) {
+                        Button(role: .destructive) {
+                            trustedManager.untrustDevice(id: device.deviceId)
+                        } label: {
+                            Label("Untrust", systemImage: "xmark.shield")
+                        }
+                    } else {
+                        Button {
+                            trustedManager.trustDevice(id: device.deviceId, name: device.name)
+                        } label: {
+                            Label("Trust", systemImage: "checkmark.shield")
+                        }
+                        .tint(.green)
                     }
-                    .tint(.green)
                 }
             }
             .onDelete(perform: deleteDevices)
@@ -454,6 +577,7 @@ struct AllResultsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .background(DesignSystem.backgroundColor)
+        .listRowBackground(DesignSystem.cardBackground)
         .searchable(text: $searchText, prompt: "Search detections")
         .navigationTitle("All Detections")
         .navigationBarTitleDisplayMode(.inline)
@@ -572,11 +696,14 @@ struct AllResultsView: View {
                             }
                         }
                     } label: {
-                        Image(isFilterActive ? "Filter" : "Filter_Off")
-                            .renderingMode(.template)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 20, height: 20)
+                        HStack(spacing: 4) {
+                            Text("Filter")
+                            Image(isFilterActive ? "Filter" : "Filter_Off")
+                                .renderingMode(.template)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 20, height: 20)
+                        }
                     }
                 }
             }
@@ -615,4 +742,38 @@ struct AllResultsView: View {
     DashboardView()
         .preferredColorScheme(.dark)
         .modelContainer(for: DetectedDevice.self, inMemory: true)
+}
+
+struct RoundedCorner: Shape {
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
+        return Path(path.cgPath)
+    }
+}
+
+struct GroupedRowBackground: View {
+    let index: Int
+    let count: Int
+    
+    var body: some View {
+        Group {
+            if count == 1 {
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(DesignSystem.cardBackground)
+            } else if index == 0 {
+                RoundedCorner(radius: 22, corners: [.topLeft, .topRight])
+                    .fill(DesignSystem.cardBackground)
+            } else if index == count - 1 {
+                RoundedCorner(radius: 22, corners: [.bottomLeft, .bottomRight])
+                    .fill(DesignSystem.cardBackground)
+            } else {
+                Rectangle()
+                    .fill(DesignSystem.cardBackground)
+            }
+        }
+        .padding(.horizontal, 16)
+    }
 }

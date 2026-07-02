@@ -9,6 +9,7 @@ struct OnboardingView: View {
     @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
     @State private var path = NavigationPath()
     @State private var iconPositions: [IconPosition] = []
+    @State private var isAnimating: Bool = false
 
     let backgroundIcons = [
         "Wifi_High", "Camera", "Desktop", "Shield_Warning", "Help",
@@ -43,8 +44,6 @@ struct OnboardingView: View {
                                 .font(.system(size: 16, weight: .bold))
                                 .foregroundColor(.primary)
                                 .frame(width: 36, height: 36)
-                                .background(Color(UIColor.secondarySystemBackground))
-                                .clipShape(Circle())
                         }
                     }
                 }
@@ -54,6 +53,7 @@ struct OnboardingView: View {
             if iconPositions.isEmpty {
                 generatePositions()
             }
+            isAnimating = true
         }
     }
 
@@ -77,24 +77,19 @@ struct OnboardingView: View {
                                 .position(
                                     x: pos.x * geometry.size.width, y: pos.y * geometry.size.height
                                 )
+                                .offset(y: isAnimating ? -pos.yOffset : pos.yOffset)
                                 .opacity(pos.opacity)
                                 .foregroundColor(pos.color)
+                                .animation(
+                                    Animation.easeInOut(duration: pos.duration)
+                                        .repeatForever(autoreverses: true)
+                                        .delay(pos.delay),
+                                    value: isAnimating
+                                )
                         }
                     }
                 }
                 .frame(height: 300)
-
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .fill(Color(UIColor.systemBackground))
-                    .frame(width: 104, height: 104)
-                    .shadow(color: Color.black.opacity(0.08), radius: 20, x: 0, y: 10)
-
-                Image("AppLogo")
-                    .renderingMode(.template)
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundColor(Color.primary)
-                    .frame(width: 60, height: 60)
             }
             .padding(.bottom, 40)
 
@@ -165,16 +160,7 @@ struct OnboardingView: View {
                 .padding(.bottom, 40)
             }
 
-            VStack(spacing: 16) {
-                Text(
-                    "By continuing, you agree to our [Terms of Service](https://github.com/HenriquesPontes/Near/blob/main/TERMS.md) and [Privacy Policy](https://github.com/HenriquesPontes/Near/blob/main/PRIVACY.md)."
-                )
-                .tint(.blue)
-                .font(.system(size: 12))
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
-
+            ZStack(alignment: .bottom) {
                 Button {
                     UNUserNotificationCenter.current().requestAuthorization(options: [
                         .alert, .sound, .badge,
@@ -195,6 +181,16 @@ struct OnboardingView: View {
                         .clipShape(Capsule())
                 }
                 .padding(.horizontal, 24)
+                
+                Text(
+                    "By continuing, you agree to our [Terms of Service](https://github.com/HenriquesPontes/Near/blob/main/TERMS.md) and [Privacy Policy](https://github.com/HenriquesPontes/Near/blob/main/PRIVACY.md)."
+                )
+                .tint(.blue)
+                .font(.system(size: 12))
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+                .offset(y: 38)
             }
             .padding(.bottom, 32)
         }
@@ -224,7 +220,10 @@ struct OnboardingView: View {
                     y: 0.5 + yOffset,
                     scale: scale,
                     rotation: rotation,
-                    opacity: 1.0
+                    opacity: 1.0,
+                    duration: Double.random(in: 2...4),
+                    delay: Double.random(in: 0...2),
+                    yOffset: CGFloat.random(in: 10...25)
                 ))
         }
         iconPositions = newPositions
@@ -240,6 +239,9 @@ struct IconPosition: Identifiable {
     let scale: CGFloat
     let rotation: Double
     let opacity: Double
+    let duration: Double
+    let delay: Double
+    let yOffset: CGFloat
 }
 
 struct FeatureRow: View {

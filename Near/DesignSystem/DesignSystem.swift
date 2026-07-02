@@ -47,12 +47,21 @@ struct DesignSystem {
     static let primaryBlue = Color.blue
     static let activeRed = Color.red
     
+    // Dynamic background for the hero header card
+    static var heroBackground: Color {
+        Color(UIColor { traitCollection in
+            traitCollection.userInterfaceStyle == .dark
+                ? UIColor(hex: "1A2B4C") // Sleek deep navy blue in dark mode
+                : UIColor(hex: "007AFF") // System blue in light mode
+        })
+    }
+    
     // Card styles (dynamic)
     static var cardBackground: Color {
         Color(UIColor { traitCollection in
             traitCollection.userInterfaceStyle == .dark
                 ? UIColor(hex: "1C1D1F")
-                : UIColor(hex: "E1E3E6")
+                : UIColor(hex: "FFFFFF")
         })
     }
     
@@ -67,8 +76,8 @@ struct DesignSystem {
     static var borderStroke: Color {
         Color(UIColor { traitCollection in
             traitCollection.userInterfaceStyle == .dark
-                ? UIColor(hex: "5D5F64")
-                : UIColor(hex: "B1B5B7")
+                ? UIColor(white: 1.0, alpha: 0.1)
+                : UIColor(white: 0.0, alpha: 0.1)
         })
     }
 }

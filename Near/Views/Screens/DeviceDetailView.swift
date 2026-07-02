@@ -16,6 +16,7 @@ struct DeviceDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @ObservedObject var btManager = BluetoothManager.shared
+    @ObservedObject var trustedManager = TrustedDeviceManager.shared
     
     @State private var currentRssi: Int = -80
     @State private var rssiHistory: [Int] = []
@@ -44,25 +45,24 @@ struct DeviceDetailView: View {
             List {
                 // 1. DEVICE HEADER
                 Section {
-                    VStack(spacing: 12) {
-                        Spacer(minLength: 4)
+                    VStack(spacing: 8) {
                         DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
                             .frame(width: 64, height: 64)
                         
                         VStack(spacing: 4) {
                             Text(device.name)
-                                .font(.system(size: 32, weight: .bold))
+                                .font(.system(size: 28, weight: .bold))
                                 .foregroundColor(.primary)
                             
                             let typeName = displayNameForType(device.type, manufacturer: device.manufacturer)
-                            let mfgName = device.manufacturer ?? "Unknown Manufacturer"
+                            let mfgName = device.manufacturer ?? String(localized: "Unknown Manufacturer")
                             let subtitle = (typeName == mfgName) ? typeName : (device.name.contains(typeName) ? mfgName : "\(typeName) • \(mfgName)")
                             Text(subtitle)
-                                .font(.system(size: 16, weight: .medium))
+                                .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.secondary)
                             
                             Text("ID: \(device.deviceId)")
-                                .font(.system(size: 12))
+                                .font(.system(.caption, design: .monospaced))
                                 .foregroundColor(.secondary.opacity(0.4))
                                 .padding(.top, 4)
                         }
@@ -76,14 +76,20 @@ struct DeviceDetailView: View {
                 }
                 
                 // DEVICE INFO
-                Section(header: Text("Device Info").font(.system(size: 14, weight: .bold))) {
+                Section(header: Text("Device Info")) {
                     HStack {
                         Text("Manufacturer")
                             .font(.system(size: 15, weight: .medium))
                         Spacer()
-                        Text(device.manufacturer ?? "Unknown Manufacturer")
-                            .font(.system(size: 15))
-                            .foregroundColor(.secondary)
+                        if let manufacturer = device.manufacturer {
+                            Text(manufacturer)
+                                .font(.system(size: 15))
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("Unknown Manufacturer")
+                                .font(.system(size: 15))
+                                .foregroundColor(.secondary)
+                        }
                     }
                     if let companyID = device.companyID {
                         HStack {
@@ -98,7 +104,7 @@ struct DeviceDetailView: View {
                 }
                 
                 // 2. SIGNAL TREND (LINE CHART)
-                Section(header: Text("Signal Strength").font(.system(size: 14, weight: .bold))) {
+                Section(header: Text("Signal Strength")) {
                     HStack {
                         Label("Signal strength over time", systemImage: "chart.line.uptrend.xyaxis")
                             .font(.system(size: 14, weight: .bold))
@@ -111,7 +117,7 @@ struct DeviceDetailView: View {
                     
                     // Live Signal Line Graph
                     ZStack {
-                        Color.black.opacity(0.15)
+                        Color(UIColor.secondarySystemBackground)
                             .cornerRadius(12)
                         
                         if rssiHistory.count > 1 {
@@ -131,7 +137,7 @@ struct DeviceDetailView: View {
                 }
                 
                 // 3. HOT & COLD PROXIMITY FINDER
-                Section(header: Text("PROXIMITY RADAR").font(.system(size: 14, weight: .bold))) {
+                Section(header: Text("Proximity Radar")) {
                     ZStack {
                         // Background Radar Rings
                         Circle()
@@ -177,38 +183,45 @@ struct DeviceDetailView: View {
                     
                     
                     // Precision Finding Button
-                    VStack(spacing: 8) {
-                        Button {
-                            showTrackerView = true
-                        } label: {
-                            HStack {
-                                Image("Map_Pin")
-                                    .renderingMode(.template)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 14, height: 14)
-                                Text("Trace Device")
-                                    .fontWeight(.bold)
-                            }
-                            .frame(maxWidth: .infinity)
+                    Button {
+                        showTrackerView = true
+                    } label: {
+                        HStack {
+                            Image("Map_Pin")
+                                .renderingMode(.template)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 18, height: 18)
+                                .foregroundColor(colorForType(device.type))
+                            
+                            Text("Trace Device")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.primary)
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(.secondary.opacity(0.5))
                         }
-                        .buttonStyle(.borderedProminent)
-                        .tint(colorForType(device.type))
-                        .foregroundStyle(foregroundColorForType(device.type))
-                        .controlSize(.large)
-                        
+                    }
+                    .padding(.vertical, 4)
+                    
+                    VStack(alignment: .center, spacing: 4) {
                         Text("Note: Distance tracking relies on Bluetooth signals which can fluctuate. False positives in distance estimation may occur due to physical obstructions.")
                             .font(.system(size: 11))
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 8)
                     }
-                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets())
+                    .padding(.top, 4)
                     .padding(.bottom, 8)
                 }
                 
                 // 4. PRIVACY RISK PROFILE
-                Section(header: Text("PRIVACY THREAT PROFILE")) {
+                Section(header: Text("Privacy Threat Profile")) {
                     riskRow(title: "Video Capture Capabilities", desc: videoDescription(for: device.type), danger: hasCamera(for: device.type))
                     riskRow(title: "Audio Capture Arrays", desc: audioDescription(for: device.type), danger: hasMic(for: device.type))
                     riskRow(title: "Display / HUD Capabilities", desc: hudDescription(for: device.type), danger: false)
@@ -228,14 +241,8 @@ struct DeviceDetailView: View {
                         dismiss()
                     } label: {
                         HStack {
-                            Spacer()
-                            Image("Hide")
-                                .renderingMode(.template)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 16, height: 16)
                             Text("Ignore Device (Add to Whitelist)")
-                                .font(.system(size: 15, weight: .bold))
+                                .font(.system(size: 16, weight: .regular))
                             Spacer()
                         }
                     }
@@ -244,25 +251,40 @@ struct DeviceDetailView: View {
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
             .background(DesignSystem.backgroundColor)
+            .listRowBackground(DesignSystem.cardBackground)
         .navigationTitle("Device Details")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
+                let isTrusted = trustedManager.isTrusted(id: device.deviceId)
                 Button {
-                    device.isStarred.toggle()
+                    if isTrusted {
+                        trustedManager.untrustDevice(id: device.deviceId)
+                        device.isStarred = false
+                    } else {
+                        trustedManager.trustDevice(id: device.deviceId, name: device.name)
+                        device.isStarred = true
+                    }
                     try? modelContext.save()
                 } label: {
-                    Image("Star")
-                        .renderingMode(.template)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 20, height: 20)
-                        .opacity(device.isStarred ? 1.0 : 0.5)
-                        .foregroundColor(device.isStarred ? .yellow : .gray)
-                        .contentTransition(.identity)
+                    if isTrusted {
+                        Image(systemName: "checkmark.shield.fill")
+                            .font(.system(size: 18))
+                            .foregroundColor(.green)
+                            .contentTransition(.identity)
+                    } else {
+                        Image("Star")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .opacity(device.isStarred ? 1.0 : 0.5)
+                            .foregroundColor(device.isStarred ? .yellow : .gray)
+                            .contentTransition(.identity)
+                    }
                 }
                 .buttonStyle(.plain)
-                .animation(nil, value: device.isStarred)
+                .animation(nil, value: isTrusted)
             }
         }
         .onAppear {

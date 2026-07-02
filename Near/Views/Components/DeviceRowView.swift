@@ -6,6 +6,7 @@ struct DeviceRowView: View {
     let manufacturer: String?
     let rssi: Int
     let isStarred: Bool
+    let isTrusted: Bool
     let timestamp: Date?
     let estimatedDistance: Double
     
@@ -20,19 +21,24 @@ struct DeviceRowView: View {
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(.primary)
                     
-                    if isStarred {
+                    if isTrusted {
+                        Image(systemName: "checkmark.shield.fill")
+                            .font(.system(size: 12))
+                            .foregroundColor(.green)
+                            .accessibilityLabel(String(localized: "Trusted"))
+                    } else if isStarred {
                         Image("Star")
                             .renderingMode(.template)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 12, height: 12)
                             .foregroundColor(.yellow)
-                            .accessibilityLabel("Starred")
+                            .accessibilityLabel(String(localized: "Starred"))
                     }
                 }
                 
                 let typeName = displayNameForType(type, manufacturer: manufacturer)
-                let mfgName = manufacturer ?? "Unknown Manufacturer"
+                let mfgName = manufacturer ?? String(localized: "Unknown Manufacturer")
                 let subtitle = (typeName == mfgName) ? typeName : (name.contains(typeName) ? mfgName : "\(typeName) • \(mfgName)")
                 Text(subtitle)
                     .font(.system(size: 14, weight: .medium))

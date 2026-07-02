@@ -15,77 +15,78 @@ struct ScanRadarView: View {
     @Environment(\.openURL) private var openURL
     @ObservedObject var btManager = BluetoothManager.shared
     
-    @State private var rotationAngle: Double = 0.0
-    @State private var rippleScale: CGFloat = 0.5
-    @State private var rippleOpacity: Double = 0.8
     @State private var selectedDevice: BluetoothDevice? = nil
     @State private var showLocationPermissionPrompt: Bool = false
     @State private var showLocationSettingsPrompt: Bool = false
+    @State private var navigateToAllResults: Bool = false
     
     var body: some View {
         ZCenterContainer {
-            VStack(spacing: 16) {
-                
-                // RADAR SCREEN
-                GeometryReader { geo in
-                    let radarSize = max(geo.size.width - 40, 0)
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(spacing: 24) {
+                    
+                    // TITLE
+                    if btManager.isScanning {
+                        Text("Searching for Devices...")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundColor(.primary)
+                            .padding(.top, 16)
+                    } else {
+                        Text("Scan Completed")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundColor(.primary)
+                            .padding(.top, 16)
+                    }
+                    
+                    // RADAR SCREEN
                     ZStack {
                         // Concord Rings
                         ForEach(1...4, id: \.self) { ring in
                             Circle()
                                 .stroke(Color.blue.opacity(0.15), lineWidth: 1)
-                                .frame(width: CGFloat(ring) * radarSize / 4)
+                                .frame(width: CGFloat(ring) * 280 / 4)
                         }
                         
                         // Cross lines
                         Path { path in
-                            path.move(to: CGPoint(x: 20, y: geo.size.height / 2))
-                            path.addLine(to: CGPoint(x: geo.size.width - 20, y: geo.size.height / 2))
-                            path.move(to: CGPoint(x: geo.size.width / 2, y: 20))
-                            path.addLine(to: CGPoint(x: geo.size.width / 2, y: geo.size.height - 20))
+                            path.move(to: CGPoint(x: 20, y: 140))
+                            path.addLine(to: CGPoint(x: 260, y: 140))
+                            path.move(to: CGPoint(x: 140, y: 20))
+                            path.addLine(to: CGPoint(x: 140, y: 260))
                         }
                         .stroke(Color.blue.opacity(0.08), lineWidth: 1)
                         
-                        // Sonar Sweep Wave (Rippling Out)
+                        // Sonar Sweep Wave & Radar Sweep Shader (Animated via TimelineView to prevent stuttering/glitches)
                         if btManager.isScanning {
-                            Circle()
-                                .stroke(Color.blue.opacity(0.2), lineWidth: 3)
-                                .scaleEffect(rippleScale)
-                                .opacity(rippleOpacity)
-                                .onAppear {
-                                    var transaction = Transaction()
-                                    transaction.disablesAnimations = true
-                                    withTransaction(transaction) {
-                                        rippleScale = 0.5
-                                        rippleOpacity = 0.8
-                                    }
-                                    withAnimation(Animation.linear(duration: 3.0).repeatForever(autoreverses: false)) {
-                                        rippleScale = 1.0
-                                        rippleOpacity = 0.0
-                                    }
+                            TimelineView(.animation) { timelineContext in
+                                let time = timelineContext.date.timeIntervalSinceReferenceDate
+                                
+                                // Sonar Wave: Ripples out every 3 seconds
+                                let waveProgress = (time.truncatingRemainder(dividingBy: 3.0) / 3.0)
+                                let waveScale = 0.5 + (waveProgress * 0.5)
+                                let waveOpacity = 0.8 * (1.0 - waveProgress)
+                                
+                                // Radar Sweep: Rotates full 360 degrees every 4 seconds
+                                let sweepAngle = (time.truncatingRemainder(dividingBy: 4.0) / 4.0) * 360.0
+                                
+                                ZStack {
+                                    Circle()
+                                        .stroke(Color.blue.opacity(0.2), lineWidth: 3)
+                                        .scaleEffect(waveScale)
+                                        .opacity(waveOpacity)
+                                    
+                                    Circle()
+                                        .fill(
+                                            AngularGradient(
+                                                gradient: Gradient(colors: [Color.blue.opacity(0.4), Color.blue.opacity(0.0)]),
+                                                center: .center,
+                                                angle: .degrees(0)
+                                            )
+                                        )
+                                        .rotationEffect(.degrees(sweepAngle))
                                 }
-                            
-                            // Radar Sweep Shader Line (Gradient Sweep)
-                            Circle()
-                                .fill(
-                                    AngularGradient(
-                                        gradient: Gradient(colors: [Color.blue.opacity(0.4), Color.blue.opacity(0.0)]),
-                                        center: .center,
-                                        angle: .degrees(0)
-                                    )
-                                )
-                                .frame(width: radarSize, height: radarSize)
-                                .rotationEffect(.degrees(rotationAngle))
-                                .onAppear {
-                                    var transaction = Transaction()
-                                    transaction.disablesAnimations = true
-                                    withTransaction(transaction) {
-                                        rotationAngle = 0.0
-                                    }
-                                    withAnimation(Animation.linear(duration: 4.0).repeatForever(autoreverses: false)) {
-                                        rotationAngle = 360.0
-                                    }
-                                }
+                            }
+                            .frame(width: 280, height: 280)
                         }
                         
                         // Center Core (Scanner Node)
@@ -95,9 +96,9 @@ struct ScanRadarView: View {
                             .shadow(color: DesignSystem.primaryBlue, radius: 8)
                         
                         // Detected Device Ping Dots
-                        if btManager.isScanning {
+                        if btManager.isScanning || !btManager.detectedDevices.isEmpty {
                             ForEach(btManager.detectedDevices) { device in
-                                let pos = position(for: device, in: geo.size)
+                                let pos = position(for: device, in: CGSize(width: 280, height: 280))
                                 DevicePingNode(device: device) {
                                     selectedDevice = device
                                 }
@@ -105,106 +106,98 @@ struct ScanRadarView: View {
                             }
                         }
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
-                .aspectRatio(1.0, contentMode: .fit)
-                .padding(20)
-                
-                // STATUS TEXT
-                VStack(spacing: 4) {
-                    if btManager.isScanning {
-                        HStack(spacing: 8) {
-                            Circle()
-                                .fill(Color.green)
-                                .frame(width: 8, height: 8)
-                                .shadow(color: .green, radius: 4)
-                            Text("SCANNING ACTIVE")
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundColor(.green)
-                        }
-                        Text("\(btManager.detectedDevices.count) devices emissions in range")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.secondary)
-                    } else {
-                        HStack(spacing: 8) {
-                            Circle()
-                                .fill(Color.red)
-                                .frame(width: 8, height: 8)
-                            Text("SCANNING PAUSED")
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundColor(.red)
-                        }
-                        Text("Tap to resume the scanning")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.secondary)
-                    }
-                }
-                .padding(.top, 8)
-                
-                // ACTIVE DETECTED LIST (Horizontal scroll)
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 16) {
-                        ForEach(btManager.detectedDevices) { device in
-                            Button {
-                                selectedDevice = device
-                            } label: {
-                                detectedDeviceCard(for: device)
+                    .frame(width: 280, height: 280)
+                    .padding(20)
+                    
+                    // SUBTITLE
+                    Text("Ensure Bluetooth is enabled to detect nearby smart glasses.")
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 40)
+                    
+                    // LIST OF DEVICES (vertical grouped card style matching All Detections / List style)
+                    if !btManager.detectedDevices.isEmpty {
+                        VStack(spacing: 0) {
+                            ForEach(Array(btManager.detectedDevices.enumerated()), id: \.element.id) { index, device in
+                                Button {
+                                    selectedDevice = device
+                                } label: {
+                                    deviceRowCard(for: device)
+                                }
+                                .buttonStyle(.plain)
+                                
+                                if index < btManager.detectedDevices.count - 1 {
+                                    Divider()
+                                        .padding(.leading, 60) // align divider line with the start of text
+                                }
                             }
-                            .buttonStyle(.plain)
                         }
+                        .background(DesignSystem.cardBackground)
+                        .cornerRadius(16)
+                        .padding(.horizontal, 24)
                     }
-                    .padding(.horizontal, 24)
+                    
+                    // DEVICE COUNT
+                    if btManager.detectedDevices.count == 1 {
+                        Text("1 Device Found")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .padding(.top, 8)
+                            .padding(.bottom, 120) // Leave space for bottom bar
+                    } else {
+                        (Text("\(btManager.detectedDevices.count)") + Text(" ") + Text("Devices Found"))
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .padding(.top, 8)
+                            .padding(.bottom, 120) // Leave space for bottom bar
+                    }
                 }
-                .frame(height: 110)
-                
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .safeAreaInset(edge: .bottom) {
                 VStack(spacing: 16) {
-                    HStack(spacing: 12) {
-                        // Pause / Resume Button
-                        Button {
-                            withAnimation {
-                                toggleScanningWithLocationCheck()
-                            }
-                        } label: {
-                            Text(btManager.isScanning ? "Pause Scan" : "Resume Scan")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(btManager.isScanning ? DesignSystem.primaryBlue : .white)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 52)
-                                .background(btManager.isScanning ? Color.clear : DesignSystem.primaryBlue)
-                                .cornerRadius(26)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 26)
-                                        .stroke(DesignSystem.primaryBlue, lineWidth: btManager.isScanning ? 2 : 0)
-                                )
-                        }
-                        
-                        // Stop & Show Results Button
-                        Button {
+                    Button {
+                        if btManager.isScanning {
                             btManager.continueScanInBackground = false
                             btManager.stopScanning()
                             dismiss()
-                        } label: {
-                            Text("Stop")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 52)
-                                .background(DesignSystem.activeRed)
-                                .cornerRadius(26)
+                        } else if !btManager.detectedDevices.isEmpty {
+                            navigateToAllResults = true
+                        } else {
+                            btManager.startScanning()
                         }
+                    } label: {
+                        Group {
+                            if btManager.isScanning {
+                                Text("Stop Scanning")
+                            } else if !btManager.detectedDevices.isEmpty {
+                                Text("View All Results")
+                            } else {
+                                Text("Try Again")
+                            }
+                        }
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 52)
+                        .background(
+                            Capsule()
+                                .fill(DesignSystem.heroBackground)
+                        )
+                        .overlay(
+                            Capsule()
+                                .stroke(DesignSystem.primaryBlue.opacity(0.6), lineWidth: 1.5)
+                        )
                     }
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 16)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 48)
-                .padding(.bottom, 16)
+                .padding(.top, 16)
                 .background(
                     LinearGradient(
                         stops: [
                             .init(color: .clear, location: 0.0),
-                            .init(color: DesignSystem.backgroundColor, location: 0.7),
+                            .init(color: DesignSystem.backgroundColor, location: 0.5),
                             .init(color: DesignSystem.backgroundColor, location: 1.0)
                         ],
                         startPoint: .top,
@@ -213,7 +206,7 @@ struct ScanRadarView: View {
                 )
             }
         }
-        .navigationTitle("Scan")
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -237,6 +230,9 @@ struct ScanRadarView: View {
                 btManager.stopScanning()
             }
         }
+        .navigationDestination(isPresented: $navigateToAllResults) {
+            AllResultsView()
+        }
         .navigationDestination(item: $selectedDevice) { device in
             // Map the transient BluetoothDevice to a temporary DetectedDevice for the details view
             let tempDevice = DetectedDevice(
@@ -245,7 +241,7 @@ struct ScanRadarView: View {
                 type: device.type,
                 timestamp: device.lastSeen,
                 rssi: device.rssi,
-                isStarred: device.isStarred,
+                isStarred: device.isStarred || TrustedDeviceManager.shared.isTrusted(id: device.deviceId),
                 threatLevel: device.threatLevel,
                 isSimulated: device.isSimulated,
                 companyID: device.companyID,
@@ -268,49 +264,30 @@ struct ScanRadarView: View {
         }
     }
     
-    // Calculates dot position
-    private func detectedDeviceCard(for device: BluetoothDevice) -> some View {
-        let distanceLabel = String(format: "%.1f m", device.estimatedDistance)
-        let rssiLabel = "RSSI: \(device.rssi) dBm"
+    private func deviceRowCard(for device: BluetoothDevice) -> some View {
+        let isTrusted = TrustedDeviceManager.shared.isTrusted(id: device.deviceId)
         
-        return VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                DeviceIconView(icon: iconForType(device.type), color: colorForType(device.type))
-                    .frame(width: 26, height: 26)
-                
-                Spacer()
-                
-                Text(distanceLabel)
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(DesignSystem.primaryBlue)
-            }
+        return HStack(spacing: 16) {
+            DeviceRowView(
+                name: device.name,
+                type: device.type,
+                manufacturer: device.manufacturer,
+                rssi: device.rssi,
+                isStarred: device.isStarred || isTrusted,
+                isTrusted: isTrusted,
+                timestamp: nil,
+                estimatedDistance: device.estimatedDistance
+            )
             
-            Text(device.name)
-                .font(.system(size: 14, weight: .bold))
-                .foregroundColor(.primary)
-                .lineLimit(1)
+            Spacer()
             
-            let typeName = displayNameForType(device.type, manufacturer: device.manufacturer)
-            let mfgName = device.manufacturer ?? "Unknown Manufacturer"
-            let subtitle = (typeName == mfgName) ? typeName : (device.name.contains(typeName) ? mfgName : "\(typeName) • \(mfgName)")
-            
-            Text(subtitle)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundColor(.secondary)
-                .lineLimit(1)
-            
-            Text(rssiLabel)
-                .font(.system(size: 11))
-                .foregroundColor(.secondary)
+            // Trailing Chevron
+            Image(systemName: "chevron.right")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(.secondary.opacity(0.5))
         }
-        .padding(12)
-        .frame(width: 140)
-        .background(DesignSystem.itemBackground)
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(DesignSystem.borderStroke, lineWidth: 1)
-        )
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
     }
     
     private func position(for device: BluetoothDevice, in size: CGSize) -> CGPoint {
@@ -335,6 +312,7 @@ struct ScanRadarView: View {
     }
     
 }
+
 #Preview {
     ScanRadarView()
         .preferredColorScheme(.dark)
