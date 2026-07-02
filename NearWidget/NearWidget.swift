@@ -79,7 +79,7 @@ struct RadarHUDView: View {
             // Concentric Circles
             ForEach(1...4, id: \.self) { ring in
                 Circle()
-                    .stroke(Color(hex: "1A66FF").opacity(0.3), lineWidth: 1)
+                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
                     .frame(width: CGFloat(ring) * 76 / 4, height: CGFloat(ring) * 76 / 4)
             }
             
@@ -90,7 +90,7 @@ struct RadarHUDView: View {
                 path.move(to: CGPoint(x: 38, y: 4))
                 path.addLine(to: CGPoint(x: 38, y: 72))
             }
-            .stroke(Color(hex: "1A66FF").opacity(0.15), lineWidth: 1)
+            .stroke(Color.white.opacity(0.15), lineWidth: 1)
             
             if scanning {
                 // Sweep angle
@@ -98,9 +98,9 @@ struct RadarHUDView: View {
                     .fill(
                         AngularGradient(
                             gradient: Gradient(colors: [
-                                Color(hex: "1A66FF").opacity(0.0),
-                                Color(hex: "3399FF").opacity(0.4),
-                                Color(hex: "1A66FF").opacity(0.0)
+                                Color.white.opacity(0.0),
+                                Color.white.opacity(0.4),
+                                Color.white.opacity(0.0)
                             ]),
                             center: .center,
                             startAngle: .degrees(-60),
@@ -115,13 +115,13 @@ struct RadarHUDView: View {
                     path.move(to: CGPoint(x: 38, y: 38))
                     path.addLine(to: CGPoint(x: 38 + 26.8, y: 38 - 26.8)) // 45 degree angle line
                 }
-                .stroke(Color(hex: "3399FF"), lineWidth: 1.5)
+                .stroke(Color.white.opacity(0.8), lineWidth: 1.5)
                 
                 // Center point
                 Circle()
-                    .fill(Color(hex: "3399FF"))
+                    .fill(Color.white)
                     .frame(width: 6, height: 6)
-                    .shadow(color: Color(hex: "3399FF"), radius: 3)
+                    .shadow(color: Color.white, radius: 3)
             } else {
                 Circle()
                     .fill(Color.white.opacity(0.4))
@@ -170,17 +170,14 @@ struct NearWidgetEntryView : View {
         .padding(16)
         .containerBackground(for: .widget) {
             ZStack {
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(hex: "0A3580"),
-                        Color(hex: "021438")
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
+                Color(UIColor { traitCollection in
+                    traitCollection.userInterfaceStyle == .dark
+                        ? UIColor(red: 26/255, green: 43/255, blue: 76/255, alpha: 1)
+                        : UIColor(red: 0, green: 122/255, blue: 1, alpha: 1)
+                })
                 
                 RoundedRectangle(cornerRadius: 24)
-                    .stroke(Color(hex: "1A66FF").opacity(0.3), lineWidth: 1.5)
+                    .stroke(Color.white.opacity(0.2), lineWidth: 1.5)
                     .padding(1)
             }
         }
@@ -210,17 +207,14 @@ struct NearWidgetEntryView : View {
         .padding(12)
         .containerBackground(for: .widget) {
             ZStack {
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(hex: "0A3580"),
-                        Color(hex: "021438")
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
+                Color(UIColor { traitCollection in
+                    traitCollection.userInterfaceStyle == .dark
+                        ? UIColor(red: 26/255, green: 43/255, blue: 76/255, alpha: 1)
+                        : UIColor(red: 0, green: 122/255, blue: 1, alpha: 1)
+                })
                 
                 RoundedRectangle(cornerRadius: 24)
-                    .stroke(Color(hex: "1A66FF").opacity(0.3), lineWidth: 1.5)
+                    .stroke(Color.white.opacity(0.2), lineWidth: 1.5)
                     .padding(1)
             }
         }
