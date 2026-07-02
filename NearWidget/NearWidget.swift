@@ -168,6 +168,7 @@ struct NearWidgetEntryView : View {
             Spacer()
         }
         .padding(16)
+        .widgetURL(URL(string: "nearbyapp://scan")!)
         .containerBackground(for: .widget) {
             ZStack {
                 Color(UIColor { traitCollection in
@@ -205,6 +206,7 @@ struct NearWidgetEntryView : View {
             Spacer()
         }
         .padding(12)
+        .widgetURL(URL(string: "nearbyapp://scan")!)
         .containerBackground(for: .widget) {
             ZStack {
                 Color(UIColor { traitCollection in

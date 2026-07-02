@@ -19,6 +19,7 @@ struct DashboardView: View {
     @State private var showRadarWarning = false
     @State private var showLocationSettingsAlert = false
     @State private var showingClearConfirmation = false
+    @State private var navigateToScan = false
     
     var body: some View {
         NavigationStack {
@@ -157,6 +158,18 @@ struct DashboardView: View {
             .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("NewDeviceDetectedHistory"))) { notification in
                 if let btDevice = notification.object as? BluetoothDevice {
                     addHistoricalLog(device: btDevice)
+                }
+            }
+            .navigationDestination(isPresented: $navigateToScan) {
+                ScanRadarView()
+            }
+            .onOpenURL { url in
+                if url.absoluteString == "nearbyapp://scan" {
+                    btManager.detectedDevices.removeAll()
+                    if !btManager.isScanning {
+                        btManager.startScanning()
+                    }
+                    navigateToScan = true
                 }
             }
         }
