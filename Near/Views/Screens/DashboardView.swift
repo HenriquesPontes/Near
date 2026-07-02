@@ -276,10 +276,8 @@ struct DashboardView: View {
                 }
             }
         )
-        .listRowInsets(EdgeInsets(top: 16, leading: 28, bottom: 8, trailing: 28))
-        .listRowBackground(
-            GroupedRowBackground(index: 0, count: 1)
-        )
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
     }
     

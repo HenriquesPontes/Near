@@ -11,7 +11,7 @@ struct StatusHeaderCard: View {
             impact.impactOccurred()
             onRadarModeToggle()
         }) {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 24) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Radar Mode")
@@ -20,12 +20,12 @@ struct StatusHeaderCard: View {
                         
                         HStack(alignment: .firstTextBaseline, spacing: 6) {
                             Text("\(deviceCount)")
-                                .font(.system(size: 48, weight: .bold))
+                                .font(.system(size: 56, weight: .bold))
                                 .foregroundColor(.primary)
                                 .contentTransition(.numericText())
                             
                             Text("devices")
-                                .font(.system(size: 16, weight: .semibold))
+                                .font(.system(size: 18, weight: .semibold))
                                 .foregroundColor(.secondary)
                         }
                     }
@@ -44,9 +44,15 @@ struct StatusHeaderCard: View {
             .font(.system(size: 14, weight: .regular))
             .foregroundColor(.secondary)
             .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, minHeight: 150, maxHeight: 150, alignment: .topLeading)
             .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(Color.clear)
+            .padding(.top, 16)
+            .padding(.bottom, 24)
+            .background(
+                DesignSystem.cardBackground
+                    .padding(.top, -1000)
+                    .ignoresSafeArea()
+            )
         }
         .buttonStyle(PlainButtonStyle())
     }

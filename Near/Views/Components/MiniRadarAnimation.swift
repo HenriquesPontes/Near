@@ -2,7 +2,7 @@ import SwiftUI
 
 struct MiniRadarAnimation: View {
     var isActive: Bool
-    var color: Color = .primary
+    var color: Color = Color.blue
     
     @State private var rotation: Double = 0
     @State private var rippleScale: CGFloat = 0.1
@@ -12,7 +12,7 @@ struct MiniRadarAnimation: View {
         ZStack {
             // Background
             Circle()
-                .fill(color.opacity(0.12))
+                .fill(color.opacity(0.15))
                 .frame(width: 44, height: 44)
             
             if isActive {
@@ -39,7 +39,7 @@ struct MiniRadarAnimation: View {
                         
                         // Ripple
                         Circle()
-                            .stroke(color.opacity(0.3), lineWidth: 1)
+                            .stroke(color.opacity(0.4), lineWidth: 1)
                             .frame(width: 44, height: 44)
                             .scaleEffect(waveScale)
                             .opacity(waveOpacity)
