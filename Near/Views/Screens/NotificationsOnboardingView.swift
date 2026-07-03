@@ -113,7 +113,6 @@ struct PhoneNotificationMockupView: View {
             VStack(spacing: 12) {
                 // First Notification Banner
                 NotificationBannerView(
-                    iconName: "N",
                     title: "Smart Glasses Detected",
                     time: "Just now",
                     subtitle: "Ray-Ban Meta detected nearby."
@@ -121,7 +120,6 @@ struct PhoneNotificationMockupView: View {
                 
                 // Second Notification Banner
                 NotificationBannerView(
-                    iconName: "N",
                     title: "Unknown Tracker Nearby",
                     time: "10m ago",
                     subtitle: "An unidentified beacon is moving with you."
@@ -135,7 +133,6 @@ struct PhoneNotificationMockupView: View {
 }
 
 struct NotificationBannerView: View {
-    let iconName: String
     let title: String
     let time: String
     let subtitle: String
@@ -143,11 +140,10 @@ struct NotificationBannerView: View {
     var body: some View {
         HStack(spacing: 12) {
             // App Logo Icon
-            Text(iconName)
-                .font(.system(size: 20, weight: .bold, design: .serif))
-                .foregroundColor(.primary)
+            Image("AppLogo")
+                .resizable()
+                .scaledToFit()
                 .frame(width: 38, height: 38)
-                .background(Color(UIColor.systemGray5))
                 .cornerRadius(10)
             
             VStack(alignment: .leading, spacing: 2) {
