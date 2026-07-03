@@ -133,9 +133,9 @@ struct PhoneNotificationMockupView: View {
 }
 
 struct NotificationBannerView: View {
-    let title: String
-    let time: String
-    let subtitle: String
+    let title: LocalizedStringKey
+    let time: LocalizedStringKey
+    let subtitle: LocalizedStringKey
     
     var body: some View {
         HStack(spacing: 12) {
