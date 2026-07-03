@@ -3,6 +3,7 @@ import UserNotifications
 
 struct NotificationsOnboardingView: View {
     @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
+    @AppStorage("alertOnNewDevices") var alertOnNewDevices: Bool = true
 
     var body: some View {
         ZStack {
@@ -32,9 +33,9 @@ struct NotificationsOnboardingView: View {
                 .padding(.horizontal, 24)
                 .padding(.bottom, 32)
 
-                // Action Buttons (Allow notifications / Not right now)
                 VStack(spacing: 12) {
                     Button {
+                        alertOnNewDevices = true
                         UNUserNotificationCenter.current().requestAuthorization(options: [
                             .alert, .sound, .badge,
                         ]) { _, _ in
@@ -55,6 +56,7 @@ struct NotificationsOnboardingView: View {
                     }
 
                     Button {
+                        alertOnNewDevices = false
                         withAnimation {
                             hasSeenOnboarding = true
                         }
