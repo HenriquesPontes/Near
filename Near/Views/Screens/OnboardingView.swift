@@ -1,8 +1,9 @@
 import SwiftUI
 import UserNotifications
 
-enum OnboardingStep: Int, Hashable {
-    case features = 1
+enum OnboardingStep: Hashable {
+    case features
+    case notifications
 }
 
 struct OnboardingView: View {
@@ -31,6 +32,8 @@ struct OnboardingView: View {
                     switch step {
                     case .features:
                         featuresStep
+                    case .notifications:
+                        notificationsStep
                     }
                 }
                 .navigationBarBackButtonHidden(true)
@@ -93,6 +96,70 @@ struct OnboardingView: View {
     }
 
     private var featuresStep: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 32) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Features &")
+                        Text("Notifications")
+                    }
+                    .font(.system(size: 32, weight: .bold))
+                    .foregroundColor(.primary)
+                    .padding(.top, 40)
+                    .padding(.horizontal, 24)
+
+                    VStack(alignment: .leading, spacing: 32) {
+                        FeatureRow(
+                            icon: "Wifi_High", title: "Signal Detection",
+                            subtitle:
+                                "Detects Bluetooth emissions from popular smart glasses like Ray-Ban Meta and other smart glasses.",
+                            iconColor: .blue)
+                        FeatureRow(
+                            icon: "Bell_Notification", title: "Alerts & Notifications",
+                            subtitle:
+                                "Get notified when potential surveillance devices are nearby.",
+                            iconColor: .orange)
+                        FeatureRow(
+                            icon: "Shield_Check", title: "Privacy First",
+                            subtitle:
+                                "Nearby doesn't collect your data. Everything happens entirely on your device.",
+                            iconColor: .green)
+                    }
+                    .padding(.horizontal, 24)
+                }
+                .padding(.bottom, 40)
+            }
+
+            Spacer()
+
+            // Continue Button (navigates to notifications Step!)
+            Button {
+                path.append(OnboardingStep.notifications)
+            } label: {
+                Text("Continue")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundColor(Color(UIColor.systemBackground))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Color.primary)
+                    .clipShape(Capsule())
+            }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 16)
+            
+            Text(
+                "By continuing, you agree to our [Terms of Service](https://github.com/HenriquesPontes/Near/blob/main/TERMS.md) and [Privacy Policy](https://github.com/HenriquesPontes/Near/blob/main/PRIVACY.md)."
+            )
+            .tint(.blue)
+            .font(.system(size: 11))
+            .foregroundColor(.secondary)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 40)
+            .padding(.bottom, 24)
+        }
+    }
+
+    private var notificationsStep: some View {
         VStack(spacing: 0) {
             Spacer()
 
