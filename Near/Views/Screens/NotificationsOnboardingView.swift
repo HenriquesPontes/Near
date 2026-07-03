@@ -7,6 +7,7 @@ struct NotificationsOnboardingView: View {
     
     @State private var banner1Visible: Bool = false
     @State private var banner2Visible: Bool = false
+    @State private var banner3Visible: Bool = false
 
     var body: some View {
         ZStack {
@@ -18,7 +19,8 @@ struct NotificationsOnboardingView: View {
                 // Phone Frame with Stacked Notifications Mockup
                 PhoneNotificationMockupView(
                     banner1Visible: banner1Visible,
-                    banner2Visible: banner2Visible
+                    banner2Visible: banner2Visible,
+                    banner3Visible: banner3Visible
                 )
                 .padding(.bottom, 24)
 
@@ -98,6 +100,9 @@ struct NotificationsOnboardingView: View {
             withAnimation(.spring(response: 0.65, dampingFraction: 0.75).delay(1.2)) {
                 banner2Visible = true
             }
+            withAnimation(.spring(response: 0.65, dampingFraction: 0.75).delay(1.9)) {
+                banner3Visible = true
+            }
         }
     }
 }
@@ -105,6 +110,7 @@ struct NotificationsOnboardingView: View {
 struct PhoneNotificationMockupView: View {
     let banner1Visible: Bool
     let banner2Visible: Bool
+    let banner3Visible: Bool
 
     var body: some View {
         ZStack {
@@ -129,7 +135,7 @@ struct PhoneNotificationMockupView: View {
                 )
                 .offset(y: 40)
             
-            VStack(spacing: 12) {
+            VStack(spacing: 8) {
                 // First Notification Banner
                 NotificationBannerView(
                     title: "Smart Glasses Detected",
@@ -147,9 +153,18 @@ struct PhoneNotificationMockupView: View {
                 )
                 .opacity(banner2Visible ? 1.0 : 0.0)
                 .offset(y: banner2Visible ? 0 : -20)
+                
+                // Third Notification Banner
+                NotificationBannerView(
+                    title: "Smart Glasses in Range",
+                    time: "1h ago",
+                    subtitle: "A smart wearable is close by."
+                )
+                .opacity(banner3Visible ? 1.0 : 0.0)
+                .offset(y: banner3Visible ? 0 : -20)
             }
             .padding(.horizontal, 24)
-            .padding(.top, 20)
+            .padding(.top, 12)
         }
         .frame(height: 240)
     }
