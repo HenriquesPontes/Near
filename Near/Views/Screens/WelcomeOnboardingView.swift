@@ -179,25 +179,28 @@ struct OnboardingPingNode: View {
     var body: some View {
         ZStack {
             Circle()
-                .stroke(color.opacity(0.4), lineWidth: 2)
+                .stroke(color, lineWidth: 2)
+                .frame(width: 32, height: 32)
                 .scaleEffect(scale)
                 .opacity(opacity)
-                .frame(width: 24, height: 24)
                 .onAppear {
                     withAnimation(
-                        Animation.easeOut(duration: 2.0)
+                        Animation.easeInOut(duration: 1.5)
                             .repeatForever(autoreverses: false)
                             .delay(delay)
                     ) {
-                        scale = 2.2
+                        scale = 1.6
                         opacity = 0.0
                     }
                 }
             
             Circle()
                 .fill(color)
-                .frame(width: 10, height: 10)
-                .shadow(color: color, radius: 4)
+                .frame(width: 14, height: 14)
+                .overlay(
+                    Circle().stroke(Color.white, lineWidth: 2)
+                )
+                .shadow(color: color, radius: 6)
         }
         .position(x: x, y: y)
     }
