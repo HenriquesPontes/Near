@@ -1,26 +1,12 @@
 import SwiftUI
 import UserNotifications
 
-struct MockNotification: Identifiable, Equatable {
-    let id: Int
-    let title: LocalizedStringKey
-    let time: LocalizedStringKey
-    let subtitle: LocalizedStringKey
-}
-
-let mockNotifications = [
-    MockNotification(id: 1, title: "Smart Glasses Detected", time: "Just now", subtitle: "Ray-Ban Meta detected nearby."),
-    MockNotification(id: 2, title: "Unknown Tracker Nearby", time: "10m ago", subtitle: "An unidentified beacon is moving with you."),
-    MockNotification(id: 3, title: "Smart Glasses in Range", time: "1h ago", subtitle: "A smart wearable is close by.")
-]
-
 struct NotificationsOnboardingView: View {
     @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
     @AppStorage("alertOnNewDevices") var alertOnNewDevices: Bool = true
     
-    @State private var visibleBanners: [MockNotification] = []
-    @State private var activeIndex = 0
-    @State private var timer: Timer? = nil
+    @State private var banner1Visible: Bool = false
+    @State private var banner2Visible: Bool = false
 
     var body: some View {
         ZStack {
@@ -30,8 +16,11 @@ struct NotificationsOnboardingView: View {
                 Spacer()
 
                 // Phone Frame with Stacked Notifications Mockup
-                PhoneNotificationMockupView(visibleBanners: visibleBanners)
-                    .padding(.bottom, 24)
+                PhoneNotificationMockupView(
+                    banner1Visible: banner1Visible,
+                    banner2Visible: banner2Visible
+                )
+                .padding(.bottom, 24)
 
                 Spacer()
 
@@ -103,40 +92,19 @@ struct NotificationsOnboardingView: View {
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {
-            // Step 1: Initial Cascade Slide-In
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
-                    visibleBanners.append(mockNotifications[0])
-                }
+            withAnimation(.spring(response: 0.65, dampingFraction: 0.75).delay(0.5)) {
+                banner1Visible = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-                withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
-                    visibleBanners.append(mockNotifications[1])
-                }
+            withAnimation(.spring(response: 0.65, dampingFraction: 0.75).delay(1.2)) {
+                banner2Visible = true
             }
-            
-            // Step 2: Continuous loop showing 2 at a time
-            DispatchQueue.main.asyncAfter(deadline: .now() + 4.2) {
-                timer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { _ in
-                    withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
-                        activeIndex = (activeIndex + 1) % 3
-                        visibleBanners = [
-                            mockNotifications[activeIndex],
-                            mockNotifications[(activeIndex + 1) % 3]
-                        ]
-                    }
-                }
-            }
-        }
-        .onDisappear {
-            timer?.invalidate()
-            timer = nil
         }
     }
 }
 
 struct PhoneNotificationMockupView: View {
-    let visibleBanners: [MockNotification]
+    let banner1Visible: Bool
+    let banner2Visible: Bool
 
     var body: some View {
         ZStack {
@@ -161,27 +129,27 @@ struct PhoneNotificationMockupView: View {
                 )
                 .offset(y: 40)
             
-            VStack {
-                Spacer()
+            VStack(spacing: 12) {
+                // First Notification Banner
+                NotificationBannerView(
+                    title: "Smart Glasses Detected",
+                    time: "Just now",
+                    subtitle: "Ray-Ban Meta detected nearby."
+                )
+                .opacity(banner1Visible ? 1.0 : 0.0)
+                .offset(y: banner1Visible ? 0 : -20)
                 
-                VStack(spacing: 8) {
-                    ForEach(visibleBanners) { banner in
-                        NotificationBannerView(
-                            title: banner.title,
-                            time: banner.time,
-                            subtitle: banner.subtitle
-                        )
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .bottom).combined(with: .opacity),
-                            removal: .move(edge: .top).combined(with: .opacity)
-                        ))
-                    }
-                }
-                .padding(.horizontal, 24)
-                
-                Spacer()
+                // Second Notification Banner
+                NotificationBannerView(
+                    title: "Unknown Tracker Nearby",
+                    time: "10m ago",
+                    subtitle: "An unidentified beacon is moving with you."
+                )
+                .opacity(banner2Visible ? 1.0 : 0.0)
+                .offset(y: banner2Visible ? 0 : -20)
             }
-            .offset(y: 10)
+            .padding(.horizontal, 24)
+            .padding(.top, 20)
         }
         .frame(height: 240)
     }
