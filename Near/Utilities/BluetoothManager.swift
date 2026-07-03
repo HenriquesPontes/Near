@@ -83,6 +83,7 @@ class BluetoothManager: NSObject, ObservableObject {
             }
         }
     }
+    @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
     @AppStorage("rssiThreshold") var rssiThreshold: Int = -75
     @AppStorage("autoStartScanning") var autoStartScanning: Bool = false
     @AppStorage("continueScanInBackground") var continueScanInBackground: Bool = false {
@@ -278,6 +279,7 @@ class BluetoothManager: NSObject, ObservableObject {
     }
 
     private func checkAndTriggerAlert(for device: BluetoothDevice, isNew: Bool) {
+        guard hasSeenOnboarding else { return }
         guard alertOnNewDevices else { return }
         guard device.rssi >= rssiThreshold else { return }
         guard enabledAlertTypes.contains(device.type) else { return }
