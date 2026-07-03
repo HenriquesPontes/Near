@@ -53,10 +53,10 @@ struct WelcomeOnboardingView: View {
                 } label: {
                     Text("Next")
                         .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(Color(UIColor.systemBackground))
+                        .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
-                        .background(Color.primary)
+                        .background(Color.blue)
                         .clipShape(Capsule())
                 }
                 .padding(.horizontal, 24)

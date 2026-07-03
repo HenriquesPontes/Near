@@ -48,10 +48,10 @@ struct NotificationsOnboardingView: View {
                     } label: {
                         Text("Allow notifications")
                             .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(Color(UIColor.systemBackground))
+                            .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
-                            .background(Color.primary)
+                            .background(Color.blue)
                             .clipShape(Capsule())
                     }
 
