@@ -4,6 +4,9 @@ import UserNotifications
 struct NotificationsOnboardingView: View {
     @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
     @AppStorage("alertOnNewDevices") var alertOnNewDevices: Bool = true
+    
+    @State private var banner1Visible: Bool = false
+    @State private var banner2Visible: Bool = false
 
     var body: some View {
         ZStack {
@@ -13,8 +16,11 @@ struct NotificationsOnboardingView: View {
                 Spacer()
 
                 // Phone Frame with Stacked Notifications Mockup
-                PhoneNotificationMockupView()
-                    .padding(.bottom, 24)
+                PhoneNotificationMockupView(
+                    banner1Visible: banner1Visible,
+                    banner2Visible: banner2Visible
+                )
+                .padding(.bottom, 24)
 
                 Spacer()
 
@@ -48,10 +54,10 @@ struct NotificationsOnboardingView: View {
                     } label: {
                         Text("Allow notifications")
                             .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(UIColor.systemBackground))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
-                            .background(Color.blue)
+                            .background(Color.primary)
                             .clipShape(Capsule())
                     }
 
@@ -85,10 +91,21 @@ struct NotificationsOnboardingView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+            withAnimation(.spring(response: 0.65, dampingFraction: 0.75).delay(0.5)) {
+                banner1Visible = true
+            }
+            withAnimation(.spring(response: 0.65, dampingFraction: 0.75).delay(1.2)) {
+                banner2Visible = true
+            }
+        }
     }
 }
 
 struct PhoneNotificationMockupView: View {
+    let banner1Visible: Bool
+    let banner2Visible: Bool
+
     var body: some View {
         ZStack {
             // Mock Phone Frame
@@ -119,6 +136,8 @@ struct PhoneNotificationMockupView: View {
                     time: "Just now",
                     subtitle: "Ray-Ban Meta detected nearby."
                 )
+                .opacity(banner1Visible ? 1.0 : 0.0)
+                .offset(y: banner1Visible ? 0 : -20)
                 
                 // Second Notification Banner
                 NotificationBannerView(
@@ -126,6 +145,8 @@ struct PhoneNotificationMockupView: View {
                     time: "10m ago",
                     subtitle: "An unidentified beacon is moving with you."
                 )
+                .opacity(banner2Visible ? 1.0 : 0.0)
+                .offset(y: banner2Visible ? 0 : -20)
             }
             .padding(.horizontal, 24)
             .padding(.top, 20)
