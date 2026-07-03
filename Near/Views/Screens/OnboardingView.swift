@@ -351,26 +351,25 @@ struct PhoneNotificationMockupView: View {
     var body: some View {
         ZStack {
             // Mock Phone Frame
-            ZStack(alignment: .top) {
-                RoundedRectangle(cornerRadius: 38)
-                    .stroke(Color.primary.opacity(0.12), lineWidth: 6)
-                
-                // Dynamic Island Notch
-                Capsule()
-                    .fill(Color.primary.opacity(0.12))
-                    .frame(width: 60, height: 16)
-                    .padding(.top, 10)
-            }
-            .frame(width: 250, height: 260)
-            // Mask with gradient to fade out bottom edge
-            .mask(
-                LinearGradient(
-                    gradient: Gradient(colors: [.black, .black, .black, .clear]),
-                    startPoint: .top,
-                    endPoint: .bottom
+            Image("Device")
+                .resizable()
+                .renderingMode(.template)
+                .foregroundColor(Color.primary.opacity(0.12))
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 320, height: 260)
+                // Mask with gradient to fade out bottom edge within container bounds
+                .mask(
+                    LinearGradient(
+                        gradient: Gradient(stops: [
+                            .init(color: .black, location: 0.0),
+                            .init(color: .black, location: 0.4),
+                            .init(color: .clear, location: 0.75)
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
                 )
-            )
-            .offset(y: 40)
+                .offset(y: 40)
             
             VStack(spacing: 12) {
                 // First Notification Banner
