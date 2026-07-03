@@ -56,6 +56,9 @@ struct DashboardView: View {
                     )
                     DeviceDetailView(device: historyDevice)
                 }
+                .navigationDestination(for: DetectedDevice.self) { device in
+                    DeviceDetailView(device: device)
+                }
                 .confirmationDialog("Are you sure you want to delete all detections?", isPresented: $showingClearConfirmation, titleVisibility: .visible) {
                     Button("Delete All Detections", role: .destructive) {
                         clearSearchHistory()
