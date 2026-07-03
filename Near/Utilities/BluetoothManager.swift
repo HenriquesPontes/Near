@@ -194,7 +194,6 @@ class BluetoothManager: NSObject, ObservableObject {
         super.init()
         loadCompanyIdentifiers()
         self.centralManager = CBCentralManager(delegate: self, queue: nil)
-        NotificationManager.shared.requestNotificationPermission()
 
         NotificationCenter.default.addObserver(
             self,
