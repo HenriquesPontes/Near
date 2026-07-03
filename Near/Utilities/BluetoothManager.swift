@@ -41,12 +41,12 @@ struct BluetoothDevice: Identifiable, Hashable {
 class BluetoothManager: NSObject, ObservableObject {
     static let shared = BluetoothManager()
 
-    @Published var detectedDevices: [BluetoothDevice] = [] {
+    @Published fileprivate(set) var detectedDevices: [BluetoothDevice] = [] {
         didSet {
             updateWidgetData()
         }
     }
-    @Published var isScanning: Bool = false {
+    @Published fileprivate(set) var isScanning: Bool = false {
         didSet {
             updateWidgetData()
         }
@@ -214,6 +214,13 @@ class BluetoothManager: NSObject, ObservableObject {
 
     deinit {
         updateTimer?.invalidate()
+    }
+
+    func clearDetectedDevices() {
+        DispatchQueue.main.async {
+            self.internalDevices.removeAll()
+            self.detectedDevices = []
+        }
     }
 
     func startScanning() {
@@ -553,5 +560,44 @@ extension BluetoothManager: CBCentralManagerDelegate {
         
         internalDevices[deviceId] = dev
         checkAndTriggerAlert(for: dev, isNew: isNew)
+    }
+}
+
+class MockBluetoothManager: BluetoothManager {
+    private var mockTimer: Timer?
+
+    override func startScanning() {
+        guard !isScanning else { return }
+        isScanning = true
+        
+        // Populate mock devices immediately
+        clearDetectedDevices()
+        self.detectedDevices = [
+            BluetoothDevice(deviceId: "mock_rayban", name: "Ray-Ban Meta", type: "rayban_meta", rssi: -55, isSimulated: true),
+            BluetoothDevice(deviceId: "mock_tracker", name: "Tile Tracker", type: "unknown", rssi: -72, isSimulated: true)
+        ]
+        
+        // Periodically simulate RSSI variations to verify UI pulse/radar animations
+        mockTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            var updated = self.detectedDevices
+            for i in 0..<updated.count {
+                let randomDelta = Int.random(in: -5...5)
+                updated[i].rssi = max(-95, min(-40, updated[i].rssi + randomDelta))
+                updated[i].lastSeen = Date()
+            }
+            self.detectedDevices = updated
+        }
+    }
+
+    override func stopScanning() {
+        guard isScanning else { return }
+        isScanning = false
+        mockTimer?.invalidate()
+        mockTimer = nil
+    }
+
+    override func clearDetectedDevices() {
+        self.detectedDevices = []
     }
 }

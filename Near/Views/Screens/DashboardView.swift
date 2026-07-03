@@ -37,7 +37,7 @@ struct DashboardView: View {
                 .scrollContentBackground(.hidden)
                 .background(Color.clear)
                 .refreshable {
-                    btManager.detectedDevices.removeAll()
+                    btManager.clearDetectedDevices()
                     if !btManager.isScanning {
                         btManager.startScanning()
                     }

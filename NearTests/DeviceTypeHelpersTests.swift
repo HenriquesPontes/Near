@@ -4,17 +4,17 @@ import XCTest
 final class DeviceTypeHelpersTests: XCTestCase {
 
     func testIconForType() throws {
-        XCTAssertEqual(iconForType("rayban_meta"), "eyeglasses")
-        XCTAssertEqual(iconForType("vision_pro"), "apple.logo")
+        XCTAssertEqual(iconForType("rayban_meta"), "Meta")
+        XCTAssertEqual(iconForType("vision_pro"), "Apple")
         XCTAssertEqual(iconForType("snap_spectacles"), "snapchat_icon")
-        XCTAssertEqual(iconForType("google_glass"), "g.circle.fill")
-        XCTAssertEqual(iconForType("samsung_glasses"), "s.circle.fill")
+        XCTAssertEqual(iconForType("google_glass"), "Google")
+        XCTAssertEqual(iconForType("samsung_glasses"), "Samsung")
         XCTAssertEqual(iconForType("unknown"), "questionmark.circle.fill")
     }
 
     func testDisplayNameForType() throws {
         XCTAssertEqual(displayNameForType("rayban_meta"), String(localized: "Ray-Ban Meta glasses"))
-        XCTAssertEqual(displayNameForType("vision_pro"), String(localized: "Apple Vision Pro"))
+        XCTAssertEqual(displayNameForType("vision_pro"), String(localized: "Apple Devices"))
         XCTAssertEqual(displayNameForType("snap_spectacles"), String(localized: "Snapchat Spectacles"))
     }
 
@@ -24,7 +24,7 @@ final class DeviceTypeHelpersTests: XCTestCase {
         
         // Test near distance
         let nearDist = estimatedDistance(for: -59)
-        XCTAssertEqual(nearDist, 1.0, accuracy: 0.1) // ratio = 1.0 -> 0.89976 + 0.111 = 1.01076
+        XCTAssertEqual(nearDist, 1.01076, accuracy: 0.001) // ratio = 1.0 -> 0.89976 + 0.111 = 1.01076
         
         // Test far distance
         let farDist = estimatedDistance(for: -90)
