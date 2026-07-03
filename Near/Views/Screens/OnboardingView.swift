@@ -350,16 +350,27 @@ struct OnboardingPingNode: View {
 struct PhoneNotificationMockupView: View {
     var body: some View {
         ZStack {
-            // iPhone Device Outline Frame
-            IPhoneDeviceOutline()
-                .mask(
-                    LinearGradient(
-                        gradient: Gradient(colors: [.black, .black, .black, .clear]),
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
+            // Mock Phone Frame
+            ZStack(alignment: .top) {
+                RoundedRectangle(cornerRadius: 38)
+                    .stroke(Color.primary.opacity(0.12), lineWidth: 6)
+                
+                // Dynamic Island Notch
+                Capsule()
+                    .fill(Color.primary.opacity(0.12))
+                    .frame(width: 60, height: 16)
+                    .padding(.top, 10)
+            }
+            .frame(width: 250, height: 260)
+            // Mask with gradient to fade out bottom edge
+            .mask(
+                LinearGradient(
+                    gradient: Gradient(colors: [.black, .black, .black, .clear]),
+                    startPoint: .top,
+                    endPoint: .bottom
                 )
-                .offset(y: 40)
+            )
+            .offset(y: 40)
             
             VStack(spacing: 12) {
                 // First Notification Banner
@@ -382,37 +393,6 @@ struct PhoneNotificationMockupView: View {
             .padding(.top, 20)
         }
         .frame(height: 240)
-    }
-}
-
-struct IPhoneDeviceOutline: View {
-    var body: some View {
-        ZStack {
-            // Outer Frame (Device border)
-            RoundedRectangle(cornerRadius: 44, style: .continuous)
-                .stroke(Color.primary.opacity(0.15), lineWidth: 4)
-                .frame(width: 290, height: 480)
-            
-            // Screen Bezel (Screen border)
-            RoundedRectangle(cornerRadius: 38, style: .continuous)
-                .stroke(Color.primary.opacity(0.08), lineWidth: 2)
-                .frame(width: 282, height: 472)
-            
-            // Dynamic Island
-            Capsule(style: .continuous)
-                .fill(Color.primary.opacity(0.12))
-                .frame(width: 80, height: 20)
-                .padding(.top, 14)
-                .frame(maxHeight: .infinity, alignment: .top)
-            
-            // Home Indicator
-            Capsule(style: .continuous)
-                .fill(Color.primary.opacity(0.12))
-                .frame(width: 100, height: 4)
-                .padding(.bottom, 12)
-                .frame(maxHeight: .infinity, alignment: .bottom)
-        }
-        .frame(width: 290, height: 480)
     }
 }
 
