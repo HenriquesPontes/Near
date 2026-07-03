@@ -158,10 +158,10 @@ struct OnboardingRadarView: View {
                     .frame(width: 14, height: 14)
                     .shadow(color: Color.blue, radius: 8)
                 
-                // High fidelity pulsating device pings in different colors
-                OnboardingPingNode(x: 196, y: 84, delay: 0.0, color: .green)
-                OnboardingPingNode(x: 84, y: 182, delay: 0.8, color: .red)
-                OnboardingPingNode(x: 70, y: 84, delay: 1.5, color: .purple)
+                // High fidelity pulsating device pings matching brand blue theme
+                OnboardingPingNode(x: 196, y: 84, delay: 0.0, color: .blue)
+                OnboardingPingNode(x: 84, y: 182, delay: 0.8, color: .blue)
+                OnboardingPingNode(x: 70, y: 84, delay: 1.5, color: .blue)
             }
             .frame(width: 280, height: 280)
         }
