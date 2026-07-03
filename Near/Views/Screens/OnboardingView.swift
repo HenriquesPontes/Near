@@ -350,14 +350,8 @@ struct OnboardingPingNode: View {
 struct PhoneNotificationMockupView: View {
     var body: some View {
         ZStack {
-            // Mock Phone Frame
-            Image("Device")
-                .resizable()
-                .renderingMode(.template)
-                .foregroundColor(Color.primary.opacity(0.12))
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 320, height: 260)
-                // Mask with gradient to fade out bottom edge
+            // iPhone Device Outline Frame
+            IPhoneDeviceOutline()
                 .mask(
                     LinearGradient(
                         gradient: Gradient(colors: [.black, .black, .black, .clear]),
@@ -388,6 +382,37 @@ struct PhoneNotificationMockupView: View {
             .padding(.top, 20)
         }
         .frame(height: 240)
+    }
+}
+
+struct IPhoneDeviceOutline: View {
+    var body: some View {
+        ZStack {
+            // Outer Frame (Device border)
+            RoundedRectangle(cornerRadius: 44, style: .continuous)
+                .stroke(Color.primary.opacity(0.15), lineWidth: 4)
+                .frame(width: 290, height: 480)
+            
+            // Screen Bezel (Screen border)
+            RoundedRectangle(cornerRadius: 38, style: .continuous)
+                .stroke(Color.primary.opacity(0.08), lineWidth: 2)
+                .frame(width: 282, height: 472)
+            
+            // Dynamic Island
+            Capsule(style: .continuous)
+                .fill(Color.primary.opacity(0.12))
+                .frame(width: 80, height: 20)
+                .padding(.top, 14)
+                .frame(maxHeight: .infinity, alignment: .top)
+            
+            // Home Indicator
+            Capsule(style: .continuous)
+                .fill(Color.primary.opacity(0.12))
+                .frame(width: 100, height: 4)
+                .padding(.bottom, 12)
+                .frame(maxHeight: .infinity, alignment: .bottom)
+        }
+        .frame(width: 290, height: 480)
     }
 }
 
