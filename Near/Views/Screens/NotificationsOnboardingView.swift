@@ -139,11 +139,12 @@ struct NotificationBannerView: View {
     
     var body: some View {
         HStack(spacing: 12) {
-            // App Logo Icon
-            Image("AppLogo")
-                .resizable()
-                .scaledToFit()
+            // App Logo Icon: Bell icon inside a light grey background tile
+            Image(systemName: "bell.fill")
+                .font(.system(size: 16))
+                .foregroundColor(.primary)
                 .frame(width: 38, height: 38)
+                .background(Color(UIColor.systemGray5))
                 .cornerRadius(10)
             
             VStack(alignment: .leading, spacing: 2) {
