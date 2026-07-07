@@ -137,87 +137,75 @@ struct DeviceDetailView: View {
                 }
                 
                 // 3. HOT & COLD PROXIMITY FINDER
-                Section(header: Text("Proximity Radar")) {
-                    ZStack {
-                        // Background Radar Rings
-                        Circle()
-                            .stroke(proximityStatus.color.opacity(0.15), lineWidth: 2)
-                            .frame(width: 140, height: 140)
-                        Circle()
-                            .stroke(proximityStatus.color.opacity(0.25), lineWidth: 2)
-                            .frame(width: 100, height: 100)
-                        Circle()
-                            .stroke(proximityStatus.color.opacity(0.4), lineWidth: 2)
-                            .frame(width: 60, height: 60)
-                        
-                        // Core locator ring
-                        Circle()
-                            .fill(proximityStatus.color)
-                            .frame(width: 20, height: 20)
-                            .scaleEffect(pulseScale)
-                            .shadow(color: proximityStatus.color, radius: 8)
-                            .animation(Animation.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: pulseScale)
-                            .onAppear {
-                                pulseScale = 1.3
-                            }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 160)
-                    .listRowSeparator(.hidden)
-                    .padding(.vertical, 8)
-                    
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(proximityStatus.text)
-                            .font(.system(size: 15, weight: .black))
-                            .foregroundColor(proximityStatus.color)
-                        
-                        Text("Estimated distance: ~\(String(format: "%.1f", estimatedDistance(for: currentRssi))) meters")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(.primary)
-                        
-                        Text(proximityStatus.description)
-                            .font(.system(size: 12))
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.vertical, 4)
-                    
-                    
-                    // Precision Finding Button
-                    Button {
-                        showTrackerView = true
-                    } label: {
-                        HStack {
-                            Image("Map_Pin")
-                                .renderingMode(.template)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 18, height: 18)
-                                .foregroundColor(colorForType(device.type))
+                Section {
+                    VStack(alignment: .leading, spacing: 16) {
+                        ZStack {
+                            // Background Radar Rings
+                            Circle()
+                                .stroke(proximityStatus.color.opacity(0.15), lineWidth: 2)
+                                .frame(width: 140, height: 140)
+                            Circle()
+                                .stroke(proximityStatus.color.opacity(0.25), lineWidth: 2)
+                                .frame(width: 100, height: 100)
+                            Circle()
+                                .stroke(proximityStatus.color.opacity(0.4), lineWidth: 2)
+                                .frame(width: 60, height: 60)
                             
-                            Text("Trace Device")
-                                .font(.system(size: 16, weight: .medium))
+                            // Core locator ring
+                            Circle()
+                                .fill(proximityStatus.color)
+                                .frame(width: 20, height: 20)
+                                .scaleEffect(pulseScale)
+                                .shadow(color: proximityStatus.color, radius: 8)
+                                .animation(Animation.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: pulseScale)
+                                .onAppear {
+                                    pulseScale = 1.3
+                                }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 160)
+                        
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(proximityStatus.text)
+                                .font(.system(size: 15, weight: .black))
+                                .foregroundColor(proximityStatus.color)
+                            
+                            Text("Estimated distance: ~\(String(format: "%.1f", estimatedDistance(for: currentRssi))) meters")
+                                .font(.system(size: 14, weight: .bold))
                                 .foregroundColor(.primary)
                             
-                            Spacer()
-                            
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundColor(.secondary.opacity(0.5))
+                            Text(proximityStatus.description)
+                                .font(.system(size: 13))
+                                .foregroundColor(.secondary)
                         }
-                    }
-                    .padding(.vertical, 4)
-                    
-                    VStack(alignment: .center, spacing: 4) {
+                        
+                        // Precision Finding Button
+                        Button {
+                            showTrackerView = true
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "viewfinder")
+                                    .font(.system(size: 16, weight: .bold))
+                                
+                                Text("Trace Device")
+                                    .font(.system(size: 18, weight: .bold))
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(proximityStatus.color)
+                            .foregroundColor(.white)
+                            .clipShape(Capsule())
+                        }
+                        .buttonStyle(BorderlessButtonStyle())
+                        
                         Text("Note: Distance tracking relies on Bluetooth signals which can fluctuate. False positives in distance estimation may occur due to physical obstructions.")
                             .font(.system(size: 11))
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
+                            .frame(maxWidth: .infinity)
                             .padding(.horizontal, 8)
                     }
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(EdgeInsets())
-                    .padding(.top, 4)
-                    .padding(.bottom, 8)
+                    .padding(.vertical, 8)
                 }
                 
                 // 4. PRIVACY RISK PROFILE
