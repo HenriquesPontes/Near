@@ -18,11 +18,11 @@ struct SettingsView: View {
     @State private var versionTapCount = 0
     
     private var appVersion: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.2"
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.1.0"
     }
     
     private var appBuild: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "3"
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "2607240120"
     }
     
     var body: some View {
