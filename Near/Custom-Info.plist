@@ -7,10 +7,8 @@
 		<string>com.luvlu.Near.refresh</string>
 		<string>com.luvlu.Near.processing</string>
 	</array>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app uses your location to map where suspicious devices were detected.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>This app uses your location to track potential tracking devices near you even in the background.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>

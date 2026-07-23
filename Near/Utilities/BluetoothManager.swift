@@ -59,6 +59,12 @@ class BluetoothManager: NSObject, ObservableObject {
             sharedDefaults.synchronize()
         }
         WidgetCenter.shared.reloadAllTimelines()
+        
+        if isScanning {
+            LiveActivityManager.shared.updateActivity(isScanning: isScanning, detectedDevices: detectedDevices)
+        } else {
+            LiveActivityManager.shared.endActivity()
+        }
     }
 
     @objc func syncFromWidget() {

@@ -18,6 +18,7 @@ struct DeviceTrackerView: View {
     
     // Audio and haptics
     @State private var enableHaptics = true
+    @State private var enableAudio = true
     
     private var distanceText: LocalizedStringKey {
         if smoother.smoothedRSSI == -100.0 { return "Searching..." }
@@ -110,13 +111,21 @@ struct DeviceTrackerView: View {
                     .fontWeight(.semibold)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { enableHaptics.toggle() }) {
-                        Image(enableHaptics ? "Mobile_Button" : "Mobile")
-                            .renderingMode(.template)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(enableHaptics ? .green : .gray)
+                    HStack(spacing: 16) {
+                        Button(action: { enableAudio.toggle() }) {
+                            Image(systemName: enableAudio ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(enableAudio ? .blue : .gray)
+                        }
+                        
+                        Button(action: { enableHaptics.toggle() }) {
+                            Image(enableHaptics ? "Mobile_Button" : "Mobile")
+                                .renderingMode(.template)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 20, height: 20)
+                                .foregroundColor(enableHaptics ? .green : .gray)
+                        }
                     }
                 }
             }
@@ -169,18 +178,26 @@ struct DeviceTrackerView: View {
                     smoother.add(rssi: activeDev.rssi)
                 }
                 
+                let rssi = smoother.smoothedRSSI
+                
+                // Play Geiger counter audio click
+                if enableAudio && rssi != -100.0 {
+                    GeigerAudioPlayer.shared.playClick()
+                }
+                
                 // Trigger continuous haptics if very close
-                if enableHaptics && smoother.smoothedRSSI >= -60 && smoother.smoothedRSSI != -100.0 {
+                if enableHaptics && rssi >= -60 && rssi != -100.0 {
                     #if os(iOS)
                     triggerHaptic(style: .light)
                     #endif
                 }
                 
                 let interval: Double
-                let rssi = smoother.smoothedRSSI
-                if rssi >= -60 { interval = 0.3 }
-                else if rssi >= -75 { interval = 0.6 }
-                else { interval = 1.0 }
+                if rssi >= -55 { interval = 0.15 }       // Rapid Geiger chatter (<0.5m)
+                else if rssi >= -65 { interval = 0.35 }  // Getting warmer (~1-2m)
+                else if rssi >= -75 { interval = 0.70 }  // Signal detected (~3-5m)
+                else if rssi >= -85 { interval = 1.20 }  // Weak signal
+                else { interval = 2.00 }                 // Searching
                 
                 try? await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
             }

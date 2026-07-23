@@ -178,6 +178,23 @@ struct SettingsView: View {
                             .font(.system(size: 16, weight: .medium))
                     }
                 }
+                
+                // Geofence & Safe Zones Row
+                NavigationLink {
+                    GeofenceSettingsView()
+                } label: {
+                    HStack(spacing: 16) {
+                        Image(systemName: "location.circle.fill")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                            .frame(width: 24, height: 24)
+                        Text("Geofence & Safe Zones")
+                            .font(.system(size: 16, weight: .medium))
+                    }
+                }
             }
             
             // SECTION 3: ABOUT
@@ -1029,6 +1046,84 @@ struct SensitivitySettingsView: View {
         .listRowBackground(DesignSystem.cardBackground)
         .navigationTitle("Sensitivity")
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+struct GeofenceSettingsView: View {
+    @ObservedObject var locationManager = LocationManager.shared
+    @State private var showConfirmationAlert = false
+    
+    var body: some View {
+        Form {
+            Section(
+                header: Text("AUTO-SCAN IN PUBLIC AREAS"),
+                footer: Text("Near automatically scans when you leave home or enter public venues, and pauses when you arrive at your Safe Zone.")
+            ) {
+                Toggle("Enable Geofenced Scanning", isOn: $locationManager.isGeofenceEnabled)
+                    .tint(.green)
+            }
+            
+            Section(header: Text("SAFE ZONE (HOME / OFFICE)")) {
+                if locationManager.hasSetSafeZone {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Safe Zone Configured")
+                                .font(.system(size: 15, weight: .semibold))
+                            Text(String(format: "Lat: %.4f, Lon: %.4f", locationManager.safeZoneLat, locationManager.safeZoneLon))
+                                .font(.system(size: 13))
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                    }
+                    
+                    Button("Clear Safe Zone", role: .destructive) {
+                        locationManager.clearHomeLocation()
+                    }
+                } else {
+                    Text("No Safe Zone configured. Tap below to save your current location as your Safe Zone.")
+                        .font(.system(size: 13))
+                        .foregroundColor(.secondary)
+                }
+                
+                Button(action: {
+                    locationManager.setHomeLocation()
+                    showConfirmationAlert = true
+                }) {
+                    HStack {
+                        Image(systemName: "location.fill")
+                        Text("Set Current Location as Safe Zone")
+                            .fontWeight(.medium)
+                    }
+                }
+            }
+            
+            Section(header: Text("SAFE ZONE RADIUS")) {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Radius Boundary")
+                        Spacer()
+                        Text("\(Int(locationManager.safeZoneRadius)) meters")
+                            .fontWeight(.bold)
+                            .foregroundColor(.blue)
+                    }
+                    Slider(value: $locationManager.safeZoneRadius, in: 50...500, step: 25)
+                        .tint(.blue)
+                }
+            }
+        }
+        .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(DesignSystem.backgroundColor)
+        .listRowBackground(DesignSystem.cardBackground)
+        .navigationTitle("Geofence & Safe Zones")
+        .navigationBarTitleDisplayMode(.inline)
+        .alert("Safe Zone Updated", isPresented: $showConfirmationAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Your current location has been saved as your Safe Zone.")
+        }
     }
 }
 

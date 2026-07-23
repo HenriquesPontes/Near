@@ -8,11 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		0420780AC69099D0BC3507AA /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 4293F1AF141A0C26F1F83FFA /* Supabase */; };
-		289817BA734F572231F1C45B /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = "TEMP_39E0F2B6-B9B3-4F3B-A3DD-1C6C97AC35C2" /* Supabase */; };
-		2CFA2F8A5259E6144142DD8D /* NearWidget/NearWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A23786C8B41D77B3ADA4F2 /* NearWidget/NearWidget.swift */; };
+		281BD3D0084EB148CCDEB827 /* NearActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E73AB4306FBB8E2F7DB47C /* NearActivityAttributes.swift */; };
+		289817BA734F572231F1C45B /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = TEMP_39E0F2B6-B9B3-4F3B-A3DD-1C6C97AC35C2 /* Supabase */; };
+		2CFA2F8A5259E6144142DD8D /* NearWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A23786C8B41D77B3ADA4F2 /* NearWidget.swift */; };
 		32154EAE93C15F98C21AA6EF /* NearWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AFE7D13441CB9B7ED2898C13 /* NearWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3BD5611AD9C39962D4BB905C /* NearActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E73AB4306FBB8E2F7DB47C /* NearActivityAttributes.swift */; };
+		4A050751666A55AF0492C547 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE7281C3D4A8ACE94B3ABEFF /* LiveActivityManager.swift */; };
 		6579E0033DD00082509C9162 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA6586A37491B8E86641FE7 /* Supabase */; };
-		7EBB09D8145B6AE5CFCFB9D9 /* NearTests/DeviceTypeHelpersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E58DDDAA0C7A8F2A8EAB75BF /* NearTests/DeviceTypeHelpersTests.swift */; };
+		65DDF6CB641ACE393BC5B691 /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = EFA71012D03BCCBF4CE2558D /* GoogleMaps */; };
+		697F4EF541E4D62E956F022D /* GeigerAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7FAF7E3668DC208EAB528C8 /* GeigerAudioPlayer.swift */; };
+		7EBB09D8145B6AE5CFCFB9D9 /* DeviceTypeHelpersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E58DDDAA0C7A8F2A8EAB75BF /* DeviceTypeHelpersTests.swift */; };
 		846A6EC12FD3186300562C8A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 941660B4C7809CF8D7A757CC /* Foundation.framework */; };
 		84D665602FD1742C00123C64 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 84D6655F2FD1742C00123C64 /* Auth */; };
 		84D665622FD1742C00123C64 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 84D665612FD1742C00123C64 /* Functions */; };
@@ -56,16 +61,21 @@
 
 /* Begin PBXFileReference section */
 		641CDDB8CA5BE0D6522C4BCF /* NearTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NearTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		83A23786C8B41D77B3ADA4F2 /* NearWidget/NearWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NearWidget/NearWidget.swift; sourceTree = "<group>"; };
+		83A23786C8B41D77B3ADA4F2 /* NearWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NearWidget/NearWidget.swift; sourceTree = "<group>"; };
 		84C495F42FD04B8D007803D4 /* Nearbyglasses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nearbyglasses.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		941660B4C7809CF8D7A757CC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		AFE7D13441CB9B7ED2898C13 /* NearWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NearWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		E58DDDAA0C7A8F2A8EAB75BF /* NearTests/DeviceTypeHelpersTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NearTests/DeviceTypeHelpersTests.swift; sourceTree = "<group>"; };
+		B7E73AB4306FBB8E2F7DB47C /* NearActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Near/Utilities/NearActivityAttributes.swift; sourceTree = "<group>"; };
+		BE7281C3D4A8ACE94B3ABEFF /* LiveActivityManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Near/Utilities/LiveActivityManager.swift; sourceTree = "<group>"; };
+		C7FAF7E3668DC208EAB528C8 /* GeigerAudioPlayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Near/Utilities/GeigerAudioPlayer.swift; sourceTree = "<group>"; };
+		E58DDDAA0C7A8F2A8EAB75BF /* DeviceTypeHelpersTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NearTests/DeviceTypeHelpersTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		84C495F62FD04B8D007803D4 /* Near */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = Near;
 			sourceTree = "<group>";
 		};
@@ -93,6 +103,7 @@
 				84D665662FD1742C00123C64 /* Realtime in Frameworks */,
 				289817BA734F572231F1C45B /* Supabase in Frameworks */,
 				6579E0033DD00082509C9162 /* Supabase in Frameworks */,
+				65DDF6CB641ACE393BC5B691 /* GoogleMaps in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,9 +129,18 @@
 		723BD7952E242A0A3DB1A990 /* NearWidget */ = {
 			isa = PBXGroup;
 			children = (
-				83A23786C8B41D77B3ADA4F2 /* NearWidget/NearWidget.swift */,
+				83A23786C8B41D77B3ADA4F2 /* NearWidget.swift */,
 			);
 			name = NearWidget;
+			sourceTree = "<group>";
+		};
+		84627C4C3012D30300D1E92F /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				B7E73AB4306FBB8E2F7DB47C /* NearActivityAttributes.swift */,
+				BE7281C3D4A8ACE94B3ABEFF /* LiveActivityManager.swift */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 		84C495EB2FD04B8D007803D4 = {
@@ -131,6 +151,7 @@
 				889EEF366FAFB9B2464BC1C8 /* Frameworks */,
 				9FDBD22BDDC81F06AB566350 /* NearTests */,
 				723BD7952E242A0A3DB1A990 /* NearWidget */,
+				84627C4C3012D30300D1E92F /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -155,7 +176,7 @@
 		9FDBD22BDDC81F06AB566350 /* NearTests */ = {
 			isa = PBXGroup;
 			children = (
-				E58DDDAA0C7A8F2A8EAB75BF /* NearTests/DeviceTypeHelpersTests.swift */,
+				E58DDDAA0C7A8F2A8EAB75BF /* DeviceTypeHelpersTests.swift */,
 			);
 			name = NearTests;
 			sourceTree = "<group>";
@@ -201,6 +222,7 @@
 			name = Near;
 			packageProductDependencies = (
 				5BA6586A37491B8E86641FE7 /* Supabase */,
+				EFA71012D03BCCBF4CE2558D /* GoogleMaps */,
 			);
 			productName = Near;
 			productReference = 84C495F42FD04B8D007803D4 /* Nearbyglasses.app */;
@@ -258,6 +280,7 @@
 			packageReferences = (
 				84D6655E2FD1742C00123C64 /* XCRemoteSwiftPackageReference "supabase-swift" */,
 				FE74D98194C9A0B43B398D3B /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				F0E4E5E32DC747540500840A /* XCRemoteSwiftPackageReference "ios-maps-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 84C495F52FD04B8D007803D4 /* Products */;
@@ -300,7 +323,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7EBB09D8145B6AE5CFCFB9D9 /* NearTests/DeviceTypeHelpersTests.swift in Sources */,
+				7EBB09D8145B6AE5CFCFB9D9 /* DeviceTypeHelpersTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -308,7 +331,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2CFA2F8A5259E6144142DD8D /* NearWidget/NearWidget.swift in Sources */,
+				2CFA2F8A5259E6144142DD8D /* NearWidget.swift in Sources */,
+				3BD5611AD9C39962D4BB905C /* NearActivityAttributes.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -316,6 +340,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				281BD3D0084EB148CCDEB827 /* NearActivityAttributes.swift in Sources */,
+				4A050751666A55AF0492C547 /* LiveActivityManager.swift in Sources */,
+				697F4EF541E4D62E956F022D /* GeigerAudioPlayer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -472,9 +499,11 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Near scans for nearby smart glasses Bluetooth signals for privacy awareness.";
 				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Near scans for nearby smart glasses Bluetooth signals for privacy awareness.";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "\"NearbyGlasses uses your location to keep the app active in the background, allowing it to continuously scan for smart glasses.\"";
+				INFOPLIST_KEY_NSBluetoothWhileInUseUsageDescription = "";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This app uses your location to track potential tracking devices near you even in the background.";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "\"NearbyGlasses uses your location to keep the app active in the background, allowing it to continuously scan for smart glasses.\"";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "NearbyGlasses uses location permission to help scan for nearby Bluetooth devices.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app uses your location to map where suspicious devices were detected.";
+				INFOPLIST_KEY_NSNearbyInteractionUsageDescription = "";
 				INFOPLIST_KEY_UIBackgroundModes = "location bluetooth-central";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -515,9 +544,11 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Near scans for nearby smart glasses Bluetooth signals for privacy awareness.";
 				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Near scans for nearby smart glasses Bluetooth signals for privacy awareness.";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "\"NearbyGlasses uses your location to keep the app active in the background, allowing it to continuously scan for smart glasses.\"";
+				INFOPLIST_KEY_NSBluetoothWhileInUseUsageDescription = "";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This app uses your location to track potential tracking devices near you even in the background.";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "\"NearbyGlasses uses your location to keep the app active in the background, allowing it to continuously scan for smart glasses.\"";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "NearbyGlasses uses location permission to help scan for nearby Bluetooth devices.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app uses your location to map where suspicious devices were detected.";
+				INFOPLIST_KEY_NSNearbyInteractionUsageDescription = "";
 				INFOPLIST_KEY_UIBackgroundModes = "location bluetooth-central";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -660,6 +691,14 @@
 				minimumVersion = 2.5.1;
 			};
 		};
+		F0E4E5E32DC747540500840A /* XCRemoteSwiftPackageReference "ios-maps-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googlemaps/ios-maps-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
 		FE74D98194C9A0B43B398D3B /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/supabase/supabase-swift";
@@ -711,7 +750,12 @@
 			package = 84D6655E2FD1742C00123C64 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
 		};
-		"TEMP_39E0F2B6-B9B3-4F3B-A3DD-1C6C97AC35C2" /* Supabase */ = {
+		EFA71012D03BCCBF4CE2558D /* GoogleMaps */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F0E4E5E32DC747540500840A /* XCRemoteSwiftPackageReference "ios-maps-sdk" */;
+			productName = GoogleMaps;
+		};
+		TEMP_39E0F2B6-B9B3-4F3B-A3DD-1C6C97AC35C2 /* Supabase */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = FE74D98194C9A0B43B398D3B /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
