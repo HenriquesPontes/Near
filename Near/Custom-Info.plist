@@ -9,6 +9,16 @@
 	</array>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Near requires Bluetooth access to detect nearby smart glasses and recording devices in real-time.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Near uses Bluetooth to scan for nearby smart devices.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Near uses location to automatically start scanning in public venues and pause when you arrive at your Safe Zone.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Near uses location to detect when you are in public areas vs safe zones.</string>
+	<key>NSNearbyInteractionUsageDescription</key>
+	<string>Near uses Nearby Interaction (UWB) for precise directional arrow tracking of nearby compatible hardware.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
@@ -16,6 +26,7 @@
 		<string>processing</string>
 		<string>remote-notification</string>
 		<string>nearby-interaction</string>
+		<string>bluetooth-central</string>
 	</array>
 </dict>
 </plist>
