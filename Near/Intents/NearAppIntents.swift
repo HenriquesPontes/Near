@@ -28,7 +28,7 @@ struct StopScanningIntent: AppIntent {
     }
 }
 
-struct CheckNearbyGlassesIntent: AppIntent {
+struct CheckNearIntent: AppIntent {
     static var title: LocalizedStringResource = "Check for Smart Glasses"
     static var description = IntentDescription("Checks if any smart glasses or recording devices are detected nearby.")
     
@@ -95,7 +95,7 @@ struct NearAppShortcutsProvider: AppShortcutsProvider {
         )
         
         AppShortcut(
-            intent: CheckNearbyGlassesIntent(),
+            intent: CheckNearIntent(),
             phrases: [
                 "Check for smart glasses with \(.applicationName)",
                 "Is anyone wearing smart glasses near me with \(.applicationName)",

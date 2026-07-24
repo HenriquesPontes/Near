@@ -1,5 +1,5 @@
 import XCTest
-@testable import Nearbyglasses // The app target module is Nearbyglasses based on the build logs
+@testable import Near // The app target module is Near based on the build logs
 
 final class DeviceTypeHelpersTests: XCTestCase {
 

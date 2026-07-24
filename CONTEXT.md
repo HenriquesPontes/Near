@@ -9,7 +9,7 @@
 **Near** is a native iOS app that continuously scans for Bluetooth Low Energy (BLE) signals from smart glasses and camera-equipped wearables — such as **Ray-Ban Meta**, **Apple Vision Pro**, and **Snapchat Spectacles** — and alerts you when one is nearby. It exists because these devices can record video, audio, and spatial data discreetly, and people deserve to know when they are in range of one.
 
 - **Bundle ID**: `com.luvlu.Near`
-- **Display Name**: Nearbyglasses
+- **Display Name**: Near
 - **Platform**: iOS 17+ (SwiftUI, Swift 6)
 - **Data Persistence**: SwiftData
 - **License**: Proprietary (Henriques Pontes)

@@ -522,7 +522,7 @@ struct AllResultsView: View {
                         isStarred: device.isStarred,
                         isTrusted: trustedManager.isTrusted(id: device.deviceId),
                         timestamp: device.timestamp,
-                        estimatedDistance: Nearbyglasses.estimatedDistance(for: device.rssi)
+                        estimatedDistance: Near.estimatedDistance(for: device.rssi)
                     )
                 }
                 .swipeActions(edge: .leading) {

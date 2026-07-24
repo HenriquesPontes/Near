@@ -1,6 +1,6 @@
 # End User License Agreement (EULA)
 
-This End User License Agreement ("Agreement") is a legal agreement between you and Henriques Pontes ("Developer") for the NearbyGlasses mobile application ("Application").
+This End User License Agreement ("Agreement") is a legal agreement between you and Henriques Pontes ("Developer") for the Near mobile application ("Application").
 
 ## 1. Acknowledgment
 This Agreement is concluded between you and the Developer only, and not with Apple Inc. ("Apple"). The Developer is solely responsible for the Application and its content.

@@ -62,7 +62,7 @@
 /* Begin PBXFileReference section */
 		641CDDB8CA5BE0D6522C4BCF /* NearTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NearTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		83A23786C8B41D77B3ADA4F2 /* NearWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NearWidget/NearWidget.swift; sourceTree = "<group>"; };
-		84C495F42FD04B8D007803D4 /* Nearbyglasses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nearbyglasses.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		84C495F42FD04B8D007803D4 /* Near.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Near.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		941660B4C7809CF8D7A757CC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		AFE7D13441CB9B7ED2898C13 /* NearWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NearWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7E73AB4306FBB8E2F7DB47C /* NearActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Near/Utilities/NearActivityAttributes.swift; sourceTree = "<group>"; };
@@ -158,7 +158,7 @@
 		84C495F52FD04B8D007803D4 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				84C495F42FD04B8D007803D4 /* Nearbyglasses.app */,
+				84C495F42FD04B8D007803D4 /* Near.app */,
 				641CDDB8CA5BE0D6522C4BCF /* NearTests.xctest */,
 				AFE7D13441CB9B7ED2898C13 /* NearWidget.appex */,
 			);
@@ -225,7 +225,7 @@
 				EFA71012D03BCCBF4CE2558D /* GoogleMaps */,
 			);
 			productName = Near;
-			productReference = 84C495F42FD04B8D007803D4 /* Nearbyglasses.app */;
+			productReference = 84C495F42FD04B8D007803D4 /* Near.app */;
 			productType = "com.apple.product-type.application";
 		};
 		F638C587CBCAE5203737FE60 /* NearWidget */ = {
@@ -501,7 +501,7 @@
 				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Near scans for nearby smart glasses Bluetooth signals for privacy awareness.";
 				INFOPLIST_KEY_NSBluetoothWhileInUseUsageDescription = "";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This app uses your location to track potential tracking devices near you even in the background.";
-				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "\"NearbyGlasses uses your location to keep the app active in the background, allowing it to continuously scan for smart glasses.\"";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "\"Near uses your location to keep the app active in the background, allowing it to continuously scan for smart glasses.\"";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app uses your location to map where suspicious devices were detected.";
 				INFOPLIST_KEY_NSNearbyInteractionUsageDescription = "";
 				INFOPLIST_KEY_UIBackgroundModes = "location bluetooth-central";
@@ -515,7 +515,7 @@
 				);
 				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.luvlu.Near;
-				PRODUCT_NAME = Nearbyglasses;
+				PRODUCT_NAME = Near;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -546,7 +546,7 @@
 				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Near scans for nearby smart glasses Bluetooth signals for privacy awareness.";
 				INFOPLIST_KEY_NSBluetoothWhileInUseUsageDescription = "";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This app uses your location to track potential tracking devices near you even in the background.";
-				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "\"NearbyGlasses uses your location to keep the app active in the background, allowing it to continuously scan for smart glasses.\"";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "\"Near uses your location to keep the app active in the background, allowing it to continuously scan for smart glasses.\"";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app uses your location to map where suspicious devices were detected.";
 				INFOPLIST_KEY_NSNearbyInteractionUsageDescription = "";
 				INFOPLIST_KEY_UIBackgroundModes = "location bluetooth-central";
@@ -560,7 +560,7 @@
 				);
 				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.luvlu.Near;
-				PRODUCT_NAME = Nearbyglasses;
+				PRODUCT_NAME = Near;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -584,7 +584,7 @@
 				PRODUCT_NAME = NearTests;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nearbyglasses.app/Nearbyglasses";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Near.app/Near";
 			};
 			name = Debug;
 		};
@@ -619,7 +619,7 @@
 				PRODUCT_NAME = NearTests;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nearbyglasses.app/Nearbyglasses";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Near.app/Near";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;

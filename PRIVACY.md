@@ -3,7 +3,7 @@
 **Effective Date:** June 6, 2026
 
 ## 1. Information We Collect
-NearbyGlasses does not collect, store, or transmit any personally identifiable information (PII). All Bluetooth scanning and device detection happens entirely locally on your device.
+Near does not collect, store, or transmit any personally identifiable information (PII). All Bluetooth scanning and device detection happens entirely locally on your device.
 
 ## 2. Bluetooth and Location Data
 - **Bluetooth:** The app uses Bluetooth Low Energy (BLE) to detect nearby smart glasses and camera-equipped wearables. The app only reads publicly broadcasted advertising packets.

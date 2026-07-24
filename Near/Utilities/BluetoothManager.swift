@@ -34,7 +34,7 @@ struct BluetoothDevice: Identifiable, Hashable {
     }
 
     var estimatedDistance: Double {
-        return Nearbyglasses.estimatedDistance(for: rssi)
+        return Near.estimatedDistance(for: rssi)
     }
 }
 

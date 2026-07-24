@@ -9,7 +9,7 @@ class PDFExporter {
     
     func exportPDF(devices: [DetectedDevice]) -> URL? {
         let pdfMetaData = [
-            kCGPDFContextCreator: "NearbyGlasses App",
+            kCGPDFContextCreator: "Near App",
             kCGPDFContextAuthor: "User",
             kCGPDFContextTitle: "Security Audit Report"
         ]
@@ -29,7 +29,7 @@ class PDFExporter {
                 NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 24)
             ]
             
-            let text = "NearbyGlasses Security Audit Report"
+            let text = "Near Security Audit Report"
             text.draw(at: CGPoint(x: 50, y: 50), withAttributes: attributes)
             
             var yOffset: CGFloat = 100

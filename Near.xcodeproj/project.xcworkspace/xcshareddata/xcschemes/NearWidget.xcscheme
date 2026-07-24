@@ -31,7 +31,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "84C495F32FD04B8D007803D4"
-               BuildableName = "Nearbyglasses.app"
+               BuildableName = "Near.app"
                BlueprintName = "Near"
                ReferencedContainer = "container:">
             </BuildableReference>
@@ -73,7 +73,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "84C495F32FD04B8D007803D4"
-            BuildableName = "Nearbyglasses.app"
+            BuildableName = "Near.app"
             BlueprintName = "Near"
             ReferencedContainer = "container:">
          </BuildableReference>
@@ -109,7 +109,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "84C495F32FD04B8D007803D4"
-            BuildableName = "Nearbyglasses.app"
+            BuildableName = "Near.app"
             BlueprintName = "Near"
             ReferencedContainer = "container:">
          </BuildableReference>

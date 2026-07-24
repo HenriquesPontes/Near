@@ -2,10 +2,10 @@
 
 **Effective Date:** June 6, 2026
 
-Welcome to NearbyGlasses. By using this application, you agree to these Terms of Service.
+Welcome to Near. By using this application, you agree to these Terms of Service.
 
 ## 1. Use of the App
-NearbyGlasses is designed for personal situational awareness. It uses Bluetooth Low Energy (BLE) heuristics to estimate proximity to potential smart glasses and camera-equipped wearables.
+Near is designed for personal situational awareness. It uses Bluetooth Low Energy (BLE) heuristics to estimate proximity to potential smart glasses and camera-equipped wearables.
 
 ## 2. Disclaimer of Liability
 - **False Positives:** The app may identify devices that are not smart glasses (e.g., VR headsets, smartwatches, or generic BLE beacons).
